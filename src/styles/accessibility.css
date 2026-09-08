@@ -1,3 +1,7 @@
+:root {
+  --compass-accessibility-bottom-offset: 1rem;
+}
+
 html[data-compass-text-size="large"] {
   font-size: 112.5%;
 }
@@ -39,7 +43,7 @@ html[data-compass-contrast="high"] {
   --compass-shadow-md: 0 8px 24px rgba(0, 0, 0, 0.16);
 }
 
-html[data-compass-underline-links="true"] a {
+html[data-compass-underline-links="true"] a:not(.public-brand):not(.public-back-to-top) {
   text-decoration-line: underline !important;
   text-decoration-thickness: 0.1rem;
   text-underline-offset: 0.18rem;
@@ -57,15 +61,25 @@ html[data-compass-motion="reduced"] *::after {
 @layer components {
   .compass-accessibility {
     position: fixed;
-    right: clamp(1rem, 3vw, 2rem);
-    bottom: calc(4.8rem + env(safe-area-inset-bottom));
+    right: max(1rem, env(safe-area-inset-right));
+    bottom: calc(var(--compass-accessibility-bottom-offset) + env(safe-area-inset-bottom));
     z-index: 60;
   }
 
   html[data-compass-service-status="maintenance_scheduled"] .compass-accessibility,
   html[data-compass-service-status="offline"] .compass-accessibility,
   html[data-compass-service-status="unavailable"] .compass-accessibility {
-    bottom: calc(8.25rem + env(safe-area-inset-bottom));
+    --compass-accessibility-bottom-offset: 7.25rem;
+  }
+
+  html[data-compass-fixed-actions="present"] .compass-accessibility {
+    --compass-accessibility-bottom-offset: 5.5rem;
+  }
+
+  html[data-compass-service-status="maintenance_scheduled"][data-compass-fixed-actions="present"] .compass-accessibility,
+  html[data-compass-service-status="offline"][data-compass-fixed-actions="present"] .compass-accessibility,
+  html[data-compass-service-status="unavailable"][data-compass-fixed-actions="present"] .compass-accessibility {
+    --compass-accessibility-bottom-offset: 9rem;
   }
 
   .compass-accessibility__trigger {
@@ -80,6 +94,11 @@ html[data-compass-motion="reduced"] *::after {
     color: var(--compass-brand-maroon);
     cursor: pointer;
     box-shadow: var(--compass-shadow-sm);
+    transition:
+      background-color var(--compass-motion-fast) ease,
+      border-color var(--compass-motion-fast) ease,
+      box-shadow var(--compass-motion-fast) ease,
+      color var(--compass-motion-fast) ease;
   }
 
   .compass-accessibility__trigger:hover,
@@ -237,14 +256,7 @@ html[data-compass-motion="reduced"] *::after {
 
 @media (max-width: 40rem) {
   .compass-accessibility {
-    right: 0.75rem;
-    bottom: calc(4.65rem + env(safe-area-inset-bottom));
-  }
-
-  html[data-compass-service-status="maintenance_scheduled"] .compass-accessibility,
-  html[data-compass-service-status="offline"] .compass-accessibility,
-  html[data-compass-service-status="unavailable"] .compass-accessibility {
-    bottom: calc(8.5rem + env(safe-area-inset-bottom));
+    right: max(0.75rem, env(safe-area-inset-right));
   }
 
   .compass-accessibility__panel {

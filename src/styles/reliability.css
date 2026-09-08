@@ -36,6 +36,24 @@
     animation: compass-rotate 2.4s linear infinite;
   }
 
+  .compass-page-loader {
+    display: flex;
+    min-height: 60vh;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    background-color: var(--compass-body);
+    color: var(--foreground);
+  }
+
+  .compass-page-loader__label {
+    margin: 0;
+    color: var(--muted-foreground);
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
   .compass-status-banner {
     position: fixed;
     right: 0;
@@ -46,11 +64,12 @@
     background-color: var(--compass-surface-muted);
     box-shadow: 0 -0.35rem 1.25rem rgba(34, 42, 45, 0.08);
     color: var(--foreground);
+    padding-bottom: env(safe-area-inset-bottom);
   }
 
   .compass-status-banner--scheduled {
     border-top-color: color-mix(in srgb, var(--compass-brand-gold) 50%, transparent);
-    background-color: #f5f0dc;
+    background-color: color-mix(in srgb, var(--compass-brand-gold) 10%, var(--compass-surface));
   }
 
   .compass-status-banner--offline {
@@ -59,7 +78,7 @@
 
   .compass-status-banner--unavailable {
     border-top-color: color-mix(in srgb, var(--compass-brand-maroon) 42%, transparent);
-    background-color: #f5e8e8;
+    background-color: color-mix(in srgb, var(--compass-danger) 8%, var(--compass-surface));
   }
 
   .compass-status-banner__inner {
@@ -109,6 +128,7 @@
   .compass-system-error {
     display: grid;
     min-height: 100vh;
+    min-height: 100svh;
     place-items: center;
     padding: clamp(2rem, 7vw, 6rem) 1rem;
     background-color: var(--compass-body);
@@ -212,6 +232,19 @@
   .compass-system-error__actions .compass-status-action {
     margin-top: 1.3rem;
   }
+
+  .compass-system-error__reference {
+    margin-top: 1rem !important;
+    font-family: var(--compass-font-mono);
+    font-size: 0.78rem !important;
+    line-height: 1.5 !important;
+  }
+
+  .compass-system-error__reference code {
+    color: var(--compass-brand-maroon);
+    font-family: inherit;
+    font-weight: 700;
+  }
 }
 
 @media (max-width: 40rem) {
@@ -249,6 +282,7 @@
   }
 
   .compass-loader svg,
+  .compass-page-loader__label,
   .compass-status-banner__inner > svg,
   .compass-status-banner__title,
   .compass-status-banner__copy,
@@ -260,6 +294,7 @@
   .compass-system-error h1,
   .compass-maintenance-screen__content > p,
   .compass-system-error__content > p,
+  .compass-system-error__reference code,
   .compass-status-action,
   .compass-status-action:hover {
     color: CanvasText;

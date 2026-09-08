@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
 import { Caveat, Outfit, Plus_Jakarta_Sans } from "next/font/google";
 import type { ReactNode } from "react";
+
+import { AccessibilityLayer } from "@/components/accessibility/accessibility-layer";
+import { ServiceStatusProvider } from "@/components/system/service-status-provider";
+import { getInitialServiceStatus } from "@/lib/server/system-status";
+
 import "./globals.css";
 
 const plusJakarta = Plus_Jakarta_Sans({
@@ -32,13 +37,23 @@ export const metadata: Metadata = {
   description: "A simpler way to find COMPASS support.",
 };
 
-export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
+export const dynamic = "force-dynamic";
+
+export default async function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
+  const initialStatus = await getInitialServiceStatus();
+
   return (
     <html
       lang="en"
       className={`h-full ${plusJakarta.variable} ${outfit.variable} ${caveat.variable}`}
     >
-      <body className="min-h-full antialiased">{children}</body>
+      <body className="min-h-full antialiased">
+        <AccessibilityLayer>
+          <ServiceStatusProvider initialStatus={initialStatus}>
+            {children}
+          </ServiceStatusProvider>
+        </AccessibilityLayer>
+      </body>
     </html>
   );
 }

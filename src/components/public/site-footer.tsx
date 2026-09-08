@@ -10,7 +10,7 @@ function FooterOffice({ branding }: { branding: BrandingConfig }) {
   return (
     <section aria-labelledby="public-footer-office-heading" className="public-footer__link-group">
       <h2 id="public-footer-office-heading">Office</h2>
-      <div className="public-footer__contact-links">
+      <address className="public-footer__contact-links">
         {branding.email ? (
           <a href={`mailto:${branding.email}`}>{branding.email}</a>
         ) : null}
@@ -20,7 +20,7 @@ function FooterOffice({ branding }: { branding: BrandingConfig }) {
           </a>
         ) : null}
         {location ? <p>{location}</p> : null}
-      </div>
+      </address>
     </section>
   );
 }
@@ -46,7 +46,10 @@ function PrivacyCredential({
           fallbackLabel={fallbackLabel}
         />
       </span>
-      <span>{credentialLabel}</span>
+      <span className="public-footer__privacy-credential-copy">
+        <span className="public-footer__privacy-credential-owner">{ownerLabel}</span>
+        <span className="public-footer__privacy-credential-label">{asset.alt}</span>
+      </span>
     </>
   );
 
@@ -57,7 +60,6 @@ function PrivacyCredential({
           aria-label={`${credentialLabel}; open privacy notice`}
           className="public-footer__privacy-credential-link"
           href={noticeLink.url}
-          showArrow={false}
         >
           {credential}
         </ExternalLink>
@@ -146,14 +148,15 @@ export function SiteFooter({ branding }: { branding: BrandingConfig }) {
           <div className="public-footer__identity-copy">
             <p className="public-footer__institution">{branding.institutionName}</p>
             <p className="public-footer__office">{branding.officeName}</p>
-            <p className="public-footer__product">{branding.productName}</p>
           </div>
         </div>
 
-        <div className="public-footer__links-column">
+        <div className="public-footer__details">
           <FooterOffice branding={branding} />
-          <FooterPrivacy branding={branding} />
-          <FooterLinks branding={branding} />
+          <div className="public-footer__link-groups">
+            <FooterPrivacy branding={branding} />
+            <FooterLinks branding={branding} />
+          </div>
         </div>
       </div>
       <div className="public-shell public-footer__meta">

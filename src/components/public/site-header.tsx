@@ -15,10 +15,21 @@ import {
 } from "@/components/ui/dropdown-menu";
 import type { BrandingConfig } from "@/lib/branding";
 
-const navigation = [{ href: "/", label: "Home" }];
+const navigation = [
+  { href: "/", label: "Home" },
+  { href: "/announcements", label: "Announcements" },
+  { href: "/resources", label: "Resources" },
+] as const;
 
 function navigationLinkClassName(isCurrent: boolean) {
   return `public-nav__link${isCurrent ? " is-current" : ""}`;
+}
+
+function isCurrentNavigationItem(pathname: string | null, href: string) {
+  if (!pathname) return false;
+  return href === "/"
+    ? pathname === "/"
+    : pathname === href || pathname.startsWith(`${href}/`);
 }
 
 function BrandIdentity({ branding }: { branding: BrandingConfig }) {
@@ -64,17 +75,21 @@ export function SiteHeader({ branding }: { branding: BrandingConfig }) {
         <div className="public-header__actions">
           <nav className="public-nav" aria-label="Primary navigation">
             <ul>
-              {navigation.map((item) => (
-                <li key={item.href}>
-                  <Link
-                    href={item.href}
-                    className={navigationLinkClassName(pathname === item.href)}
-                    aria-current={pathname === item.href ? "page" : undefined}
-                  >
-                    {item.label}
-                  </Link>
-                </li>
-              ))}
+              {navigation.map((item) => {
+                const isCurrent = isCurrentNavigationItem(pathname, item.href);
+
+                return (
+                  <li key={item.href}>
+                    <Link
+                      href={item.href}
+                      className={navigationLinkClassName(isCurrent)}
+                      aria-current={isCurrent ? "page" : undefined}
+                    >
+                      {item.label}
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
           </nav>
 
@@ -105,20 +120,24 @@ export function SiteHeader({ branding }: { branding: BrandingConfig }) {
                 sideOffset={10}
               >
                 <nav aria-label="Mobile navigation">
-                  {navigation.map((item) => (
-                    <DropdownMenuItem
-                      key={item.href}
-                      className="public-mobile-nav__item"
-                      render={
-                        <Link
-                          href={item.href}
-                          aria-current={pathname === item.href ? "page" : undefined}
-                        />
-                      }
-                    >
-                      {item.label}
-                    </DropdownMenuItem>
-                  ))}
+                  {navigation.map((item) => {
+                    const isCurrent = isCurrentNavigationItem(pathname, item.href);
+
+                    return (
+                      <DropdownMenuItem
+                        key={item.href}
+                        className={`public-mobile-nav__item${isCurrent ? " is-current" : ""}`}
+                        render={
+                          <Link
+                            href={item.href}
+                            aria-current={isCurrent ? "page" : undefined}
+                          />
+                        }
+                      >
+                        {item.label}
+                      </DropdownMenuItem>
+                    );
+                  })}
                 </nav>
               </DropdownMenuContent>
             </DropdownMenu>

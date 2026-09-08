@@ -91,6 +91,10 @@
   --compass-motion-fast: 120ms;
   --compass-motion-standard: 200ms;
   --compass-journal-highlighter: rgba(255, 213, 79, 0.45);
+  --compass-note-butter: #fff8d9;
+  --compass-note-sage: #e6efe2;
+  --compass-note-rose: #f4e1df;
+  --compass-paper-clip: #687275;
   --compass-space-1: 0.25rem;
   --compass-space-2: 0.5rem;
   --compass-space-3: 0.75rem;
