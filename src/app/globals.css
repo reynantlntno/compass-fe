@@ -1,18 +1,7 @@
 @import "tailwindcss";
-
-:root {
-  color-scheme: light;
-}
-
-* {
-  box-sizing: border-box;
-}
-
-html {
-  min-height: 100%;
-}
-
-body {
-  min-height: 100%;
-  margin: 0;
-}
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "../styles/tokens.css";
+@import "../styles/base.css";
+@import "../styles/accessibility.css";
+@import "../styles/reliability.css";

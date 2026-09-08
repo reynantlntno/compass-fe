@@ -1,0 +1,72 @@
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+    box-sizing: border-box;
+  }
+
+  html {
+    min-height: 100%;
+    @apply font-sans;
+  }
+
+  body {
+    min-height: 100%;
+    margin: 0;
+    @apply bg-background text-foreground;
+    color: var(--foreground);
+    font-family: var(--compass-font-ui);
+    line-height: var(--compass-line-height);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: var(--foreground);
+    font-family: var(--compass-font-heading);
+    font-weight: var(--compass-heading-weight);
+    line-height: var(--compass-line-height-compact);
+  }
+
+  a {
+    color: var(--compass-brand-maroon);
+  }
+
+  a:hover {
+    color: var(--compass-brand-maroon-strong);
+  }
+
+  :focus-visible {
+    outline: var(--compass-focus-width) solid var(--compass-focus-color);
+    outline-offset: var(--compass-focus-offset);
+  }
+
+  ::selection {
+    background: var(--compass-support-soft);
+    color: var(--foreground);
+  }
+
+  img,
+  svg {
+    max-width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+@media (forced-colors: active) {
+  :focus-visible {
+    outline-color: CanvasText;
+  }
+}

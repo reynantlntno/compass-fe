@@ -1,0 +1,272 @@
+@layer components {
+  @keyframes compass-rotate {
+    from {
+      transform: rotate(0deg);
+    }
+
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .compass-loader {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--compass-brand-maroon);
+  }
+
+  .compass-loader__ring {
+    position: absolute;
+    inset: 9%;
+    border: 1px solid color-mix(in srgb, var(--compass-brand-maroon) 20%, transparent);
+    border-radius: 50%;
+  }
+
+  .compass-loader__ring::after {
+    position: absolute;
+    inset: 15%;
+    border: 1px dashed color-mix(in srgb, var(--compass-support-strong) 24%, transparent);
+    border-radius: 50%;
+    content: "";
+  }
+
+  .compass-loader svg {
+    animation: compass-rotate 2.4s linear infinite;
+  }
+
+  .compass-status-banner {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 50;
+    border-top: 1px solid var(--compass-border-strong);
+    background-color: var(--compass-surface-muted);
+    box-shadow: 0 -0.35rem 1.25rem rgba(34, 42, 45, 0.08);
+    color: var(--foreground);
+  }
+
+  .compass-status-banner--scheduled {
+    border-top-color: color-mix(in srgb, var(--compass-brand-gold) 50%, transparent);
+    background-color: #f5f0dc;
+  }
+
+  .compass-status-banner--offline {
+    border-top-color: color-mix(in srgb, var(--compass-support-strong) 45%, transparent);
+  }
+
+  .compass-status-banner--unavailable {
+    border-top-color: color-mix(in srgb, var(--compass-brand-maroon) 42%, transparent);
+    background-color: #f5e8e8;
+  }
+
+  .compass-status-banner__inner {
+    display: flex;
+    width: min(calc(100% - 2rem), 72rem);
+    align-items: flex-start;
+    gap: 0.7rem;
+    margin-inline: auto;
+    padding-block: 0.7rem;
+  }
+
+  .compass-status-banner__inner > svg {
+    width: 1.05rem;
+    height: 1.05rem;
+    flex: 0 0 auto;
+    margin-top: 0.12rem;
+    color: var(--compass-brand-maroon);
+  }
+
+  .compass-status-banner--scheduled .compass-status-banner__inner > svg {
+    color: var(--compass-brand-gold);
+  }
+
+  .compass-status-banner--offline .compass-status-banner__inner > svg {
+    color: var(--compass-support-strong);
+  }
+
+  .compass-status-banner__title,
+  .compass-status-banner__copy {
+    margin: 0;
+  }
+
+  .compass-status-banner__title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    line-height: 1.35;
+  }
+
+  .compass-status-banner__copy {
+    margin-top: 0.15rem;
+    color: var(--muted-foreground);
+    font-size: 0.78rem;
+    line-height: 1.5;
+  }
+
+  .compass-maintenance-screen,
+  .compass-system-error {
+    display: grid;
+    min-height: 100vh;
+    place-items: center;
+    padding: clamp(2rem, 7vw, 6rem) 1rem;
+    background-color: var(--compass-body);
+    color: var(--foreground);
+  }
+
+  .compass-maintenance-screen__content,
+  .compass-system-error__content {
+    width: min(100%, 38rem);
+    text-align: center;
+  }
+
+  .compass-maintenance-screen__icon,
+  .compass-system-error__icon {
+    width: clamp(4rem, 10vw, 6rem);
+    height: clamp(4rem, 10vw, 6rem);
+    margin-inline: auto;
+    color: var(--compass-brand-maroon);
+    stroke-width: 1.2;
+  }
+
+  .compass-maintenance-screen__eyebrow,
+  .compass-system-error__code {
+    margin: 1.4rem 0 0;
+    color: var(--compass-brand-maroon);
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+  }
+
+  .compass-maintenance-screen h1,
+  .compass-system-error h1 {
+    margin: 0.65rem 0 0;
+    font-family: var(--compass-font-heading);
+    font-size: clamp(2.25rem, 7vw, 4.7rem);
+    letter-spacing: -0.045em;
+    line-height: 1;
+    text-wrap: balance;
+  }
+
+  .compass-maintenance-screen__content > p:not(.compass-maintenance-screen__eyebrow),
+  .compass-system-error__content > p:not(.compass-system-error__code) {
+    max-width: 34rem;
+    margin: 1rem auto 0;
+    color: var(--muted-foreground);
+    font-size: 1rem;
+    line-height: 1.75;
+  }
+
+  .compass-maintenance-screen__schedule {
+    font-size: 0.82rem !important;
+  }
+
+  .compass-status-action {
+    display: inline-flex;
+    min-height: 2.6rem;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1.65rem;
+    border: 1px solid var(--compass-brand-maroon);
+    border-radius: 0.35rem;
+    padding: 0.55rem 1rem;
+    background-color: var(--compass-brand-maroon);
+    color: var(--compass-on-brand);
+    cursor: pointer;
+    font: inherit;
+    font-size: 0.82rem;
+    font-weight: 700;
+    text-decoration: none;
+    transition: background-color var(--compass-motion-fast) ease, color var(--compass-motion-fast) ease;
+  }
+
+  .compass-status-action:hover {
+    border-color: var(--compass-brand-maroon-strong);
+    background-color: var(--compass-brand-maroon-strong);
+    color: var(--compass-on-brand);
+  }
+
+  .compass-status-action--quiet {
+    margin-left: 0.65rem;
+    border-color: var(--compass-border-strong);
+    background-color: transparent;
+    color: var(--compass-brand-maroon);
+  }
+
+  .compass-status-action--quiet:hover {
+    background-color: var(--compass-surface-muted);
+    color: var(--compass-brand-maroon-strong);
+  }
+
+  .compass-system-error__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.2rem;
+    margin-top: 0.35rem;
+  }
+
+  .compass-system-error__actions .compass-status-action {
+    margin-top: 1.3rem;
+  }
+}
+
+@media (max-width: 40rem) {
+  .compass-status-banner__inner {
+    width: min(calc(100% - 1.5rem), 72rem);
+  }
+
+  .compass-status-action--quiet {
+    margin-left: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .compass-loader svg,
+  .compass-status-action {
+    animation: none;
+    transition: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .compass-status-banner,
+  .compass-maintenance-screen,
+  .compass-system-error {
+    border-color: CanvasText;
+    background-color: Canvas;
+    color: CanvasText;
+  }
+
+  .compass-loader__ring,
+  .compass-loader__ring::after,
+  .compass-status-action,
+  .compass-status-action:hover {
+    border-color: CanvasText;
+  }
+
+  .compass-loader svg,
+  .compass-status-banner__inner > svg,
+  .compass-status-banner__title,
+  .compass-status-banner__copy,
+  .compass-maintenance-screen__icon,
+  .compass-maintenance-screen__eyebrow,
+  .compass-system-error__icon,
+  .compass-system-error__code,
+  .compass-maintenance-screen h1,
+  .compass-system-error h1,
+  .compass-maintenance-screen__content > p,
+  .compass-system-error__content > p,
+  .compass-status-action,
+  .compass-status-action:hover {
+    color: CanvasText;
+  }
+
+  .compass-status-action,
+  .compass-status-action:hover {
+    background-color: Canvas;
+  }
+}
