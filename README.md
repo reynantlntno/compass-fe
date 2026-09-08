@@ -1,7 +1,17 @@
-# COMPASS
+# COMPASS Frontend
 
-Frontend
+University of Camarines Norte (UCN) Guidance and Counseling Office.
 
-University of Camarines Norte (UCN)
+This is the new Next.js frontend foundation. The `legacy/` directory is kept
+as a read-only reference for existing page behavior, accessibility decisions,
+and visual direction; the new application does not import from it.
 
-Guidance and Counseling Office
+## Development
+
+```bash
+pnpm install
+pnpm dev
+```
+
+The application uses the Next.js App Router under `src/app` with TypeScript,
+ESLint, Tailwind CSS, and the `@/*` import alias.
