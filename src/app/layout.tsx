@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     default: "COMPASS",
     template: "%s | COMPASS",
   },
-  description: "Guidance and Counseling Office support for UCN students and staff.",
+  description: "A simpler way to find COMPASS support.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
