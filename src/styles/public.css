@@ -139,6 +139,32 @@
   transform: scaleX(1);
 }
 
+.public-auth-action__desktop {
+  display: block;
+  flex: 0 0 auto;
+}
+
+.public-auth-action {
+  display: inline-flex;
+  min-height: 2.25rem;
+  align-items: center;
+  border: 1px solid var(--compass-brand-maroon);
+  border-radius: var(--compass-radius-sm);
+  padding: 0.3rem 0.7rem;
+  color: var(--compass-brand-maroon);
+  font-size: 0.78rem;
+  font-weight: var(--compass-weight-bold);
+  text-decoration: none;
+  transition: background-color var(--compass-motion-fast) ease,
+    color var(--compass-motion-fast) ease;
+}
+
+.public-auth-action:hover,
+.public-auth-action:focus-visible {
+  background-color: var(--compass-brand-maroon);
+  color: var(--compass-on-brand);
+}
+
 .public-mobile-nav {
   position: relative;
   display: none;
@@ -216,6 +242,11 @@
 .public-mobile-nav__item.is-current::after {
   opacity: 1;
   transform: scaleX(1);
+}
+
+.public-mobile-nav__item--auth {
+  color: var(--compass-brand-maroon);
+  font-weight: var(--compass-weight-bold);
 }
 
 .public-brand-asset-fallback {
@@ -1947,6 +1978,10 @@
     display: none;
   }
 
+  .public-auth-action__desktop {
+    display: none;
+  }
+
   .public-mobile-nav {
     display: block;
   }
@@ -1991,7 +2026,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .public-nav__link::after,
-  .public-mobile-nav__item::after {
+  .public-mobile-nav__item::after,
+  .public-auth-action {
     transition: none;
   }
 }
@@ -1999,7 +2035,8 @@
 @media (forced-colors: active) {
   .public-header,
   .public-footer,
-  .public-mobile-nav__panel {
+  .public-mobile-nav__panel,
+  .public-auth-action {
     border-color: CanvasText;
     background-color: Canvas;
     color: CanvasText;
@@ -2041,7 +2078,8 @@
   .public-footer__meta,
   .public-footer__privacy,
   .public-footer__privacy-credential,
-  .public-mobile-nav__item {
+  .public-mobile-nav__item,
+  .public-auth-action {
     border-color: CanvasText;
     background-color: transparent;
   }
@@ -2061,6 +2099,10 @@
   .public-mobile-nav__trigger {
     border-color: CanvasText;
     background-color: Canvas;
+    color: CanvasText;
+  }
+
+  .public-auth-action {
     color: CanvasText;
   }
 }

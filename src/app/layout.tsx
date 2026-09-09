@@ -3,6 +3,7 @@ import { Caveat, Outfit, Plus_Jakarta_Sans } from "next/font/google";
 import type { ReactNode } from "react";
 
 import { AccessibilityLayer } from "@/components/accessibility/accessibility-layer";
+import { AuthSessionProvider } from "@/components/auth/auth-session-provider";
 import { ServiceStatusProvider } from "@/components/system/service-status-provider";
 import { getInitialServiceStatus } from "@/lib/server/system-status";
 
@@ -50,7 +51,7 @@ export default async function RootLayout({ children }: Readonly<{ children: Reac
       <body className="min-h-full antialiased">
         <AccessibilityLayer>
           <ServiceStatusProvider initialStatus={initialStatus}>
-            {children}
+            <AuthSessionProvider>{children}</AuthSessionProvider>
           </ServiceStatusProvider>
         </AccessibilityLayer>
       </body>

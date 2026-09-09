@@ -6,11 +6,13 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 import { BrandAssetImage } from "@/components/public/brand-asset-image";
+import { useAuthSession } from "@/components/auth/auth-session-provider";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import type { BrandingConfig } from "@/lib/branding";
@@ -60,6 +62,30 @@ function BrandIdentity({ branding }: { branding: BrandingConfig }) {
   );
 }
 
+function PublicAuthAction({ mobile = false }: { mobile?: boolean }) {
+  const { status } = useAuthSession();
+  const isAuthenticated = status === "authenticated";
+  const href = isAuthenticated ? "/portal" : "/login";
+  const label = isAuthenticated ? "Open COMPASS" : "Sign in";
+
+  if (mobile) {
+    return (
+      <DropdownMenuItem
+        className="public-mobile-nav__item public-mobile-nav__item--auth"
+        render={<Link href={href} />}
+      >
+        {label}
+      </DropdownMenuItem>
+    );
+  }
+
+  return (
+    <Link className="public-auth-action" href={href}>
+      {label}
+    </Link>
+  );
+}
+
 export function SiteHeader({ branding }: { branding: BrandingConfig }) {
   const pathname = usePathname();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
@@ -95,6 +121,10 @@ export function SiteHeader({ branding }: { branding: BrandingConfig }) {
               })}
             </ul>
           </nav>
+
+          <div className="public-auth-action__desktop">
+            <PublicAuthAction />
+          </div>
 
           <div className="public-mobile-nav">
             <DropdownMenu
@@ -141,6 +171,8 @@ export function SiteHeader({ branding }: { branding: BrandingConfig }) {
                       </DropdownMenuItem>
                     );
                   })}
+                  <DropdownMenuSeparator />
+                  <PublicAuthAction mobile />
                 </nav>
               </DropdownMenuContent>
             </DropdownMenu>
