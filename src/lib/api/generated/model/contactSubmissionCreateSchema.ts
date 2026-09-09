@@ -10,6 +10,7 @@ import type { ContactSubmissionCreateSchemaSubmissionType } from './contactSubmi
 
 export interface ContactSubmissionCreateSchema {
   affiliation?: ContactSubmissionCreateSchemaAffiliation;
+  captcha_response?: string | null;
   /** @maxLength 254 */
   email?: string;
   /** @maxLength 32768 */

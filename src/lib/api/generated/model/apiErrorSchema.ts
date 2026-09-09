@@ -5,9 +5,12 @@
  * The canonical backend API for COMPASS clients.
  * OpenAPI spec version: 1.0.0
  */
+import type { ApiErrorSchemaChallengeAction } from './apiErrorSchemaChallengeAction';
 import type { ApiErrorSchemaFieldErrors } from './apiErrorSchemaFieldErrors';
 
 export interface ApiErrorSchema {
+  challenge_action?: ApiErrorSchemaChallengeAction;
+  challenge_required?: boolean;
   code: string;
   detail: string;
   error_id?: string | null;

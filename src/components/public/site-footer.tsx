@@ -1,5 +1,7 @@
-import { ExternalLink } from "@/components/public/external-link";
+import Link from "next/link";
+
 import { BrandAssetImage } from "@/components/public/brand-asset-image";
+import { ExternalLink } from "@/components/public/external-link";
 import { isExternalUrl, PublicLink } from "@/components/public/public-link";
 import type { BrandingConfig, ResolvedBrandAsset } from "@/lib/branding";
 
@@ -21,6 +23,9 @@ function FooterOffice({ branding }: { branding: BrandingConfig }) {
         ) : null}
         {location ? <p>{location}</p> : null}
       </address>
+      <Link className="public-footer__contact-link" href="/contact">
+        Contact the office
+      </Link>
     </section>
   );
 }
@@ -57,7 +62,7 @@ function PrivacyCredential({
     <div className="public-footer__privacy-credential">
       {noticeLink ? (
         <ExternalLink
-          aria-label={`${credentialLabel}; open privacy notice`}
+          ariaLabel={`${credentialLabel}; open privacy notice`}
           className="public-footer__privacy-credential-link"
           href={noticeLink.url}
         >
@@ -71,36 +76,50 @@ function PrivacyCredential({
 }
 
 function FooterPrivacy({ branding }: { branding: BrandingConfig }) {
-  if (branding.privacyLinks.length === 0 && branding.footerPrivacyAssets.length === 0) {
-    return null;
-  }
+  const compassPrivacyHref = "/privacy";
+  const privacyLinks = branding.privacyLinks.filter((link) => {
+    try {
+      const url = new URL(link.url, "https://compass.invalid");
+      return !(url.origin === "https://compass.invalid" && url.pathname === compassPrivacyHref);
+    } catch {
+      return true;
+    }
+  });
 
-  const noticeLink = branding.privacyLinks.find((link) => isExternalUrl(link.url));
+  const noticeLink = privacyLinks.find((link) => isExternalUrl(link.url));
   const ownerLabel = noticeLink?.owner_label?.trim() || branding.institutionName;
 
   return (
     <section aria-labelledby="public-footer-privacy-heading" className="public-footer__privacy public-footer__link-group">
       <h2 id="public-footer-privacy-heading">Privacy</h2>
-      {branding.privacyLinks.length > 0 ? (
-        <div className="public-footer__privacy-links">
-          {branding.privacyLinks.map((link) => (
+      <div className="public-footer__privacy-links">
+        <PublicLink
+          href={compassPrivacyHref}
+          label={`${branding.productName} Privacy Notice`}
+        />
+        {privacyLinks.length > 0 ? (
+          privacyLinks.map((link) => (
             <PublicLink
               key={`${link.owner_type}-${link.url}`}
               href={link.url}
               label={link.label}
             />
+          ))
+        ) : null}
+      </div>
+      {branding.footerPrivacyAssets.length > 0 ? (
+        <>
+          {branding.footerPrivacyAssets.map((asset) => (
+            <PrivacyCredential
+              key={asset.id}
+              asset={asset}
+              fallbackLabel={branding.productName}
+              noticeLink={noticeLink}
+              ownerLabel={ownerLabel}
+            />
           ))}
-        </div>
+        </>
       ) : null}
-      {branding.footerPrivacyAssets.map((asset) => (
-        <PrivacyCredential
-          key={asset.id}
-          asset={asset}
-          fallbackLabel={branding.productName}
-          noticeLink={noticeLink}
-          ownerLabel={ownerLabel}
-        />
-      ))}
     </section>
   );
 }

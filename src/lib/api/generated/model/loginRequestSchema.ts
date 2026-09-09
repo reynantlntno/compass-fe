@@ -7,6 +7,7 @@
  */
 
 export interface LoginRequestSchema {
+  captcha_response?: string | null;
   email: string;
   password: string;
   trusted_device_token?: string | null;

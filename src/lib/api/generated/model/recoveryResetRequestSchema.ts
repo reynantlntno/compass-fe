@@ -7,6 +7,7 @@
  */
 
 export interface RecoveryResetRequestSchema {
+  captcha_response?: string | null;
   new_password: string;
   password_confirmation: string;
   token: string;

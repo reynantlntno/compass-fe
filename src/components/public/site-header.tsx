@@ -17,6 +17,9 @@ import type { BrandingConfig } from "@/lib/branding";
 
 const navigation = [
   { href: "/", label: "Home" },
+  { href: "/about", label: "About" },
+  { href: "/services", label: "Services" },
+  { href: "/contact", label: "Contact" },
   { href: "/announcements", label: "Announcements" },
   { href: "/resources", label: "Resources" },
 ] as const;

@@ -6,6 +6,4 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export interface JoinSchema {
-  captcha_response?: string;
-}
+export interface JoinSchema { [key: string]: unknown }

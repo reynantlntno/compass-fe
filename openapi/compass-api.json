@@ -1,5 +1,17 @@
 {
   "components": {
+    "parameters": {
+      "IdempotencyKeyHeader": {
+        "description": "Stable key for retrying the same mutation intent safely.",
+        "in": "header",
+        "name": "Idempotency-Key",
+        "required": true,
+        "schema": {
+          "maxLength": 128,
+          "type": "string"
+        }
+      }
+    },
     "schemas": {
       "AcademicTermPageSchema": {
         "properties": {
@@ -761,6 +773,28 @@
       },
       "ApiErrorSchema": {
         "properties": {
+          "challenge_action": {
+            "anyOf": [
+              {
+                "enum": [
+                  "login",
+                  "recovery",
+                  "activation",
+                  "contact"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Challenge Action"
+          },
+          "challenge_required": {
+            "default": false,
+            "title": "Challenge Required",
+            "type": "boolean"
+          },
           "code": {
             "title": "Code",
             "type": "string"
@@ -5021,6 +5055,18 @@
             "title": "Affiliation",
             "type": "string"
           },
+          "captcha_response": {
+            "anyOf": [
+              {
+                "maxLength": 2048,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Captcha Response"
+          },
           "email": {
             "default": "",
             "maxLength": 254,
@@ -7433,6 +7479,28 @@
       },
       "ErrorSchema": {
         "properties": {
+          "challenge_action": {
+            "anyOf": [
+              {
+                "enum": [
+                  "login",
+                  "recovery",
+                  "activation",
+                  "contact"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Challenge Action"
+          },
+          "challenge_required": {
+            "default": false,
+            "title": "Challenge Required",
+            "type": "boolean"
+          },
           "code": {
             "title": "Code",
             "type": "string"
@@ -11553,13 +11621,7 @@
         "type": "object"
       },
       "JoinSchema": {
-        "properties": {
-          "captcha_response": {
-            "default": "",
-            "title": "Captcha Response",
-            "type": "string"
-          }
-        },
+        "properties": {},
         "title": "JoinSchema",
         "type": "object"
       },
@@ -11684,6 +11746,18 @@
       },
       "LoginRequestSchema": {
         "properties": {
+          "captcha_response": {
+            "anyOf": [
+              {
+                "maxLength": 2048,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Captcha Response"
+          },
           "email": {
             "title": "Email",
             "type": "string"
@@ -16833,6 +16907,18 @@
       },
       "RecoveryRequestSchema": {
         "properties": {
+          "captcha_response": {
+            "anyOf": [
+              {
+                "maxLength": 2048,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Captcha Response"
+          },
           "email": {
             "title": "Email",
             "type": "string"
@@ -16846,6 +16932,18 @@
       },
       "RecoveryResetRequestSchema": {
         "properties": {
+          "captcha_response": {
+            "anyOf": [
+              {
+                "maxLength": 2048,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Captcha Response"
+          },
           "new_password": {
             "title": "New Password",
             "type": "string"
@@ -21784,6 +21882,18 @@
       },
       "StaffActivationRequestSchema": {
         "properties": {
+          "captcha_response": {
+            "anyOf": [
+              {
+                "maxLength": 2048,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Captcha Response"
+          },
           "password": {
             "title": "Password",
             "type": "string"
@@ -21928,6 +22038,18 @@
       "StudentActivationRequestSchema": {
         "description": "Request-local credentials for the student-only activation boundary.",
         "properties": {
+          "captcha_response": {
+            "anyOf": [
+              {
+                "maxLength": 2048,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Captcha Response"
+          },
           "password": {
             "title": "Password",
             "type": "string"
@@ -23944,7 +24066,11 @@
       },
       "post": {
         "operationId": "appointments_create",
-        "parameters": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -24091,7 +24217,11 @@
     "/api/v1/appointments/availability/": {
       "post": {
         "operationId": "appointments_availability_create",
-        "parameters": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -24247,6 +24377,9 @@
               "title": "Public Reference",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -24404,6 +24537,9 @@
               "title": "Public Reference",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -24711,7 +24847,11 @@
       },
       "post": {
         "operationId": "appointments_office_closure_create",
-        "parameters": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -24867,6 +25007,9 @@
               "title": "Public Reference",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -25024,6 +25167,9 @@
               "title": "Public Reference",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -25172,7 +25318,11 @@
     "/api/v1/appointments/schedule-changes/": {
       "post": {
         "operationId": "appointments_schedule_change",
-        "parameters": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -25665,6 +25815,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -25822,6 +25975,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -25979,6 +26135,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -26143,6 +26302,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -26300,6 +26462,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -26457,6 +26622,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "responses": {
@@ -26604,6 +26772,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -26761,6 +26932,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -26918,6 +27092,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -27075,6 +27252,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -27232,6 +27412,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "responses": {
@@ -27549,7 +27732,11 @@
       },
       "post": {
         "operationId": "assessments_create",
-        "parameters": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -28321,6 +28508,9 @@
               "title": "Record Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -28486,6 +28676,9 @@
               "title": "Record Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -29138,6 +29331,9 @@
               "title": "Record Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -29295,6 +29491,9 @@
               "title": "Record Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -29459,6 +29658,9 @@
               "title": "Record Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -29624,6 +29826,9 @@
               "title": "Record Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -29788,6 +29993,9 @@
               "title": "Record Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -29945,6 +30153,9 @@
               "title": "Record Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -30102,6 +30313,9 @@
               "title": "Record Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -32039,7 +32253,11 @@
       "post": {
         "description": "Queue a recovery email for an active staff account, including Head Guidance.",
         "operationId": "auth_staff_recovery_request",
-        "parameters": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -33118,7 +33336,11 @@
     "/api/v1/authority/grants/": {
       "post": {
         "operationId": "authority_grant_create",
-        "parameters": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -33265,7 +33487,11 @@
     "/api/v1/authority/grants/bulk/": {
       "post": {
         "operationId": "authority_grant_bulk_create",
-        "parameters": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -33431,6 +33657,9 @@
               "title": "Reason Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "responses": {
@@ -34163,7 +34392,11 @@
       },
       "post": {
         "operationId": "backups_job_request",
-        "parameters": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -34639,6 +34872,9 @@
               "title": "Job Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -34797,6 +35033,9 @@
               "title": "Job Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -34955,6 +35194,9 @@
               "title": "Job Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -35262,7 +35504,11 @@
       },
       "post": {
         "operationId": "backups_restore_request",
-        "parameters": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -35567,6 +35813,9 @@
               "title": "Request Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -35725,6 +35974,9 @@
               "title": "Request Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -35883,6 +36135,9 @@
               "title": "Request Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -36190,7 +36445,11 @@
       },
       "post": {
         "operationId": "call_slips_create",
-        "parameters": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -36337,7 +36596,11 @@
     "/api/v1/call-slips/from-referral/": {
       "post": {
         "operationId": "call_slips_from_referral",
-        "parameters": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -36640,6 +36903,9 @@
               "title": "Request Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -36942,6 +37208,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -37099,6 +37368,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "responses": {
@@ -37246,6 +37518,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -37403,6 +37678,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -37567,6 +37845,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -37914,6 +38195,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -38225,6 +38509,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -38382,6 +38669,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -38539,6 +38829,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -38843,6 +39136,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -39000,6 +39296,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -39449,7 +39748,11 @@
       },
       "post": {
         "operationId": "content_announcement_create",
-        "parameters": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -39606,6 +39909,9 @@
               "title": "Announcement Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -39764,6 +40070,9 @@
               "title": "Announcement Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "responses": {
@@ -39912,6 +40221,9 @@
               "title": "Announcement Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "responses": {
@@ -40060,6 +40372,9 @@
               "title": "Announcement Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -40225,6 +40540,9 @@
               "title": "Announcement Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "responses": {
@@ -40676,6 +40994,9 @@
               "title": "Reply Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -40834,6 +41155,9 @@
               "title": "Reply Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "responses": {
@@ -40982,6 +41306,9 @@
               "title": "Reply Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "responses": {
@@ -41130,6 +41457,9 @@
               "title": "Reply Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "responses": {
@@ -41278,6 +41608,9 @@
               "title": "Reply Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "responses": {
@@ -41426,6 +41759,9 @@
               "title": "Reply Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -42187,6 +42523,9 @@
               "title": "Submission Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -42345,6 +42684,9 @@
               "title": "Submission Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -42672,6 +43014,9 @@
               "title": "Submission Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -42830,6 +43175,9 @@
               "title": "Submission Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -43300,7 +43648,11 @@
     "/api/v1/content/pages/": {
       "post": {
         "operationId": "content_page_create",
-        "parameters": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -43457,6 +43809,9 @@
               "title": "Page Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -43615,6 +43970,9 @@
               "title": "Page Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "responses": {
@@ -43763,6 +44121,9 @@
               "title": "Page Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "responses": {
@@ -43911,6 +44272,9 @@
               "title": "Page Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "responses": {
@@ -44345,7 +44709,11 @@
       },
       "post": {
         "operationId": "content_resource_create",
-        "parameters": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -44502,6 +44870,9 @@
               "title": "Resource Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -44660,6 +45031,9 @@
               "title": "Resource Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "responses": {
@@ -44808,6 +45182,9 @@
               "title": "Resource Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "responses": {
@@ -44956,6 +45333,9 @@
               "title": "Resource Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -45121,6 +45501,9 @@
               "title": "Resource Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "responses": {
@@ -45531,7 +45914,11 @@
       },
       "post": {
         "operationId": "content_service_guide_create",
-        "parameters": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -45688,6 +46075,9 @@
               "title": "Guide Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -45846,6 +46236,9 @@
               "title": "Guide Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "responses": {
@@ -45994,6 +46387,9 @@
               "title": "Guide Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "responses": {
@@ -46142,6 +46538,9 @@
               "title": "Guide Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -46307,6 +46706,9 @@
               "title": "Guide Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "responses": {
@@ -46783,6 +47185,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "responses": {
@@ -47080,7 +47485,11 @@
       },
       "post": {
         "operationId": "counseling_case_create",
-        "parameters": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -47383,6 +47792,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -47540,6 +47952,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "responses": {
@@ -47687,6 +48102,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -47842,6 +48260,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -47999,6 +48420,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "responses": {
@@ -48146,6 +48570,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -48303,6 +48730,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "responses": {
@@ -48450,6 +48880,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "responses": {
@@ -48597,6 +49030,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "responses": {
@@ -48744,6 +49180,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -48901,6 +49340,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -49474,6 +49916,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -49638,6 +50083,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "responses": {
@@ -49783,6 +50231,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -49940,6 +50391,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -50097,6 +50551,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -50426,6 +50883,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -50581,6 +51041,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -50738,6 +51201,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -51374,6 +51840,9 @@
               "title": "Run Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -52520,6 +52989,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -52981,7 +53453,11 @@
       },
       "post": {
         "operationId": "counseling_session_create",
-        "parameters": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -53284,6 +53760,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -53441,6 +53920,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -53598,6 +54080,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -53755,6 +54240,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "responses": {
@@ -53902,6 +54390,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "responses": {
@@ -54049,6 +54540,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "responses": {
@@ -54196,6 +54690,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -54353,6 +54850,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -54510,6 +55010,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -54667,6 +55170,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "responses": {
@@ -54814,6 +55320,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -54978,6 +55487,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -55142,6 +55654,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -55306,6 +55821,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -55470,6 +55988,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "responses": {
@@ -55914,7 +56435,11 @@
       },
       "post": {
         "operationId": "counseling_urgent_create",
-        "parameters": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -56061,7 +56586,11 @@
     "/api/v1/counseling/urgent-support/access-grants/": {
       "delete": {
         "operationId": "counseling_urgent_access_revoke",
-        "parameters": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -56364,6 +56893,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -56521,6 +57053,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -56678,6 +57213,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -56835,6 +57373,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -57142,7 +57683,11 @@
       },
       "post": {
         "operationId": "exit_interviews_start",
-        "parameters": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -57443,7 +57988,11 @@
       },
       "post": {
         "operationId": "exit_interviews_assignment_create",
-        "parameters": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -57590,7 +58139,11 @@
     "/api/v1/exit-interviews/assignments/reassign/": {
       "post": {
         "operationId": "exit_interviews_assignment_reassign",
-        "parameters": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -58030,6 +58583,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -58194,6 +58750,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -58548,6 +59107,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -58859,6 +59421,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -59011,6 +59576,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -59322,6 +59890,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -59481,6 +60052,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -59986,7 +60560,11 @@
       },
       "post": {
         "operationId": "form_collections_create",
-        "parameters": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -60275,6 +60853,9 @@
               "title": "Batch Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -60575,6 +61156,9 @@
               "title": "Invitation Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -60894,6 +61478,9 @@
               "title": "Record Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -61052,6 +61639,9 @@
               "title": "Record Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -61363,6 +61953,9 @@
               "title": "Collection Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -61521,6 +62114,9 @@
               "title": "Collection Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -61855,6 +62451,9 @@
               "title": "Collection Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -62013,6 +62612,9 @@
               "title": "Collection Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -62349,6 +62951,9 @@
               "title": "Collection Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -62514,6 +63119,9 @@
               "title": "Collection Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -62828,7 +63436,11 @@
       },
       "post": {
         "operationId": "good_moral_create",
-        "parameters": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -63129,6 +63741,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -63286,6 +63901,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -63443,6 +64061,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -63600,6 +64221,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -64094,6 +64718,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "responses": {
@@ -64241,6 +64868,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "responses": {
@@ -64388,6 +65018,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -64545,6 +65178,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -64702,6 +65338,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "responses": {
@@ -64849,6 +65488,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -65006,6 +65648,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -65163,6 +65808,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -65320,6 +65968,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "responses": {
@@ -65467,6 +66118,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "responses": {
@@ -65614,6 +66268,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -65771,6 +66428,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "responses": {
@@ -65918,6 +66578,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "responses": {
@@ -66065,6 +66728,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -66372,7 +67038,11 @@
       },
       "post": {
         "operationId": "graduate_tracer_start",
-        "parameters": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -66807,6 +67477,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -67161,6 +67834,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -67472,6 +68148,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -67624,6 +68303,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -67935,6 +68617,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -68094,6 +68779,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -68408,7 +69096,11 @@
       },
       "post": {
         "operationId": "imports_create",
-        "parameters": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
+          }
+        ],
         "requestBody": {
           "content": {
             "multipart/form-data": {
@@ -68893,6 +69585,9 @@
               "title": "Invitation Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -69050,6 +69745,9 @@
               "title": "Invitation Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -69354,6 +70052,9 @@
               "title": "Batch Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -69511,6 +70212,9 @@
               "title": "Batch Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -69838,6 +70542,9 @@
               "title": "Batch Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -70175,6 +70882,9 @@
               "title": "Batch Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -70373,6 +71083,9 @@
               "title": "Row Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -70539,6 +71252,9 @@
               "title": "Row Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -70705,6 +71421,9 @@
               "title": "Row Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -70871,6 +71590,9 @@
               "title": "Row Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -71028,6 +71750,9 @@
               "title": "Batch Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -71337,7 +72062,11 @@
     "/api/v1/inventory/drafts/": {
       "post": {
         "operationId": "inventory_draft_create",
-        "parameters": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -71638,6 +72367,9 @@
               "title": "Snapshot Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -71793,6 +72525,9 @@
               "title": "Snapshot Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -72140,6 +72875,9 @@
               "title": "Snapshot Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -72621,6 +73359,9 @@
               "title": "Snapshot Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -72778,6 +73519,9 @@
               "title": "Snapshot Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -73528,7 +74272,11 @@
     "/api/v1/me/password/change/": {
       "post": {
         "operationId": "me_password_change",
-        "parameters": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -73836,7 +74584,11 @@
     "/api/v1/me/sessions/revoke-others/": {
       "post": {
         "operationId": "me_sessions_revoke_others",
-        "parameters": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
+          }
+        ],
         "responses": {
           "200": {
             "content": {
@@ -73982,6 +74734,9 @@
               "title": "Session Token",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "responses": {
@@ -74281,7 +75036,11 @@
     "/api/v1/me/trusted-devices/revoke-all/": {
       "post": {
         "operationId": "me_trusted_devices_revoke_all",
-        "parameters": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
+          }
+        ],
         "responses": {
           "200": {
             "content": {
@@ -74428,6 +75187,9 @@
               "title": "Device Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "responses": {
@@ -75699,6 +76461,9 @@
               "title": "Delivery Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -75857,6 +76622,9 @@
               "title": "Delivery Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "responses": {
@@ -76326,6 +77094,9 @@
               "title": "Notification Type",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -76769,6 +77540,9 @@
               "title": "Notification Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -76934,6 +77708,9 @@
               "title": "Notification Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -77248,7 +78025,11 @@
       },
       "post": {
         "operationId": "organizations_academic_term_create",
-        "parameters": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -77551,6 +78332,9 @@
               "title": "Term Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -77708,6 +78492,9 @@
               "title": "Term Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -77865,6 +78652,9 @@
               "title": "Term Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -78022,6 +78812,9 @@
               "title": "Term Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -78179,6 +78972,9 @@
               "title": "Term Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -78499,6 +79295,9 @@
               "title": "Term Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -78656,6 +79455,9 @@
               "title": "Term Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -78963,7 +79765,11 @@
       },
       "post": {
         "operationId": "organizations_brand_asset_create",
-        "parameters": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
+          }
+        ],
         "requestBody": {
           "content": {
             "multipart/form-data": {
@@ -79384,6 +80190,9 @@
               "title": "Asset Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -79541,6 +80350,9 @@
               "title": "Asset Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -79698,6 +80510,9 @@
               "title": "Asset Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -79855,6 +80670,9 @@
               "title": "Asset Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -80594,7 +81412,11 @@
       },
       "post": {
         "operationId": "organizations_form_family_create",
-        "parameters": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -80897,6 +81719,9 @@
               "title": "Family Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -81054,6 +81879,9 @@
               "title": "Family Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -81211,6 +82039,9 @@
               "title": "Family Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -81368,6 +82199,9 @@
               "title": "Family Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -81675,7 +82509,11 @@
       },
       "post": {
         "operationId": "organizations_form_revision_create",
-        "parameters": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -81978,6 +82816,9 @@
               "title": "Revision Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -82282,6 +83123,9 @@
               "title": "Revision Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -82439,6 +83283,9 @@
               "title": "Revision Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -82596,6 +83443,9 @@
               "title": "Revision Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -82753,6 +83603,9 @@
               "title": "Revision Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -82910,6 +83763,9 @@
               "title": "Revision Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -83067,6 +83923,9 @@
               "title": "Revision Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -83224,6 +84083,9 @@
               "title": "Revision Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -83531,7 +84393,11 @@
       },
       "post": {
         "operationId": "organizations_institution_profile_create",
-        "parameters": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -83834,6 +84700,9 @@
               "title": "Profile Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -83991,6 +84860,9 @@
               "title": "Profile Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -84148,6 +85020,9 @@
               "title": "Profile Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -84305,6 +85180,9 @@
               "title": "Profile Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -84612,7 +85490,11 @@
       },
       "post": {
         "operationId": "organizations_office_create",
-        "parameters": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -84915,6 +85797,9 @@
               "title": "Office Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -85072,6 +85957,9 @@
               "title": "Office Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -85229,6 +86117,9 @@
               "title": "Office Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -85386,6 +86277,9 @@
               "title": "Office Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -85693,7 +86587,11 @@
       },
       "post": {
         "operationId": "organizations_public_link_create",
-        "parameters": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -85996,6 +86894,9 @@
               "title": "Link Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -86153,6 +87054,9 @@
               "title": "Link Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -86310,6 +87214,9 @@
               "title": "Link Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -86467,6 +87374,9 @@
               "title": "Link Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -88024,7 +88934,11 @@
       },
       "post": {
         "operationId": "policies_dpo_appointment_create",
-        "parameters": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -88182,6 +89096,9 @@
               "title": "Appointment Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -88338,7 +89255,11 @@
     "/api/v1/policies/drafts/": {
       "post": {
         "operationId": "policies_draft_create",
-        "parameters": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -88496,6 +89417,9 @@
               "title": "Policy Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -88817,6 +89741,9 @@
               "title": "Policy Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "responses": {
@@ -88966,6 +89893,9 @@
               "title": "Policy Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "responses": {
@@ -89115,6 +90045,9 @@
               "title": "Policy Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -89274,6 +90207,9 @@
               "title": "Policy Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "responses": {
@@ -89423,6 +90359,9 @@
               "title": "Policy Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "responses": {
@@ -90060,7 +90999,11 @@
       },
       "post": {
         "operationId": "privacy_incident_create",
-        "parameters": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -90363,6 +91306,9 @@
               "title": "Incident Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -90520,6 +91466,9 @@
               "title": "Incident Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -90677,6 +91626,9 @@
               "title": "Incident Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -90834,6 +91786,9 @@
               "title": "Incident Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -90991,6 +91946,9 @@
               "title": "Incident Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -91298,7 +92256,11 @@
       },
       "post": {
         "operationId": "privacy_legal_hold_create",
-        "parameters": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -91603,6 +92565,9 @@
               "title": "Hold Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -91911,7 +92876,11 @@
       },
       "post": {
         "operationId": "privacy_notice_binding_set",
-        "parameters": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -92219,7 +93188,11 @@
       },
       "post": {
         "operationId": "privacy_notice_revision_create",
-        "parameters": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -92376,6 +93349,9 @@
               "title": "Revision Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -92534,6 +93510,9 @@
               "title": "Revision Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -93006,6 +93985,9 @@
               "title": "Notice Identifier",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -93313,7 +94295,11 @@
       },
       "post": {
         "operationId": "privacy_request_create",
-        "parameters": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -93616,6 +94602,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -93773,6 +94762,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -93930,6 +94922,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -94087,6 +95082,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -94244,6 +95242,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -94401,6 +95402,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -94558,6 +95562,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -94715,6 +95722,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -94872,6 +95882,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -95029,6 +96042,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -95333,6 +96349,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "responses": {
@@ -95471,7 +96490,11 @@
     "/api/v1/privacy/retention/evaluate/": {
       "post": {
         "operationId": "privacy_retention_evaluate",
-        "parameters": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
+          }
+        ],
         "responses": {
           "200": {
             "content": {
@@ -96090,7 +97113,11 @@
       },
       "post": {
         "operationId": "privacy_reviewer_authorization_create",
-        "parameters": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -96248,6 +97275,9 @@
               "title": "Authorization Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -96877,7 +97907,11 @@
       },
       "post": {
         "operationId": "referrals_create",
-        "parameters": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -97327,6 +98361,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -97484,6 +98521,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -97641,6 +98681,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -97798,6 +98841,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -97955,6 +99001,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -98302,6 +99351,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -98613,6 +99665,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -98770,6 +99825,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -98927,6 +99985,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -99093,6 +100154,9 @@
               "title": "Request Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -99250,6 +100314,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -99407,6 +100474,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -99564,6 +100634,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -99721,6 +100794,9 @@
               "title": "Reference Code",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -100343,7 +101419,11 @@
       },
       "post": {
         "operationId": "reports_export_create",
-        "parameters": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -100648,6 +101728,9 @@
               "title": "Export Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -100814,6 +101897,9 @@
               "title": "Export Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -101135,6 +102221,9 @@
               "title": "Export Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -101301,6 +102390,9 @@
               "title": "Export Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "responses": {
@@ -101598,7 +102690,11 @@
       },
       "post": {
         "operationId": "reports_run",
-        "parameters": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -102052,7 +103148,11 @@
       },
       "post": {
         "operationId": "staff_accounts_create",
-        "parameters": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -102199,7 +103299,11 @@
     "/api/v1/staff-accounts/head-guidance/assign/": {
       "post": {
         "operationId": "staff_accounts_head_guidance_assign",
-        "parameters": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -102346,7 +103450,11 @@
     "/api/v1/staff-accounts/head-guidance/revoke/": {
       "post": {
         "operationId": "staff_accounts_head_guidance_revoke",
-        "parameters": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -102649,6 +103757,9 @@
               "title": "User Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "responses": {
@@ -102796,6 +103907,9 @@
               "title": "User Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "responses": {
@@ -103141,7 +104255,11 @@
       },
       "post": {
         "operationId": "support_needs_create",
-        "parameters": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -103764,6 +104882,9 @@
               "title": "Support Need Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -103921,6 +105042,9 @@
               "title": "Support Need Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -104085,6 +105209,9 @@
               "title": "Support Need Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -104249,6 +105376,9 @@
               "title": "Support Need Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -104413,6 +105543,9 @@
               "title": "Support Need Id",
               "type": "integer"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -105048,6 +106181,9 @@
               "title": "Error Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -105205,6 +106341,9 @@
               "title": "Error Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -105796,7 +106935,11 @@
       },
       "post": {
         "operationId": "system_maintenance_schedule",
-        "parameters": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
+          }
+        ],
         "requestBody": {
           "content": {
             "application/json": {
@@ -106099,6 +107242,9 @@
               "title": "Window Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -106256,6 +107402,9 @@
               "title": "Window Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -106413,6 +107562,9 @@
               "title": "Window Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {
@@ -106570,6 +107722,9 @@
               "title": "Window Id",
               "type": "string"
             }
+          },
+          {
+            "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
         "requestBody": {

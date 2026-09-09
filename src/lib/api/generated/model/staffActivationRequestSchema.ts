@@ -7,6 +7,7 @@
  */
 
 export interface StaffActivationRequestSchema {
+  captcha_response?: string | null;
   password: string;
   password_confirmation: string;
   token: string;

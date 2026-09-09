@@ -10,6 +10,7 @@
  * Request-local credentials for the student-only activation boundary.
  */
 export interface StudentActivationRequestSchema {
+  captcha_response?: string | null;
   password: string;
   password_confirmation: string;
   token: string;

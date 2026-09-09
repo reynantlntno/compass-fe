@@ -58,9 +58,21 @@ python manage.py export_openapi \
 pnpm api:generate
 ```
 
+For a mutation that requires replay protection, create one request-local key
+with `createIdempotencyKey()` and pass it through `withIdempotencyKey()`. Keep
+that key only while retrying the same payload and intent; discard it after a
+successful request or when the payload changes. The transport does not add
+keys automatically, and the Contact form uses the same helper even though its
+backend idempotency header remains optional.
+
 The public shell loads institution, office, and approved branding data through
 the generated client. If public configuration is unavailable, it uses the
 centralized fallbacks documented in `.env.example`.
+
+The optional public Turnstile site key is used only by endpoint-specific
+challenge widgets when the backend asks for one. Challenge tokens stay in
+memory and are validated by the backend; the Turnstile secret belongs only in
+backend deployment secrets.
 
 ## Component showcase
 

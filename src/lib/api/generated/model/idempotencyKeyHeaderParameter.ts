@@ -6,7 +6,7 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export interface RecoveryRequestSchema {
-  captcha_response?: string | null;
-  email: string;
-}
+/**
+ * Stable key for retrying the same mutation intent safely.
+ */
+export type IdempotencyKeyHeaderParameter = string;

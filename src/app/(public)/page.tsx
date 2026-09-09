@@ -7,33 +7,13 @@ import { PaperSheet } from "@/components/public/paper-sheet";
 import { StickyNote } from "@/components/public/sticky-note";
 import { getPublicBranding } from "@/lib/branding";
 import { getHomepageContent } from "@/lib/homepage";
-
-function formatDate(value: string | null | undefined) {
-  if (!value) return null;
-
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return null;
-
-  return new Intl.DateTimeFormat("en-PH", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  }).format(date);
-}
+import { formatPublicDate } from "@/lib/public-date";
 
 function phoneHref(value: string | null) {
   if (!value) return null;
 
   const normalized = value.replace(/[^0-9+]/g, "");
   return normalized ? "tel:" + normalized : null;
-}
-
-function contactHref(branding: Awaited<ReturnType<typeof getPublicBranding>>) {
-  if (branding.email) {
-    return "mailto:" + branding.email;
-  }
-
-  return phoneHref(branding.phone);
 }
 
 function contentLabel(value: string | null | undefined, fallback: string) {
@@ -47,10 +27,20 @@ function HomepageAction({
   href: string;
   label: string;
 }) {
-  return (
-    <a className="homepage-action" href={href}>
+  const content = (
+    <>
       <span className="homepage-action__label">{label}</span>
       <ArrowUpRight aria-hidden="true" className="homepage-action__icon" />
+    </>
+  );
+
+  return href.startsWith("/") ? (
+    <Link className="homepage-action" href={href}>
+      {content}
+    </Link>
+  ) : (
+    <a className="homepage-action" href={href}>
+      {content}
     </a>
   );
 }
@@ -145,7 +135,7 @@ export default async function Home() {
   ]);
   const serviceGuide = content.serviceGuide;
   const hasServices = Boolean(serviceGuide?.entries.length);
-  const contact = contactHref(branding);
+  const contact = "/contact";
   const actions = [
     contact
       ? {
@@ -153,16 +143,16 @@ export default async function Home() {
           label: "Contact the office",
         }
       : null,
+    hasServices
+      ? {
+          href: "/services",
+          label: "View service guide",
+        }
+      : null,
     content.announcements.length > 0
       ? {
           href: "#announcements",
           label: "See announcements",
-        }
-      : null,
-    hasServices
-      ? {
-          href: "#services",
-          label: "View services",
         }
       : null,
     content.resources.length > 0
@@ -274,7 +264,7 @@ export default async function Home() {
           </div>
           <div className="homepage-notes-grid">
             {content.announcements.map((item, index) => {
-              const publishedDate = formatDate(item.published_at);
+              const publishedDate = formatPublicDate(item.published_at);
 
               return (
                 <StickyNote
