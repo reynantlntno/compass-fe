@@ -1,4 +1,12 @@
-import { ArrowDown, ArrowUpRight, Clock3, Mail, MapPin, Phone } from "lucide-react";
+import {
+  ArrowDown,
+  ArrowRight,
+  ArrowUpRight,
+  Clock3,
+  Mail,
+  MapPin,
+  Phone,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 
@@ -306,27 +314,18 @@ export default async function Home() {
           className="homepage-section public-shell"
           aria-labelledby="services-heading"
         >
-          <div className="homepage-section__heading">
-            <p className="homepage-kicker">Support</p>
-            <h2 id="services-heading">Services and support</h2>
-            {serviceGuide.summary ? <p>{serviceGuide.summary}</p> : null}
-          </div>
-          <div className="homepage-services-list">
-            {serviceGuide.entries.slice(0, 4).map((entry) => (
-              <article className="homepage-service" key={entry.key}>
-                <div>
-                  <h3>{entry.label}</h3>
-                  {entry.summary || entry.description ? (
-                    <p>{entry.summary || entry.description}</p>
-                  ) : null}
-                </div>
-                {entry.availability_label ? (
-                  <span className="homepage-service__availability">
-                    {entry.availability_label}
-                  </span>
-                ) : null}
-              </article>
-            ))}
+          <div className="homepage-service-preview">
+            <div className="homepage-service-preview__copy">
+              <h2 id="services-heading">{serviceGuide.title}</h2>
+              {serviceGuide.summary ? <p>{serviceGuide.summary}</p> : null}
+            </div>
+            <Link
+              className="public-content-link homepage-service-preview__link"
+              href="/services"
+            >
+              Read the service guide
+              <ArrowRight aria-hidden="true" />
+            </Link>
           </div>
         </section>
       ) : null}
