@@ -27,6 +27,7 @@ type LoginChallenge = {
   challengeId: string;
   pendingNonce: string;
   expiresAt: number;
+  trustedDeviceEligible: boolean;
 };
 
 type LoginField = "email" | "password" | "otp";
@@ -258,6 +259,7 @@ export function LoginForm() {
         challengeId: result.challenge.challenge_id,
         pendingNonce: result.challenge.pending_nonce,
         expiresAt: Date.now() + result.challenge.expires_in * 1000,
+        trustedDeviceEligible: result.challenge.trusted_device_eligible === true,
       });
       setOtp("");
       setTrustDevice(false);
@@ -303,7 +305,7 @@ export function LoginForm() {
           challenge_id: challenge.challengeId,
           pending_nonce: challenge.pendingNonce,
           otp: otp.trim(),
-          trust_device: trustDevice,
+          trust_device: challenge.trustedDeviceEligible && trustDevice,
         },
         beginRequest(),
       );
@@ -409,18 +411,20 @@ export function LoginForm() {
           ) : null}
         </div>
 
-        <div className="auth-choice">
-          <Checkbox
-            checked={trustDevice}
-            disabled={isSubmitting}
-            id="login-trust-device"
-            onCheckedChange={setTrustDevice}
-          />
-          <div>
-            <Label htmlFor="login-trust-device">Trust this browser for future sign-ins</Label>
-            <p>The account’s security policy decides whether this can be used.</p>
+        {challenge.trustedDeviceEligible ? (
+          <div className="auth-choice">
+            <Checkbox
+              checked={trustDevice}
+              disabled={isSubmitting}
+              id="login-trust-device"
+              onCheckedChange={setTrustDevice}
+            />
+            <div>
+              <Label htmlFor="login-trust-device">Trust this browser for future sign-ins</Label>
+              <p>The account’s security policy decides whether this can be used.</p>
+            </div>
           </div>
-        </div>
+        ) : null}
 
         <div className="auth-form__actions">
           <Button disabled={isSubmitting} type="submit">

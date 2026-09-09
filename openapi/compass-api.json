@@ -11733,13 +11733,18 @@
           "requires_verification": {
             "title": "Requires Verification",
             "type": "boolean"
+          },
+          "trusted_device_eligible": {
+            "title": "Trusted Device Eligible",
+            "type": "boolean"
           }
         },
         "required": [
           "challenge_id",
           "pending_nonce",
           "expires_in",
-          "requires_verification"
+          "requires_verification",
+          "trusted_device_eligible"
         ],
         "title": "LoginChallengeSchema",
         "type": "object"

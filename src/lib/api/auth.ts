@@ -7,6 +7,8 @@ import {
   authMe,
   authRecoveryRequest,
   authRecoveryReset,
+  authStaffActivation,
+  authStudentActivation,
   authTokenRefresh,
 } from "@/lib/api/generated/authentication/authentication";
 import type {
@@ -17,17 +19,20 @@ import type {
   OtpResendRequestSchema,
   RecoveryRequestSchema,
   RecoveryResetRequestSchema,
+  StaffActivationRequestSchema,
+  StudentActivationRequestSchema,
 } from "@/lib/api/generated/model";
 
 const SESSION_MEDIA_TYPE = "application/vnd.compass.session+json";
 const SESSION_TRANSPORT_HEADER = "X-COMPASS-Auth-Transport";
 const SESSION_TRANSPORT_VALUE = "cookie";
 
-export type AuthChallengeAction = "login" | "recovery";
+export type AuthChallengeAction = "login" | "recovery" | "activation";
 
 export type AuthApiErrorKind =
   | "challenge_required"
   | "conflict"
+  | "invalid_activation"
   | "invalid_credentials"
   | "invalid_recovery"
   | "rate_limited"
@@ -149,7 +154,12 @@ function challengeError(
 function throwResponseError(
   status: number,
   data: unknown,
-  context: "login" | "verification" | "recovery-request" | "recovery-reset",
+  context:
+    | "login"
+    | "verification"
+    | "recovery-request"
+    | "recovery-reset"
+    | "activation",
   expectedChallengeAction?: AuthChallengeAction,
 ): never {
   if (status === 429) {
@@ -163,6 +173,10 @@ function throwResponseError(
 
   if (context === "recovery-reset" && [400, 401, 403, 404].includes(status)) {
     throw new AuthApiError("invalid_recovery");
+  }
+
+  if (context === "activation" && [400, 401, 403, 404].includes(status)) {
+    throw new AuthApiError("invalid_activation");
   }
 
   if (context === "recovery-request" && ![400, 422].includes(status)) {
@@ -401,6 +415,62 @@ export async function resetPassword(
     "recovery-reset",
     "recovery",
   );
+}
+
+type ActivationInput = Pick<
+  StaffActivationRequestSchema,
+  "token" | "password" | "password_confirmation"
+> & {
+  captchaResponse?: string | null;
+};
+
+function activationPayload(input: ActivationInput): StaffActivationRequestSchema {
+  const payload: StaffActivationRequestSchema = {
+    token: input.token,
+    password: input.password,
+    password_confirmation: input.password_confirmation,
+  };
+
+  if (input.captchaResponse) payload.captcha_response = input.captchaResponse;
+  return payload;
+}
+
+export async function activateStudentAccount(
+  input: ActivationInput,
+  signal?: AbortSignal,
+): Promise<void> {
+  const payload: StudentActivationRequestSchema = activationPayload(input);
+  let response;
+  try {
+    response = await authStudentActivation(
+      payload,
+      publicRequestOptions(signal),
+    );
+  } catch (error) {
+    return throwTransportError(error);
+  }
+
+  if (response.status === 200) return;
+  throwResponseError(response.status, response.data, "activation", "activation");
+}
+
+export async function activateStaffAccount(
+  input: ActivationInput,
+  signal?: AbortSignal,
+): Promise<void> {
+  const payload = activationPayload(input);
+  let response;
+  try {
+    response = await authStaffActivation(
+      payload,
+      publicRequestOptions(signal),
+    );
+  } catch (error) {
+    return throwTransportError(error);
+  }
+
+  if (response.status === 200) return;
+  throwResponseError(response.status, response.data, "activation", "activation");
 }
 
 export async function logoutCurrentSession(signal?: AbortSignal): Promise<void> {

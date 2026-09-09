@@ -11,4 +11,5 @@ export interface LoginChallengeSchema {
   expires_in: number;
   pending_nonce: string;
   requires_verification: boolean;
+  trusted_device_eligible: boolean;
 }

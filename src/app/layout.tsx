@@ -5,6 +5,11 @@ import type { ReactNode } from "react";
 import { AccessibilityLayer } from "@/components/accessibility/accessibility-layer";
 import { AuthSessionProvider } from "@/components/auth/auth-session-provider";
 import { ServiceStatusProvider } from "@/components/system/service-status-provider";
+import {
+  getCompassMetadataBase,
+  getCompassRobotsMetadata,
+  getCompassSocialMetadata,
+} from "@/lib/metadata";
 import { getInitialServiceStatus } from "@/lib/server/system-status";
 
 import "./globals.css";
@@ -30,12 +35,19 @@ const caveat = Caveat({
   weight: ["500", "600"],
 });
 
+const defaultDescription = "A simpler way to find COMPASS support.";
+const metadataBase = getCompassMetadataBase();
+
 export const metadata: Metadata = {
+  ...(metadataBase ? { metadataBase } : {}),
   title: {
     default: "COMPASS",
     template: "%s | COMPASS",
   },
-  description: "A simpler way to find COMPASS support.",
+  description: defaultDescription,
+  applicationName: "COMPASS",
+  robots: getCompassRobotsMetadata(),
+  ...getCompassSocialMetadata("COMPASS", defaultDescription),
 };
 
 export const dynamic = "force-dynamic";

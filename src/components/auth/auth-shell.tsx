@@ -60,8 +60,8 @@ export function AuthShell({
           </div>
           <footer className="auth-panel__footer">
             <p>
-              By signing in, you acknowledge that {branding.productName} handles account
-              information as described in the <Link href="/privacy">COMPASS Privacy Notice</Link>.
+              {branding.productName} handles account information as described in the{" "}
+              <Link href="/privacy">COMPASS Privacy Notice</Link>.
             </p>
           </footer>
         </section>

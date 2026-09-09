@@ -4,17 +4,21 @@ import type { ReactNode } from "react";
 import { SiteFooter } from "@/components/public/site-footer";
 import { SiteHeader } from "@/components/public/site-header";
 import { getPublicBranding } from "@/lib/branding";
+import { getCompassSocialMetadata } from "@/lib/metadata";
 
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata(): Promise<Metadata> {
   const branding = await getPublicBranding();
+  const title = `${branding.officeName} | ${branding.institutionName}`;
+  const description = `${branding.productName} support from the ${branding.officeName} of ${branding.institutionName}.`;
 
   return {
     title: {
-      absolute: `${branding.officeName} | ${branding.institutionName}`,
+      absolute: title,
     },
-    description: `${branding.productName} support from the ${branding.officeName} of ${branding.institutionName}.`,
+    description,
+    ...getCompassSocialMetadata(title, description, `${branding.productName} — ${branding.officeName}`),
   };
 }
 

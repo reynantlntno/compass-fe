@@ -1,6 +1,9 @@
 import type { NextConfig } from "next";
 
 const compassApiBaseUrl = process.env.COMPASS_API_BASE_URL?.replace(/\/+$/, "");
+const compassEnvironment = process.env.COMPASS_ENVIRONMENT?.trim().toLowerCase();
+const compassIndexable =
+  process.env.NODE_ENV === "production" && compassEnvironment === "production";
 
 const nextConfig: NextConfig = {
   trailingSlash: true,
@@ -15,6 +18,21 @@ const nextConfig: NextConfig = {
       {
         source: "/api/v1/:path*/",
         destination: `${compassApiBaseUrl}/api/v1/:path*/`,
+      },
+    ];
+  },
+  async headers() {
+    if (compassIndexable) return [];
+
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          {
+            key: "X-Robots-Tag",
+            value: "noindex, nofollow, noarchive",
+          },
+        ],
       },
     ];
   },
