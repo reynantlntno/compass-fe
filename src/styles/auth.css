@@ -444,86 +444,6 @@
     margin-top: 0.3rem;
   }
 
-  .portal-gate {
-    display: grid;
-    min-height: 100vh;
-    min-height: 100svh;
-    place-items: center;
-    padding: clamp(2rem, 7vw, 5rem) 1rem;
-    background-color: var(--compass-body);
-    color: var(--foreground);
-  }
-
-  .portal-gate__panel {
-    display: grid;
-    width: min(100%, 34rem);
-    gap: 0.85rem;
-    border: 2px solid var(--compass-brand-maroon);
-    border-radius: var(--compass-radius-2xl) var(--compass-radius-2xl) 2.5rem 2.5rem;
-    padding: clamp(1.4rem, 5vw, 2.5rem);
-    background-color: var(--compass-surface);
-    box-shadow: var(--compass-shadow-md);
-  }
-
-  .portal-gate__panel h1 {
-    margin: 0;
-    color: var(--compass-brand-maroon-strong);
-    font-family: var(--compass-font-heading);
-    font-size: clamp(2rem, 7vw, 3.5rem);
-    letter-spacing: -0.045em;
-    line-height: 1;
-    text-wrap: pretty;
-  }
-
-  .portal-gate__panel > p:not(.auth-eyebrow) {
-    margin: 0;
-    color: var(--muted-foreground);
-    font-size: 0.9rem;
-    line-height: 1.65;
-  }
-
-  .portal-gate__identity {
-    display: grid;
-    gap: 0.75rem;
-    margin: 0.35rem 0;
-    padding-block: 0.85rem;
-    border-block: 1px solid var(--compass-border);
-  }
-
-  .portal-gate__identity div {
-    display: grid;
-    gap: 0.2rem;
-    min-width: 0;
-  }
-
-  .portal-gate__identity dt {
-    color: var(--compass-brand-maroon);
-    font-size: 0.68rem;
-    font-weight: var(--compass-weight-bold);
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-  }
-
-  .portal-gate__identity dd {
-    margin: 0;
-    color: var(--foreground);
-    font-size: 0.85rem;
-    overflow-wrap: anywhere;
-  }
-
-  .portal-gate__panel > [data-slot="button"] {
-    width: fit-content;
-    min-width: 7rem;
-    min-height: 2.6rem;
-    margin-top: 0.25rem;
-    border-radius: var(--compass-radius-sm);
-    font-weight: var(--compass-weight-bold);
-  }
-
-  .portal-gate--redirect {
-    color: var(--muted-foreground);
-    font-size: 0.85rem;
-  }
 }
 
 @media (max-width: 40rem) {
@@ -556,16 +476,14 @@
 }
 
 @media (forced-colors: active) {
-  .auth-panel,
-  .portal-gate__panel {
+  .auth-panel {
     border-color: CanvasText;
     background-color: Canvas;
     color: CanvasText;
     box-shadow: none;
   }
 
-  .auth-page,
-  .portal-gate {
+  .auth-page {
     background-color: Canvas;
     color: CanvasText;
   }
@@ -583,9 +501,7 @@
   .auth-secondary-link,
   .auth-text-button,
   .auth-primary-link,
-  .auth-password-field__toggle,
-  .portal-gate__panel h1,
-  .portal-gate__identity dt {
+  .auth-password-field__toggle {
     color: CanvasText;
   }
 
@@ -598,8 +514,7 @@
   .auth-form__notice,
   .auth-challenge,
   .auth-panel__identity,
-  .auth-panel__footer,
-  .portal-gate__identity {
+  .auth-panel__footer {
     border-color: CanvasText;
     background-color: Canvas;
     color: CanvasText;

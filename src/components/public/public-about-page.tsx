@@ -157,7 +157,6 @@ export function PublicAboutState({
       className="public-content-state public-about-page__state"
       role="status"
     >
-      <p className="public-eyebrow">About the office</p>
       <h1 id="about-heading">{copy.title}</h1>
       <p>{copy.description}</p>
       {state === "unavailable" ? <ContentRetryButton /> : null}
@@ -170,7 +169,6 @@ export function PublicAboutError({ reset }: { reset: () => void }) {
     <section className="public-section public-content-page public-content-page--state">
       <div className="public-shell public-reading-width">
         <div className="public-content-state" role="alert">
-          <p className="public-eyebrow">About the office</p>
           <h1>We can’t show this right now</h1>
           <p>Try again, or come back later.</p>
           <Button type="button" variant="outline" onClick={reset}>

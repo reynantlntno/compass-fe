@@ -43,7 +43,7 @@ html[data-compass-contrast="high"] {
   --compass-shadow-md: 0 8px 24px rgba(0, 0, 0, 0.16);
 }
 
-html[data-compass-underline-links="true"] a:not(.public-brand):not(.public-back-to-top) {
+html[data-compass-underline-links="true"] a:not(.public-brand):not(.public-back-to-top):not(.portal-dock__brand) {
   text-decoration-line: underline !important;
   text-decoration-thickness: 0.1rem;
   text-underline-offset: 0.18rem;

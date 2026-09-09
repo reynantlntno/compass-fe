@@ -34,7 +34,6 @@ export default async function ServicesPage() {
     <section className="public-section public-content-page public-service-page" aria-labelledby="services-heading">
       <div className="public-shell public-reading-width">
         <header className="public-content-page__header public-service-page__header">
-          <p className="public-eyebrow">Services</p>
           <h1 id="services-heading">
             {guide.state === "ready" ? guide.data.title : "Services and support"}
           </h1>

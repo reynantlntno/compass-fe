@@ -89,6 +89,10 @@ function sessionReadOptions(signal?: AbortSignal): RequestInit {
   };
 }
 
+export function cookieSessionReadOptions(signal?: AbortSignal): RequestInit {
+  return sessionReadOptions(signal);
+}
+
 function sessionMutationOptions(
   csrf?: string | null,
   signal?: AbortSignal,
@@ -106,6 +110,13 @@ function sessionMutationOptions(
     headers,
     signal,
   };
+}
+
+export async function cookieSessionMutationOptions(
+  signal?: AbortSignal,
+): Promise<RequestInit> {
+  const csrf = await getCsrfToken(signal);
+  return sessionMutationOptions(csrf, signal);
 }
 
 function publicRequestOptions(signal?: AbortSignal): RequestInit {

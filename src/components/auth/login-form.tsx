@@ -465,7 +465,6 @@ export function LoginForm() {
       onSubmit={submitCredentials}
     >
       <header className="auth-form__header">
-        <p className="auth-eyebrow">Sign in</p>
         <h1 id="login-heading">Sign in to COMPASS.</h1>
         <p>Use the email address and password for your COMPASS account.</p>
       </header>

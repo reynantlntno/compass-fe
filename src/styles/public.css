@@ -320,6 +320,14 @@
   text-wrap: balance;
 }
 
+.public-content-page__header > h1:first-child,
+.public-content-detail__header > h1:first-child,
+.public-content-state > h1:first-child,
+.public-content-state > h2:first-child,
+.public-content-state > div > h2:first-child {
+  margin-top: 0;
+}
+
 .public-content-page__header > p:last-child,
 .public-content-detail__header > p:last-child {
   max-width: 39rem;
@@ -2334,6 +2342,11 @@
   letter-spacing: -0.045em;
   line-height: 1.05;
   text-wrap: pretty;
+}
+
+.homepage-section__heading > h2:first-child,
+.homepage-section__heading > div > h2:first-child {
+  margin-top: 0;
 }
 
 .homepage-service-preview h2 {

@@ -39,7 +39,6 @@ export default async function PrivacyPage() {
     <article className="public-section public-content-page public-content-detail public-privacy-page">
       <div className="public-shell public-reading-width">
         <header className="public-content-detail__header">
-          <p className="public-eyebrow">Privacy</p>
           <h1>{branding.productName} Privacy Notice — {branding.officeName}</h1>
           <p>
             How {branding.productName} handles personal information for the {branding.officeName}.

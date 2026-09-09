@@ -11,10 +11,12 @@ import type {
   AuthorityCapabilitiesParams,
   AuthorityGrantRevokeParams,
   AuthorityGranteesParams,
+  AuthorityMeCoverageParams,
   AuthorityScopeOptionsParams,
   BulkGrantResultSchema,
   BulkGrantSchema,
   CapabilityPageSchema,
+  CounselorCoveragePageSchema,
   EffectiveAuthorityProjectionSchema,
   GrantCreateSchema,
   GrantPageSchema,
@@ -796,6 +798,105 @@ export const getAuthorityMeUrl = () => {
 export const authorityMe = async ( options?: Parameters<typeof compassFetch>[1]): Promise<authorityMeResponse> => {
 
   return compassFetch<authorityMeResponse>(getAuthorityMeUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+export type authorityMeCoverageResponse200 = {
+  data: CounselorCoveragePageSchema
+  status: 200
+}
+
+export type authorityMeCoverageResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type authorityMeCoverageResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type authorityMeCoverageResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type authorityMeCoverageResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type authorityMeCoverageResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type authorityMeCoverageResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type authorityMeCoverageResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type authorityMeCoverageResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type authorityMeCoverageResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type authorityMeCoverageResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type authorityMeCoverageResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type authorityMeCoverageResponseSuccess = (authorityMeCoverageResponse200) & {
+  headers: Record<string, string>;
+};
+export type authorityMeCoverageResponseError = (authorityMeCoverageResponse400 | authorityMeCoverageResponse401 | authorityMeCoverageResponse403 | authorityMeCoverageResponse404 | authorityMeCoverageResponse405 | authorityMeCoverageResponse409 | authorityMeCoverageResponse413 | authorityMeCoverageResponse422 | authorityMeCoverageResponse429 | authorityMeCoverageResponse500 | authorityMeCoverageResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type authorityMeCoverageResponse = (authorityMeCoverageResponseSuccess | authorityMeCoverageResponseError)
+
+export const getAuthorityMeCoverageUrl = (params?: AuthorityMeCoverageParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/authority/me/coverage/?${stringifiedParams}` : `/api/v1/authority/me/coverage/`
+}
+
+/**
+ * @summary Me Coverage
+ */
+export const authorityMeCoverage = async (params?: AuthorityMeCoverageParams, options?: Parameters<typeof compassFetch>[1]): Promise<authorityMeCoverageResponse> => {
+
+  return compassFetch<authorityMeCoverageResponse>(getAuthorityMeCoverageUrl(params),
   {
     ...options,
     method: 'GET'

@@ -6,7 +6,6 @@ import { Spinner } from "@/components/ui/spinner";
 export function PublicPrivacyUnavailable() {
   return (
     <div className="public-content-state public-privacy-page__state" role="status" aria-live="polite">
-      <p className="public-eyebrow">Privacy</p>
       <h2>We can’t show this right now</h2>
       <p>Please try again later.</p>
       <ContentRetryButton />
@@ -44,7 +43,6 @@ export function PublicPrivacyError({ reset }: { reset: () => void }) {
     <section className="public-section public-content-page public-content-page--state">
       <div className="public-shell public-reading-width">
         <div className="public-content-state" role="alert">
-          <p className="public-eyebrow">Privacy</p>
           <h1>We can’t show this right now</h1>
           <p>Try again, or come back later.</p>
           <Button type="button" variant="outline" onClick={reset}>

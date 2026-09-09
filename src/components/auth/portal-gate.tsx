@@ -2,18 +2,23 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
 
+import { PortalAccessProvider } from "@/components/portal/portal-access-provider";
+import { PortalNotificationsProvider } from "@/components/portal/portal-notifications-provider";
+import { PortalShell } from "@/components/portal/portal-shell";
 import { PageLoader } from "@/components/feedback/page-loader";
 import { Button } from "@/components/ui/button";
 import { useAuthSession } from "@/components/auth/auth-session-provider";
+import type { BrandingConfig } from "@/lib/branding";
 
-function displayName(firstName: string, email: string) {
-  const normalized = firstName.trim();
-  return normalized || email;
-}
-
-export function PortalGate() {
+export function PortalGate({
+  branding,
+  children,
+}: {
+  branding: BrandingConfig;
+  children: ReactNode;
+}) {
   const router = useRouter();
   const { status, user, refreshSession, signOut } = useAuthSession();
   const [isSigningOut, setIsSigningOut] = useState(false);
@@ -22,14 +27,24 @@ export function PortalGate() {
     if (status === "unauthenticated") router.replace("/login");
   }, [router, status]);
 
+  const handleSignOut = useCallback(async () => {
+    setIsSigningOut(true);
+    try {
+      await signOut();
+      router.replace("/login");
+    } finally {
+      setIsSigningOut(false);
+    }
+  }, [router, signOut]);
+
   if (status === "unknown") {
-    return <PageLoader label="Checking your COMPASS session…" />;
+    return <PageLoader label={`Checking your ${branding.productName} session…`} />;
   }
 
   if (status === "unauthenticated") {
     return (
       <main className="portal-gate portal-gate--redirect" role="status" aria-live="polite">
-        Taking you to sign in…
+        Taking you to {branding.productName} sign in…
       </main>
     );
   }
@@ -38,51 +53,31 @@ export function PortalGate() {
     return (
       <main className="portal-gate" aria-labelledby="portal-unavailable-heading">
         <div className="portal-gate__panel">
-          <p className="auth-eyebrow">COMPASS</p>
+          <p className="portal-eyebrow">{branding.productName}</p>
           <h1 id="portal-unavailable-heading">We couldn’t check your session.</h1>
           <p>Try again when the connection is ready.</p>
           <Button onClick={() => void refreshSession()} type="button">
             Try again
           </Button>
-          <Link className="auth-secondary-link" href="/">
-            Back to COMPASS
+          <Link className="portal-gate__back-link" href="/">
+            Back to {branding.productName}
           </Link>
         </div>
       </main>
     );
   }
 
-  const name = displayName(user.first_name, user.email);
-
   return (
-    <main className="portal-gate" aria-labelledby="portal-heading">
-      <div className="portal-gate__panel">
-        <p className="auth-eyebrow">COMPASS</p>
-        <h1 id="portal-heading">Welcome, {name}.</h1>
-        <p>You’re signed in and ready to continue.</p>
-        <dl className="portal-gate__identity">
-          <div>
-            <dt>Email</dt>
-            <dd>{user.email}</dd>
-          </div>
-          <div>
-            <dt>Role</dt>
-            <dd>{user.role}</dd>
-          </div>
-        </dl>
-        <Button
-          disabled={isSigningOut}
-          onClick={async () => {
-            setIsSigningOut(true);
-            await signOut();
-            router.replace("/login");
-          }}
-          type="button"
-          variant="outline"
+    <PortalAccessProvider>
+      <PortalNotificationsProvider>
+        <PortalShell
+          branding={branding}
+          isSigningOut={isSigningOut}
+          onSignOut={handleSignOut}
         >
-          {isSigningOut ? "Signing out…" : "Sign out"}
-        </Button>
-      </div>
-    </main>
+          {children}
+        </PortalShell>
+      </PortalNotificationsProvider>
+    </PortalAccessProvider>
   );
 }

@@ -219,7 +219,6 @@ export default async function Home() {
           aria-labelledby="start-here-heading"
         >
           <div className="homepage-section__heading">
-            <p className="homepage-kicker">Start here</p>
             <h2 id="start-here-heading">What brings you here?</h2>
             <p>Choose a place to begin.</p>
           </div>
@@ -265,7 +264,6 @@ export default async function Home() {
               />
             ) : null}
             <div>
-              <p className="homepage-kicker">Updates</p>
               <h2 id="announcements-heading">What’s new</h2>
               <p>Announcements from the {branding.officeName}.</p>
             </div>

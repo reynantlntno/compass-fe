@@ -7,6 +7,7 @@
  */
 import type {
   ApiErrorSchema,
+  CurrentDPOAppointmentSchema,
   DPOAppointmentCreateSchema,
   DPOAppointmentSchema,
   GovernanceReasonSchema,
@@ -307,6 +308,98 @@ return compassFetch<policiesDpoAppointmentCreateResponse>(getPoliciesDpoAppointm
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
     body: JSON.stringify(dPOAppointmentCreateSchema)
+  }
+);}
+
+
+export type policiesDpoAppointmentMeResponse200 = {
+  data: CurrentDPOAppointmentSchema
+  status: 200
+}
+
+export type policiesDpoAppointmentMeResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type policiesDpoAppointmentMeResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type policiesDpoAppointmentMeResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type policiesDpoAppointmentMeResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type policiesDpoAppointmentMeResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type policiesDpoAppointmentMeResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type policiesDpoAppointmentMeResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type policiesDpoAppointmentMeResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type policiesDpoAppointmentMeResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type policiesDpoAppointmentMeResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type policiesDpoAppointmentMeResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type policiesDpoAppointmentMeResponseSuccess = (policiesDpoAppointmentMeResponse200) & {
+  headers: Record<string, string>;
+};
+export type policiesDpoAppointmentMeResponseError = (policiesDpoAppointmentMeResponse400 | policiesDpoAppointmentMeResponse401 | policiesDpoAppointmentMeResponse403 | policiesDpoAppointmentMeResponse404 | policiesDpoAppointmentMeResponse405 | policiesDpoAppointmentMeResponse409 | policiesDpoAppointmentMeResponse413 | policiesDpoAppointmentMeResponse422 | policiesDpoAppointmentMeResponse429 | policiesDpoAppointmentMeResponse500 | policiesDpoAppointmentMeResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type policiesDpoAppointmentMeResponse = (policiesDpoAppointmentMeResponseSuccess | policiesDpoAppointmentMeResponseError)
+
+export const getPoliciesDpoAppointmentMeUrl = () => {
+
+
+
+
+  return `/api/v1/policies/dpo-appointment/me/`
+}
+
+/**
+ * @summary Dpo Appointment Me
+ */
+export const policiesDpoAppointmentMe = async ( options?: Parameters<typeof compassFetch>[1]): Promise<policiesDpoAppointmentMeResponse> => {
+
+  return compassFetch<policiesDpoAppointmentMeResponse>(getPoliciesDpoAppointmentMeUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
   }
 );}
 

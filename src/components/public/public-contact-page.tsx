@@ -118,7 +118,6 @@ export function PublicContactError({ reset }: { reset: () => void }) {
     <section className="public-section public-content-page public-content-page--state">
       <div className="public-shell public-reading-width">
         <div className="public-content-state" role="alert">
-          <p className="public-eyebrow">Contact the office</p>
           <h1>We can’t show this right now</h1>
           <p>Try again, or come back later.</p>
           <Button type="button" variant="outline" onClick={reset}>
