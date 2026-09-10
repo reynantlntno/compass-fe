@@ -14,6 +14,7 @@ import {
   getPortalRoleLabel,
 } from "@/components/portal/portal-identity";
 import { PortalHomeWidget } from "@/components/portal/portal-home-widget";
+import { PortalHomeOperationsOverview } from "@/components/portal/portal-home-operations-overview";
 import { PortalSystemHealthSummary } from "@/components/portal/portal-system-health";
 import type { SelfProfileSchema } from "@/lib/api/generated/model";
 import { getCurrentPortalProfile } from "@/lib/api/portal";
@@ -82,7 +83,7 @@ export function PortalHome() {
           aria-label="Default widgets"
           as="section"
           className="portal-home__default-widgets"
-          tone="subtle"
+          tone="brand"
         >
           <div className="portal-home__default-widget-grid">
             <PortalHomeWidget
@@ -115,7 +116,10 @@ export function PortalHome() {
           </div>
         </CompassFrame>
 
-        <PortalSystemHealthSummary />
+        <div aria-label="Portal overview" className="portal-home__overview-grid">
+          <PortalSystemHealthSummary />
+          <PortalHomeOperationsOverview />
+        </div>
       </div>
     </section>
   );

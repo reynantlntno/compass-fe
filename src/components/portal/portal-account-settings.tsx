@@ -26,6 +26,7 @@ import { useAuthSession } from "@/components/auth/auth-session-provider";
 import { CompassFrame } from "@/components/compass/compass-frame";
 import { CompassSurface } from "@/components/compass/compass-surface";
 import { PasswordField } from "@/components/auth/password-field";
+import { PasswordRequirements } from "@/components/auth/password-requirements";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -65,6 +66,10 @@ import type {
   TrustedDevicePageSchema,
   TwoFactorStatusSchema,
 } from "@/lib/api/generated/model";
+import {
+  PASSWORD_MAX_LENGTH,
+  validatePasswordInput,
+} from "@/lib/password-policy";
 
 type ReadState<T> =
   | { kind: "loading" }
@@ -117,6 +122,7 @@ type PasswordErrors = Partial<Record<PasswordFieldName, string>>;
 type TwoFactorBusyState = "request" | "verify" | "resend" | null;
 
 type ConfirmAction =
+  | { kind: "password"; fingerprint: string; values: PasswordValues }
   | { kind: "session"; sessionToken: string }
   | { kind: "sessions" }
   | { kind: "trusted"; deviceId: string }
@@ -132,7 +138,6 @@ type PreferenceMutation = {
   message?: string;
 };
 
-const PASSWORD_MAX_LENGTH = 512;
 const OTP_LENGTH = 6;
 const RESEND_COOLDOWN_SECONDS = 30;
 const INITIAL_RETRIES: Record<SettingsSectionId, number> = {
@@ -186,6 +191,10 @@ function mutationErrorMessage(
   kind: AccountSettingsErrorKind,
   subject: string,
 ) {
+  if (kind === "validation" && subject === "password") {
+    return "Choose a password that meets the requirements and make sure both entries match.";
+  }
+
   switch (kind) {
     case "permission":
       return `This ${subject} action isn’t available for this account.`;
@@ -611,29 +620,17 @@ export function PortalAccountSettings() {
   };
 
   const validatePassword = () => {
-    const errors: PasswordErrors = {};
-    if (!passwordValues.current) errors.current = "Enter your current password.";
-    if (!passwordValues.new) errors.new = "Enter a new password.";
-    if (!passwordValues.confirmation) {
-      errors.confirmation = "Confirm your new password.";
-    }
-    if (passwordValues.current.length > PASSWORD_MAX_LENGTH) {
-      errors.current = "Use 512 characters or fewer.";
-    }
-    if (passwordValues.new.length > PASSWORD_MAX_LENGTH) {
-      errors.new = "Use 512 characters or fewer.";
-    }
-    if (passwordValues.confirmation.length > PASSWORD_MAX_LENGTH) {
-      errors.confirmation = "Use 512 characters or fewer.";
-    }
-    if (
-      passwordValues.new &&
-      passwordValues.confirmation &&
-      passwordValues.new !== passwordValues.confirmation
-    ) {
-      errors.confirmation = "The passwords do not match.";
-    }
-    return errors;
+    const errors = validatePasswordInput({
+      currentPassword: passwordValues.current,
+      password: passwordValues.new,
+      confirmation: passwordValues.confirmation,
+      mode: "change",
+    });
+    return {
+      current: errors.currentPassword,
+      new: errors.password,
+      confirmation: errors.confirmation,
+    };
   };
 
   const handlePasswordSubmit = async (event: FormEvent<HTMLFormElement>) => {
@@ -650,29 +647,12 @@ export function PortalAccountSettings() {
       passwordValues.new,
       passwordValues.confirmation,
     ].join("\u0000");
-    const key = getMutationKey("password", fingerprint);
-    setPasswordStatus({ kind: "submitting" });
-
-    try {
-      await changeAccountPassword(
-        {
-          current_password: passwordValues.current,
-          new_password: passwordValues.new,
-          password_confirmation: passwordValues.confirmation,
-        },
-        key,
-      );
-      discardMutationKey("password");
-      setPasswordValues({ current: "", new: "", confirmation: "" });
-      setPasswordErrors({});
-      await refreshSession();
-      router.replace("/login?reset=complete");
-    } catch (error: unknown) {
-      setPasswordStatus({
-        kind: "error",
-        message: mutationErrorMessage(getErrorKind(error), "password"),
-      });
-    }
+    setPasswordStatus({ kind: "idle" });
+    setConfirmAction({
+      kind: "password",
+      fingerprint,
+      values: passwordValues,
+    });
   };
 
   const [twoFactorPassword, setTwoFactorPassword] = useState("");
@@ -854,7 +834,7 @@ export function PortalAccountSettings() {
   const openConfirm = (action: ConfirmAction) => {
     if (action.kind === "session" || action.kind === "sessions") {
       setSessionsMutationError(null);
-    } else {
+    } else if (action.kind === "trusted" || action.kind === "trusted-all") {
       setTrustedMutationError(null);
     }
     setConfirmAction(action);
@@ -873,6 +853,22 @@ export function PortalAccountSettings() {
         discardMutationKey(scope);
         setSessionsMutationError(null);
         retrySections(["sessions", "activity"]);
+      } else if (action.kind === "password") {
+        const key = getMutationKey("password", action.fingerprint);
+        setPasswordStatus({ kind: "submitting" });
+        await changeAccountPassword(
+          {
+            current_password: action.values.current,
+            new_password: action.values.new,
+            password_confirmation: action.values.confirmation,
+          },
+          key,
+        );
+        discardMutationKey("password");
+        setPasswordValues({ current: "", new: "", confirmation: "" });
+        setPasswordErrors({});
+        await refreshSession();
+        router.replace("/login?reset=complete");
       } else if (action.kind === "sessions") {
         const key = getMutationKey("sessions:others", "revoke");
         await revokeOtherSessions(key);
@@ -900,10 +896,14 @@ export function PortalAccountSettings() {
           getErrorKind(error),
           action.kind === "session" || action.kind === "sessions"
             ? "session"
-            : "trusted browser",
+            : action.kind === "password"
+              ? "password"
+              : "trusted browser",
         ),
       } satisfies FailedConfirmAction;
-      if (action.kind === "session" || action.kind === "sessions") {
+      if (action.kind === "password") {
+        setPasswordStatus({ kind: "error", message: failed.message });
+      } else if (action.kind === "session" || action.kind === "sessions") {
         setSessionsMutationError(failed);
       } else {
         setTrustedMutationError(failed);
@@ -1013,7 +1013,9 @@ export function PortalAccountSettings() {
   const activity = activityState.kind === "ready" ? activityState.data : null;
 
   const confirmationTitle =
-    confirmAction?.kind === "sessions"
+    confirmAction?.kind === "password"
+      ? "Change your password?"
+      : confirmAction?.kind === "sessions"
       ? "Sign out other sessions?"
       : confirmAction?.kind === "trusted-all"
         ? "Revoke all trusted browsers?"
@@ -1021,7 +1023,9 @@ export function PortalAccountSettings() {
           ? "Revoke this trusted browser?"
           : "Sign out this session?";
   const confirmationDescription =
-    confirmAction?.kind === "sessions"
+    confirmAction?.kind === "password"
+      ? "Changing your password will sign out this account on all devices. You’ll need to sign in again."
+      : confirmAction?.kind === "sessions"
       ? "Other active sessions will be signed out. This browser will stay signed in."
       : confirmAction?.kind === "trusted-all"
         ? "All trusted browsers will need to verify again before they can skip the one-time code."
@@ -1069,6 +1073,7 @@ export function PortalAccountSettings() {
                   aria-invalid={passwordErrors.current ? true : undefined}
                   autoComplete="current-password"
                   id="settings-current-password"
+                  maxLength={PASSWORD_MAX_LENGTH}
                   onChange={(event) => updatePassword("current", event.target.value)}
                   value={passwordValues.current}
                 />
@@ -1081,7 +1086,12 @@ export function PortalAccountSettings() {
               <div className="portal-settings__field">
                 <Label htmlFor="settings-new-password">New password</Label>
                 <PasswordField
-                  aria-describedby={passwordErrors.new ? "settings-new-password-error" : undefined}
+                  aria-describedby={[
+                    "settings-password-requirements",
+                    passwordErrors.new ? "settings-new-password-error" : null,
+                  ]
+                    .filter(Boolean)
+                    .join(" ")}
                   aria-invalid={passwordErrors.new ? true : undefined}
                   autoComplete="new-password"
                   id="settings-new-password"
@@ -1094,6 +1104,14 @@ export function PortalAccountSettings() {
                     {passwordErrors.new}
                   </p>
                 ) : null}
+                <PasswordRequirements
+                  confirmation={passwordValues.confirmation}
+                  currentPassword={passwordValues.current}
+                  disabled={passwordStatus.kind === "submitting"}
+                  id="settings-password-requirements"
+                  mode="change"
+                  password={passwordValues.new}
+                />
               </div>
               <div className="portal-settings__field">
                 <Label htmlFor="settings-password-confirmation">Confirm new password</Label>
@@ -1687,7 +1705,13 @@ export function PortalAccountSettings() {
           <AlertDialogFooter>
             <AlertDialogCancel disabled={confirmBusy}>Cancel</AlertDialogCancel>
             <AlertDialogAction disabled={confirmBusy} onClick={() => void handleConfirmMutation()}>
-              {confirmBusy ? "Updating…" : "Continue"}
+              {confirmBusy
+                ? confirmAction?.kind === "password"
+                  ? "Changing password…"
+                  : "Updating…"
+                : confirmAction?.kind === "password"
+                  ? "Change password"
+                  : "Continue"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

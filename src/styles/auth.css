@@ -206,6 +206,72 @@
     line-height: 1.45;
   }
 
+  .auth-password-requirements {
+    display: grid;
+    gap: 0.42rem;
+    margin-top: 0.1rem;
+    color: var(--muted-foreground);
+    font-size: 0.72rem;
+    line-height: 1.4;
+  }
+
+  .auth-password-requirements__title {
+    margin: 0;
+    color: var(--compass-brand-maroon);
+    font-size: 0.7rem;
+    font-weight: var(--compass-weight-bold);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .auth-password-requirements__list {
+    display: grid;
+    gap: 0.22rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .auth-password-requirements__item {
+    display: inline-flex;
+    min-width: 0;
+    align-items: flex-start;
+    gap: 0.42rem;
+  }
+
+  .auth-password-requirements__item[data-state="pass"] {
+    color: var(--compass-support-strong);
+  }
+
+  .auth-password-requirements__item[data-state="fail"] {
+    color: var(--compass-brand-maroon-strong);
+  }
+
+  .auth-password-requirements__marker {
+    display: inline-flex;
+    flex: 0 0 auto;
+    width: 0.85rem;
+    height: 0.85rem;
+    align-items: center;
+    justify-content: center;
+    margin-top: 0.1rem;
+    color: currentColor;
+  }
+
+  .auth-password-requirements__marker svg {
+    width: 0.78rem;
+    height: 0.78rem;
+    stroke-width: 2.2;
+  }
+
+  .auth-password-requirements__guidance {
+    max-width: 32rem;
+    margin: 0;
+    color: var(--muted-foreground);
+    font-size: 0.7rem;
+    line-height: 1.45;
+  }
+
   .auth-field > label,
   .auth-field__label-row label {
     color: var(--foreground);
@@ -530,5 +596,12 @@
   .auth-form__error,
   .auth-form__notice {
     border-inline-start-color: CanvasText;
+  }
+
+  .auth-password-requirements,
+  .auth-password-requirements__title,
+  .auth-password-requirements__item,
+  .auth-password-requirements__guidance {
+    color: CanvasText;
   }
 }

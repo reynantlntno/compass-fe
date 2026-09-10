@@ -398,7 +398,7 @@ function OperationsUnavailableState({
 }
 
 function OperationsEmptyState({ children }: { children: ReactNode }) {
-  return <p className="portal-operations__empty">{children}</p>;
+  return <p className="portal-empty-state portal-operations__empty">{children}</p>;
 }
 
 function Fact({ label, value }: { label: string; value: ReactNode }) {

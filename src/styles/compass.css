@@ -12,6 +12,11 @@
   background-color: var(--compass-surface-muted);
 }
 
+.compass-surface[data-tone="brand"] {
+  background-color: var(--compass-brand-maroon);
+  color: var(--compass-on-brand);
+}
+
 .compass-surface[data-tone="raised"] {
   background-color: var(--compass-surface-raised);
 }

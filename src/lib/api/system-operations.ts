@@ -350,6 +350,16 @@ export function getSystemErrors(page = 1, signal?: AbortSignal) {
   );
 }
 
+export function getUnresolvedSystemErrors(page = 1, signal?: AbortSignal) {
+  return getReadResponse(
+    systemErrorsList(
+      { page, page_size: PAGE_SIZE, unresolved_only: true },
+      cookieSessionReadOptions(signal),
+    ),
+    parseSystemErrorPage,
+  );
+}
+
 export function getSystemMaintenance(page = 1, signal?: AbortSignal) {
   return getReadResponse(
     systemMaintenanceList(

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRight, RefreshCw } from "lucide-react";
+import { Activity, ArrowRight, RefreshCw } from "lucide-react";
 import {
   useEffect,
   useState,
@@ -151,7 +151,9 @@ function HealthSurface({
     <PortalHomeWidget
       {...props}
       className={className}
+      tone="surface"
       variant="overview"
+      watermarkIcon={Activity}
     >
       {children}
     </PortalHomeWidget>
@@ -215,24 +217,47 @@ export function PortalSystemHealthSkeleton({ detail = false }: { detail?: boolea
     <HealthSurface
       aria-busy="true"
       aria-label="Checking system health"
-      className={`portal-health portal-health--loading${detail ? " portal-health--detail" : " portal-health--summary"}`}
+      className="portal-health portal-health--loading portal-health--summary"
       detail={detail}
       role="status"
     >
       <span className="sr-only">Checking system health…</span>
-      <Skeleton
-        aria-hidden="true"
-        className="portal-health__skeleton-line portal-health__skeleton-line--short"
-      />
-      <Skeleton
-        aria-hidden="true"
-        className="portal-health__skeleton-line portal-health__skeleton-line--heading"
-      />
-      <div aria-hidden="true" className="portal-health__skeleton-facts">
-        <Skeleton className="portal-health__skeleton-line" />
-        <Skeleton className="portal-health__skeleton-line" />
-        <Skeleton className="portal-health__skeleton-line" />
+      <div className="portal-health__heading">
+        <h2 id="portal-home-health-heading">System health</h2>
+        <Link
+          className="portal-home__section-link portal-health__action"
+          href="/portal/system-health"
+        >
+          <span>Open system health</span>
+          <ArrowRight aria-hidden="true" />
+        </Link>
       </div>
+      <dl aria-hidden="true" className="portal-health__facts">
+        <div>
+          <dt>Overall status</dt>
+          <dd>
+            <Skeleton className="portal-home__operations-skeleton" />
+          </dd>
+        </div>
+        <div>
+          <dt>Components checked</dt>
+          <dd>
+            <Skeleton className="portal-home__operations-skeleton" />
+          </dd>
+        </div>
+        <div>
+          <dt>Warnings</dt>
+          <dd>
+            <Skeleton className="portal-home__operations-skeleton" />
+          </dd>
+        </div>
+        <div>
+          <dt>Failures</dt>
+          <dd>
+            <Skeleton className="portal-home__operations-skeleton" />
+          </dd>
+        </div>
+      </dl>
     </HealthSurface>
   );
 }

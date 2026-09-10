@@ -5,6 +5,7 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 
 import { AuthLoadingState } from "@/components/auth/auth-loading-state";
 import { PasswordField } from "@/components/auth/password-field";
+import { PasswordRequirements } from "@/components/auth/password-requirements";
 import { TurnstileField } from "@/components/public/turnstile-field";
 import { Button } from "@/components/ui/button";
 import { FieldError } from "@/components/ui/field";
@@ -14,6 +15,10 @@ import {
   activateStudentAccount,
   AuthApiError,
 } from "@/lib/api/auth";
+import {
+  PASSWORD_MAX_LENGTH,
+  validatePasswordInput,
+} from "@/lib/password-policy";
 
 const MAX_ACTIVATION_TOKEN_LENGTH = 512;
 
@@ -51,30 +56,22 @@ function activationErrorMessage(error: unknown): string {
     case "unavailable":
       return "Activation is temporarily unavailable. Please try again shortly.";
     case "validation":
-      return "Check your password entries and try again. The link may also be no longer available.";
+      return "Choose a password that meets the requirements and make sure both entries match. The link may also be no longer available.";
     default:
       return "We couldn’t activate this account. Please try again.";
   }
 }
 
 function validateForm(password: string, confirmation: string): ActivationFieldErrors {
-  const errors: ActivationFieldErrors = {};
-
-  if (!password) {
-    errors.password = "Enter a password.";
-  } else if (password.length > MAX_ACTIVATION_TOKEN_LENGTH) {
-    errors.password = "Your password is too long.";
-  }
-
-  if (!confirmation) {
-    errors.confirmation = "Confirm your password.";
-  } else if (confirmation.length > MAX_ACTIVATION_TOKEN_LENGTH) {
-    errors.confirmation = "Your password confirmation is too long.";
-  } else if (password && password !== confirmation) {
-    errors.confirmation = "The passwords must match.";
-  }
-
-  return errors;
+  const errors = validatePasswordInput({
+    password,
+    confirmation,
+    mode: "activation",
+  });
+  return {
+    password: errors.password,
+    confirmation: errors.confirmation,
+  };
 }
 
 export function ActivationPage({ kind }: { kind: "student" | "staff" }) {
@@ -246,6 +243,7 @@ export function ActivationPage({ kind }: { kind: "student" | "staff" }) {
   const accountLabel = kind === "student" ? "student" : "staff";
   const passwordErrorId = "activation-password-error";
   const confirmationErrorId = "activation-confirmation-error";
+  const passwordRequirementsId = "activation-password-requirements";
 
   return (
     <form
@@ -313,13 +311,18 @@ export function ActivationPage({ kind }: { kind: "student" | "staff" }) {
       <div className="auth-field">
         <Label htmlFor="activation-password">New password</Label>
         <PasswordField
-          aria-describedby={fieldErrors.password ? passwordErrorId : undefined}
+          aria-describedby={[
+            passwordRequirementsId,
+            fieldErrors.password ? passwordErrorId : null,
+          ]
+            .filter(Boolean)
+            .join(" ")}
           aria-invalid={Boolean(fieldErrors.password)}
           autoComplete="new-password"
           autoFocus
           disabled={pending}
           id="activation-password"
-          maxLength={MAX_ACTIVATION_TOKEN_LENGTH}
+          maxLength={PASSWORD_MAX_LENGTH}
           name="new-password"
           onChange={(event) => updatePassword(event.target.value)}
           required
@@ -328,7 +331,13 @@ export function ActivationPage({ kind }: { kind: "student" | "staff" }) {
         {fieldErrors.password ? (
           <FieldError id={passwordErrorId}>{fieldErrors.password}</FieldError>
         ) : null}
-        <p className="auth-field__hint">Use a password you do not use elsewhere.</p>
+        <PasswordRequirements
+          confirmation={confirmation}
+          disabled={pending}
+          id={passwordRequirementsId}
+          mode="activation"
+          password={password}
+        />
       </div>
 
       <div className="auth-field">
@@ -339,7 +348,7 @@ export function ActivationPage({ kind }: { kind: "student" | "staff" }) {
           autoComplete="new-password"
           disabled={pending}
           id="activation-confirmation"
-          maxLength={MAX_ACTIVATION_TOKEN_LENGTH}
+          maxLength={PASSWORD_MAX_LENGTH}
           name="password-confirmation"
           onChange={(event) => updateConfirmation(event.target.value)}
           required

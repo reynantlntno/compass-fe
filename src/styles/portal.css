@@ -102,7 +102,7 @@
   .portal-dock__inner {
     display: grid;
     width: min(calc(100% - 2rem), 76rem);
-    grid-template-columns: auto minmax(0, auto) minmax(0, 1fr);
+    grid-template-columns: auto minmax(0, 1fr) auto;
     align-items: center;
     gap: 1.25rem;
     margin-inline: auto;
@@ -190,6 +190,7 @@
   .portal-dock__nav,
   .portal-dock__utilities,
   .portal-dock__mobile-nav {
+    position: relative;
     display: flex;
     min-width: 0;
     align-items: center;
@@ -203,9 +204,14 @@
       visibility 0s linear;
   }
 
+  .portal-dock__nav {
+    overflow: hidden;
+  }
+
   .portal-dock__nav-link {
     position: relative;
     display: inline-flex;
+    flex: 0 0 auto;
     min-height: 2.35rem;
     align-items: center;
     gap: 0.42rem;
@@ -215,6 +221,7 @@
     font-size: 0.77rem;
     font-weight: var(--compass-weight-medium);
     text-decoration: none;
+    white-space: nowrap;
   }
 
   .portal-dock__nav-link:hover,
@@ -247,6 +254,38 @@
     width: 0.85rem;
     height: 0.85rem;
     margin-left: -0.08rem;
+  }
+
+  .portal-dock__more-trigger {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
+  .portal-dock__adaptive-nav[data-dock-ready="false"]
+    > :not(.portal-dock__nav-measure) {
+    visibility: hidden;
+  }
+
+  .portal-dock__nav-measure {
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: flex;
+    gap: inherit;
+    visibility: hidden;
+    pointer-events: none;
+    white-space: nowrap;
+  }
+
+  .portal-dock__nav-measure-item {
+    display: inline-flex;
+    flex: 0 0 auto;
+  }
+
+  .portal-dock__nav-measure .portal-dock__more-trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
   }
 
   .portal-dock__utilities {
@@ -1751,7 +1790,264 @@
   }
 }
 
+@layer components {
+  .portal-search__trigger {
+    min-height: 2.35rem;
+    gap: 0.42rem;
+    border-color: var(--compass-brand-maroon);
+    border-radius: var(--compass-radius-sm);
+    padding: 0.3rem 0.58rem;
+    color: var(--compass-brand-maroon);
+    font-size: 0.77rem;
+    font-weight: var(--compass-weight-bold);
+  }
 
+  .portal-search__trigger:hover,
+  .portal-search__trigger:focus-visible {
+    border-color: var(--compass-brand-maroon);
+    background-color: var(--compass-brand-maroon);
+    color: var(--compass-on-brand);
+  }
+
+  .portal-search__trigger--compact {
+    width: 2.2rem;
+    min-width: 2.2rem;
+    height: 2.2rem;
+    min-height: 2.2rem;
+    justify-content: center;
+    padding: 0.25rem;
+  }
+
+  .portal-search__trigger-icon,
+  .portal-search__input-icon,
+  .portal-search__result-icon {
+    width: 1rem;
+    height: 1rem;
+    flex: 0 0 auto;
+  }
+
+  .portal-search__shortcut {
+    display: inline-flex;
+    min-width: 2.25rem;
+    height: 1.35rem;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid currentColor;
+    border-radius: 0.35rem;
+    padding-inline: 0.3rem;
+    font-family: inherit;
+    font-size: 0.64rem;
+    font-weight: var(--compass-weight-bold);
+    line-height: 1;
+    opacity: 0.72;
+  }
+
+  .portal-search__dialog {
+    width: min(36rem, calc(100vw - 2rem));
+    max-width: min(36rem, calc(100vw - 2rem));
+    gap: 1rem;
+    padding: 1.25rem;
+    color: var(--foreground);
+    box-shadow: var(--compass-shadow-md);
+  }
+
+  .portal-search__header {
+    gap: 0.35rem;
+    padding-right: 1.5rem;
+  }
+
+  .portal-search__header [data-slot="dialog-title"] {
+    color: var(--compass-brand-maroon-strong);
+    font-family: var(--compass-font-heading);
+    font-size: 1.35rem;
+    letter-spacing: -0.02em;
+  }
+
+  .portal-search__header [data-slot="dialog-description"] {
+    color: var(--muted-foreground);
+    line-height: 1.5;
+  }
+
+  .portal-search__input-wrap {
+    position: relative;
+  }
+
+  .portal-search__input-wrap [data-slot="input"] {
+    height: 2.75rem;
+    border-color: var(--compass-border-strong);
+    padding-left: 2.45rem;
+    background-color: var(--compass-surface-subtle);
+  }
+
+  .portal-search__input-wrap [data-slot="input"]:focus-visible {
+    border-color: var(--compass-brand-maroon);
+    box-shadow: 0 0 0 0.18rem color-mix(in srgb, var(--compass-brand-maroon) 20%, transparent);
+  }
+
+  .portal-search__input-icon {
+    position: absolute;
+    top: 50%;
+    left: 0.8rem;
+    z-index: 1;
+    color: var(--compass-brand-maroon);
+    pointer-events: none;
+    transform: translateY(-50%);
+  }
+
+  .portal-search__results {
+    display: grid;
+    max-height: min(22rem, calc(100svh - 17rem));
+    gap: 1rem;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .portal-search__group {
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .portal-search__group-label {
+    margin: 0;
+    color: var(--compass-brand-maroon);
+    font-size: 0.68rem;
+    font-weight: var(--compass-weight-bold);
+    letter-spacing: 0.12em;
+    line-height: 1.3;
+    text-transform: uppercase;
+  }
+
+  .portal-search__result-list {
+    display: grid;
+    gap: 0.2rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .portal-search__result {
+    display: flex;
+    min-width: 0;
+    min-height: 2.75rem;
+    align-items: center;
+    gap: 0.75rem;
+    border: 1px solid transparent;
+    border-radius: var(--compass-radius-sm);
+    padding: 0.55rem 0.65rem;
+    color: var(--foreground);
+    text-decoration: none;
+    transition:
+      background-color var(--compass-motion-standard),
+      border-color var(--compass-motion-standard),
+      color var(--compass-motion-standard);
+  }
+
+  .portal-search__result:hover,
+  .portal-search__result:focus-visible {
+    border-color: var(--compass-brand-maroon);
+    background-color: var(--compass-surface-muted);
+    color: var(--compass-brand-maroon-strong);
+  }
+
+  .portal-search__result-copy {
+    display: flex;
+    min-width: 0;
+    flex: 1;
+    flex-direction: column;
+    gap: 0.1rem;
+  }
+
+  .portal-search__result-label,
+  .portal-search__result-parent {
+    overflow-wrap: anywhere;
+  }
+
+  .portal-search__result-label {
+    font-size: 0.82rem;
+    font-weight: var(--compass-weight-bold);
+    line-height: 1.3;
+  }
+
+  .portal-search__result-parent {
+    color: var(--muted-foreground);
+    font-size: 0.7rem;
+    line-height: 1.3;
+  }
+
+  .portal-search__result-icon {
+    margin-left: auto;
+    color: var(--compass-brand-maroon);
+  }
+
+  .portal-search__empty {
+    display: flex;
+    min-height: 7rem;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    padding: 1rem;
+    color: var(--muted-foreground);
+    text-align: center;
+  }
+
+  .portal-search__empty strong {
+    color: var(--compass-brand-maroon-strong);
+    font-size: 0.88rem;
+  }
+
+  .portal-search__empty span {
+    font-size: 0.75rem;
+  }
+
+  @media (max-width: 38rem) {
+    .portal-search__dialog {
+      width: calc(100vw - 1rem);
+      max-width: calc(100vw - 1rem);
+      padding: 1rem;
+    }
+
+    .portal-search__results {
+      max-height: min(20rem, calc(100svh - 15rem));
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .portal-search__result,
+    .portal-search__trigger {
+      transition: none;
+    }
+  }
+
+  @media (forced-colors: active) {
+    .portal-search__trigger,
+    .portal-search__dialog,
+    .portal-search__input-wrap [data-slot="input"],
+    .portal-search__result {
+      border-color: CanvasText;
+      background-color: Canvas;
+      color: CanvasText;
+      box-shadow: none;
+    }
+
+    .portal-search__trigger:hover,
+    .portal-search__trigger:focus-visible,
+    .portal-search__result:hover,
+    .portal-search__result:focus-visible {
+      background-color: CanvasText;
+      color: Canvas;
+    }
+
+    .portal-search__shortcut,
+    .portal-search__group-label,
+    .portal-search__header [data-slot="dialog-title"],
+    .portal-search__input-icon,
+    .portal-search__result-icon,
+    .portal-search__empty strong {
+      color: CanvasText;
+    }
+  }
+}
 
 /* Account and system-health interiors use open groups instead of inbox rules. */
 @layer components {
@@ -2234,6 +2530,11 @@
     min-height: 2.2rem;
     padding: 0.3rem 0.5rem;
     font-size: 0.72rem;
+  }
+
+  .portal-dock__nav-link,
+  .portal-dock__more-trigger {
+    white-space: nowrap;
   }
 
   .portal-account__trigger--compact {
@@ -3367,6 +3668,373 @@
 
     .portal-settings__badge {
       border-color: CanvasText;
+    }
+  }
+}
+
+@layer components {
+  /* The compact clock keeps the full desktop treatment while using a quieter
+     face when the default home tiles become narrow. */
+  @media (max-width: 38rem) {
+    .portal-time--compact .portal-clock {
+      width: min(100%, 3rem);
+      box-shadow: none;
+    }
+
+    .portal-time--compact .portal-clock::before {
+      display: none;
+    }
+
+    .portal-time--compact .portal-clock__marker {
+      display: none;
+    }
+
+    .portal-time--compact .portal-clock__marker:nth-of-type(1),
+    .portal-time--compact .portal-clock__marker:nth-of-type(4),
+    .portal-time--compact .portal-clock__marker:nth-of-type(7),
+    .portal-time--compact .portal-clock__marker:nth-of-type(10) {
+      display: block;
+    }
+
+    .portal-time--compact .portal-clock__marker::after {
+      top: 0.42rem;
+      width: 0.11rem;
+      height: 0.28rem;
+    }
+
+    .portal-time--compact .portal-clock__hand--hour {
+      width: 0.2rem;
+      height: 25%;
+    }
+
+    .portal-time--compact .portal-clock__hand--minute {
+      width: 0.13rem;
+      height: 36%;
+    }
+
+    .portal-time--compact .portal-clock__center {
+      width: 0.42rem;
+      height: 0.42rem;
+      border-width: 1px;
+      box-shadow: 0 0 0 1px var(--compass-brand-maroon);
+    }
+  }
+
+  .portal-home__operations {
+    min-width: 0;
+    margin-top: clamp(1.35rem, 3vw, 2.35rem);
+  }
+
+  .portal-home__operations-heading {
+    display: grid;
+    gap: 0.35rem;
+    min-width: 0;
+  }
+
+  .portal-home__operations-heading h2 {
+    margin: 0;
+    color: var(--compass-brand-maroon-strong);
+    font-family: var(--compass-font-heading);
+    font-size: clamp(1.45rem, 2.8vw, 2.1rem);
+    letter-spacing: -0.045em;
+    line-height: 1;
+    overflow-wrap: anywhere;
+  }
+
+  .portal-home__operations-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: stretch;
+    gap: clamp(0.8rem, 1.8vw, 1.2rem);
+    margin-top: 0.85rem;
+    min-width: 0;
+  }
+
+  .portal-home__operations-card {
+    display: flex;
+    min-width: 0;
+    min-height: 100%;
+    flex-direction: column;
+    gap: 0.9rem;
+    padding: clamp(0.9rem, 1.8vw, 1.25rem);
+  }
+
+  .portal-home__widget--overview,
+  .portal-home__operations-card {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+  }
+
+  .portal-home__widget--overview > :not(.portal-home__widget-watermark),
+  .portal-home__operations-card > :not(.portal-home__widget-watermark) {
+    position: relative;
+    z-index: 1;
+  }
+
+  .portal-home__widget-watermark {
+    position: absolute;
+    z-index: 0;
+    right: clamp(0.8rem, 2vw, 1.35rem);
+    bottom: clamp(0.7rem, 1.7vw, 1.1rem);
+    width: clamp(3.8rem, 7vw, 5.75rem);
+    height: clamp(3.8rem, 7vw, 5.75rem);
+    color: var(--compass-brand-maroon);
+    opacity: 0.085;
+    pointer-events: none;
+  }
+
+  .portal-home__operations-card-header {
+    display: flex;
+    min-width: 0;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
+
+  .portal-home__operations-card-header h3 {
+    min-width: 0;
+    margin: 0;
+    color: var(--compass-brand-maroon-strong);
+    font-family: var(--compass-font-heading);
+    font-size: clamp(1.1rem, 2vw, 1.45rem);
+    letter-spacing: -0.04em;
+    line-height: 1.05;
+    overflow-wrap: anywhere;
+  }
+
+  .portal-home__operations-card-header .portal-home__section-link {
+    flex: 0 0 auto;
+    margin-top: 0;
+    font-size: 0.7rem;
+  }
+
+  .portal-home__operations-facts {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem 1rem;
+    margin: 0;
+  }
+
+  .portal-home__operations-fact {
+    display: grid;
+    min-width: 0;
+    align-content: start;
+    gap: 0.3rem;
+    padding-top: 0.55rem;
+    border-top: 1px solid var(--compass-border);
+  }
+
+  .portal-home__operations-fact dt {
+    color: var(--compass-brand-maroon);
+    font-size: 0.64rem;
+    font-weight: var(--compass-weight-bold);
+    letter-spacing: 0.1em;
+    line-height: 1.35;
+    text-transform: uppercase;
+    overflow-wrap: anywhere;
+  }
+
+  .portal-home__operations-fact dd {
+    min-width: 0;
+    margin: 0;
+    color: var(--foreground);
+    font-size: 0.82rem;
+    font-weight: var(--compass-weight-medium);
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+  }
+
+  .portal-home__operations-badge {
+    height: auto;
+    min-height: 1.25rem;
+    max-width: 100%;
+    padding-inline: 0.45rem;
+    background-color: var(--compass-surface-subtle);
+    color: var(--compass-brand-maroon-strong);
+    white-space: normal;
+  }
+
+  .portal-home__operations-badge[data-operations-status="failed"],
+  .portal-home__operations-badge[data-operations-status="error"] {
+    border-color: var(--compass-brand-maroon);
+    color: var(--compass-brand-maroon-strong);
+  }
+
+  .portal-home__operations-badge[data-operations-status="active"] {
+    border-color: var(--compass-brand-maroon);
+  }
+
+  .portal-home__operations-unavailable {
+    display: flex;
+    min-width: 0;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .portal-home__operations-retry {
+    min-height: 1.55rem;
+    max-width: 100%;
+    border-color: var(--compass-brand-maroon);
+    background-color: transparent;
+    color: var(--compass-brand-maroon);
+    font-size: 0.68rem;
+  }
+
+  .portal-home__operations-retry:hover,
+  .portal-home__operations-retry:focus-visible {
+    border-color: var(--compass-brand-maroon);
+    background-color: var(--compass-brand-maroon);
+    color: var(--compass-on-brand);
+  }
+
+  .portal-home__operations-retry svg {
+    width: 0.75rem;
+    height: 0.75rem;
+  }
+
+  .portal-home__operations-skeleton {
+    display: block;
+    width: min(4.5rem, 100%);
+    height: 1.15rem;
+  }
+
+  @media (max-width: 50rem) {
+    .portal-home__operations-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 38rem) {
+    .portal-home__operations {
+      margin-top: 1rem;
+    }
+
+    .portal-home__operations-grid {
+      grid-template-columns: 1fr;
+      gap: 0.7rem;
+    }
+
+    .portal-home__operations-card {
+      gap: 0.75rem;
+      padding: 0.85rem;
+    }
+
+    .portal-home__operations-card-header {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .portal-home__operations-card-header .portal-home__section-link {
+      align-self: flex-start;
+    }
+
+    .portal-home__operations-facts {
+      gap: 0.65rem 0.8rem;
+    }
+  }
+
+  @media (forced-colors: active) {
+    .portal-home__operations-card,
+    .portal-home__operations-fact,
+    .portal-home__operations-badge,
+    .portal-home__operations-retry {
+      border-color: CanvasText;
+      background-color: Canvas;
+      box-shadow: none;
+      color: CanvasText;
+    }
+
+    .portal-home__operations-heading h2,
+    .portal-home__operations-card-header h3,
+    .portal-home__operations-fact dt,
+    .portal-home__operations-fact dd,
+    .portal-home__operations-badge,
+    .portal-home__operations-retry {
+      color: CanvasText !important;
+    }
+
+    .portal-home__widget-watermark {
+      color: CanvasText;
+      opacity: 0.35;
+    }
+
+    .portal-home__operations-skeleton {
+      background-color: CanvasText;
+    }
+
+    .portal-home__operations-retry:hover,
+    .portal-home__operations-retry:focus-visible {
+      background-color: CanvasText;
+      color: Canvas !important;
+    }
+  }
+
+  /* The default widgets form the narrow first column. The right side owns a
+     two-column overview grid so health and the capability-driven operation
+     summaries can share one balanced dashboard area. */
+  .portal-home__widget-grid {
+    grid-template-columns: minmax(0, 0.62fr) minmax(0, 1.38fr);
+    align-items: stretch;
+  }
+
+  .portal-home__default-widgets {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .portal-home__overview-grid {
+    display: grid;
+    grid-column: 2;
+    grid-row: 1;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: stretch;
+    gap: clamp(0.8rem, 1.8vw, 1.2rem);
+    min-width: 0;
+  }
+
+  .portal-home__overview-grid .portal-home__widget--overview,
+  .portal-home__overview-grid .portal-home__operations-card {
+    min-height: 0;
+  }
+
+  .portal-home__overview-grid .portal-home__widget--overview.portal-health--summary {
+    grid-column: auto;
+    grid-row: auto;
+  }
+
+  .portal-home__operations,
+  .portal-home__operations-grid {
+    display: contents;
+  }
+
+  .portal-home__overview-grid:not(:has(.portal-home__operations-card))
+    .portal-home__widget--overview.portal-health--summary {
+    grid-column: 1 / -1;
+  }
+
+  @media (max-width: 38rem) {
+    .portal-home__widget-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .portal-home__default-widgets {
+      grid-column: 1;
+      grid-row: auto;
+    }
+
+    .portal-home__overview-grid {
+      grid-column: 1;
+      grid-row: auto;
+      grid-template-columns: 1fr;
+    }
+
+    .portal-home__overview-grid .portal-home__widget--overview.portal-health--summary,
+    .portal-home__overview-grid:not(:has(.portal-home__operations-card))
+      .portal-home__widget--overview.portal-health--summary {
+      grid-column: 1;
+      grid-row: auto;
     }
   }
 }
@@ -5970,7 +6638,7 @@
   .portal-audit {
     display: grid;
     min-width: 0;
-    gap: clamp(0.75rem, 1.35vw, 1rem);
+    gap: 0;
   }
 
   .portal-audit__filters {
@@ -6057,6 +6725,7 @@
 
   .portal-audit__frame {
     min-width: 0;
+    margin-top: 0.8rem;
   }
 
   .portal-audit__frame--state,
@@ -6610,7 +7279,11 @@
   .portal-delivery__filters-grid {
     display: grid;
     min-width: 0;
-    grid-template-columns: minmax(10rem, 0.8fr) minmax(14rem, 1.3fr) auto;
+    grid-template-columns:
+      minmax(8rem, 0.7fr)
+      minmax(10rem, 0.85fr)
+      minmax(14rem, 1.3fr)
+      auto;
     gap: 0.8rem 1rem;
     align-items: end;
     margin-top: 0.75rem;
@@ -7588,6 +8261,16 @@
 }
 
 @layer components {
+  .portal-empty-state {
+    max-width: 38rem;
+    margin: 0;
+    color: var(--muted-foreground);
+    font-family: var(--compass-font-heading);
+    font-size: 0.84rem;
+    line-height: 1.55;
+    overflow-wrap: anywhere;
+  }
+
   /* Backups workspace composition. */
   .portal-backups {
     display: grid;
@@ -8467,7 +9150,7 @@
     display: grid;
     width: auto;
     min-width: 0;
-    gap: 0.9rem;
+    gap: 0;
     margin: 0;
     padding: 0;
     border: 0;

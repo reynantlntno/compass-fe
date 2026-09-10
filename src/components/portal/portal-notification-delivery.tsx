@@ -45,7 +45,6 @@ import { PortalFilterPanel } from "@/components/portal/portal-filter-panel";
 import { PortalListRow } from "@/components/portal/portal-list-row";
 import { PORTAL_CAPABILITIES } from "@/components/portal/portal-navigation";
 import { PortalPageHeader } from "@/components/portal/portal-page-header";
-import { PortalViewMenu } from "@/components/portal/portal-view-menu";
 import {
   deadLetterPortalNotificationDelivery,
   getPortalNotificationDelivery,
@@ -306,14 +305,6 @@ function DeliveryPageHeader({
   );
 }
 
-function DeliveryNavSkeleton() {
-  return (
-    <div aria-hidden="true" className="portal-view-menu portal-delivery__nav-skeleton">
-      <Skeleton className="portal-delivery__nav-skeleton-trigger" />
-    </div>
-  );
-}
-
 function DeliveryFilters({
   deliveryState,
   status,
@@ -330,18 +321,25 @@ function DeliveryFilters({
     event.preventDefault();
 
     const formData = new FormData(event.currentTarget);
+    const submittedStatus = formData.get("status");
     const submittedDeliveryState = formData.get("delivery_state");
     const submittedTemplateKey = formData.get("template_key");
-    const nextHref = deliveryHref(status, 1, {
-      deliveryState:
-        typeof submittedDeliveryState === "string"
-          ? parseDeliveryState(submittedDeliveryState)
-          : null,
-      templateKey:
-        typeof submittedTemplateKey === "string"
-          ? parseTemplateKey(submittedTemplateKey)
-          : null,
-    });
+    const nextHref = deliveryHref(
+      typeof submittedStatus === "string"
+        ? parseStatus(submittedStatus)
+        : "all",
+      1,
+      {
+        deliveryState:
+          typeof submittedDeliveryState === "string"
+            ? parseDeliveryState(submittedDeliveryState)
+            : null,
+        templateKey:
+          typeof submittedTemplateKey === "string"
+            ? parseTemplateKey(submittedTemplateKey)
+            : null,
+      },
+    );
 
     startFilterNavigation(() => router.push(nextHref));
   };
@@ -354,10 +352,23 @@ function DeliveryFilters({
       className="portal-delivery__filters"
       onSubmit={handleFilterSubmit}
       resetKey={`${status}:${deliveryState ?? ""}:${templateKey ?? ""}`}
-      summary="Narrow delivery records by state or template."
+      summary="Narrow delivery records by status, state, or template."
     >
-      {status !== "all" ? <input name="status" type="hidden" value={status} /> : null}
       <div className="portal-delivery__filters-grid">
+        <div className="portal-delivery__filter-field">
+          <Label htmlFor="portal-delivery-status">Status</Label>
+          <select
+            defaultValue={status}
+            id="portal-delivery-status"
+            name="status"
+          >
+            {DELIVERY_STATUS_FILTERS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
         <div className="portal-delivery__filter-field">
           <Label htmlFor="portal-delivery-state">Delivery state</Label>
           <select
@@ -428,7 +439,6 @@ function DeliveryLoadingState() {
           />
         }
       />
-      <DeliveryNavSkeleton />
       <PortalFilterPanel
         accessibleLabel="notification delivery filters"
         action="/portal/notification-delivery"
@@ -447,7 +457,7 @@ function DeliveryLoadingState() {
           aria-hidden="true"
           className="portal-delivery__filters-grid portal-delivery__filters--loading-grid"
         >
-          {Array.from({ length: 3 }, (_, index) => (
+          {Array.from({ length: 4 }, (_, index) => (
             <Skeleton as="span" key={index} />
           ))}
         </div>
@@ -1007,20 +1017,9 @@ function NotificationDeliveryWorkspace() {
     setMutation(null);
   };
 
-  const navItems = DELIVERY_STATUS_FILTERS.map((item) => ({
-    ...item,
-    href: deliveryHref(item.value, 1, { deliveryState, templateKey }),
-  }));
-
   return (
     <section aria-labelledby="portal-delivery-heading" className="portal-delivery">
       <DeliveryPageHeader />
-      <PortalViewMenu
-        activeValue={status}
-        ariaLabel="Notification delivery status"
-        items={navItems}
-        label="View"
-      />
       <DeliveryFilters
         deliveryState={deliveryState}
         status={status}

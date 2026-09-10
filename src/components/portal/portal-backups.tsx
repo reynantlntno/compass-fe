@@ -397,7 +397,11 @@ function BackupsUnavailableState({
 }
 
 function BackupsEmptyState({ children }: { children: ReactNode }) {
-  return <div className="portal-backups__empty" role="status">{children}</div>;
+  return (
+    <p className="portal-empty-state portal-backups__empty" role="status">
+      {children}
+    </p>
+  );
 }
 
 type BackupRowAction = {

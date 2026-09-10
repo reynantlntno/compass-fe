@@ -13,7 +13,13 @@ import {
   Settings,
 } from "lucide-react";
 import { usePathname } from "next/navigation";
-import { useEffect, useMemo, useState, type ReactNode } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 
 import { useAuthSession } from "@/components/auth/auth-session-provider";
 import { CompassFrame } from "@/components/compass/compass-frame";
@@ -21,11 +27,16 @@ import { usePortalAccess } from "@/components/portal/portal-access-provider";
 import { usePortalNotifications } from "@/components/portal/portal-notifications-provider";
 import {
   getVisiblePortalNavigation,
+  getVisiblePortalSearchItems,
   isPortalNavigationItemActive,
   type PortalNavigationItem,
   type PortalNavigationLink,
   type PortalNavigationMenu,
 } from "@/components/portal/portal-navigation";
+import {
+  PortalSearchDialog,
+  PortalSearchTrigger,
+} from "@/components/portal/portal-search";
 import { getPortalAccountName, getPortalInitials, getPortalRoleLabel } from "@/components/portal/portal-identity";
 import {
   AlertDialog,
@@ -53,6 +64,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import type { BrandingConfig } from "@/lib/branding";
 import type { MeSchema } from "@/lib/api/generated/model";
+
+const PORTAL_DOCK_VISIBLE_LIMIT = 5;
+// Search is the third always-visible mobile action, so only two portal
+// destinations remain in the direct mobile navigation.
+const PORTAL_MOBILE_DOCK_NAV_LIMIT = 2;
 
 function notificationAccessibleLabel(
   item: PortalNavigationLink,
@@ -284,6 +300,122 @@ function PortalNavigationItemView({
   return <PortalNavigationLinkView item={item} onNavigate={onNavigate} />;
 }
 
+function PortalNavigationMeasureItem({
+  item,
+}: {
+  item: PortalNavigationItem;
+}) {
+  const Icon = item.icon;
+
+  return (
+    <span className="portal-dock__nav-measure-item">
+      <span className="portal-dock__nav-link">
+        <Icon aria-hidden="true" className="portal-dock__nav-icon" />
+        <span>{item.label}</span>
+      </span>
+    </span>
+  );
+}
+
+function PortalAdaptiveNavigation({
+  ariaHidden,
+  items,
+}: {
+  ariaHidden: boolean;
+  items: readonly PortalNavigationItem[];
+}) {
+  const maxVisibleCount = Math.min(items.length, PORTAL_DOCK_VISIBLE_LIMIT);
+  const [visibleCount, setVisibleCount] = useState(maxVisibleCount);
+  const [isMeasured, setIsMeasured] = useState(false);
+  const navRef = useRef<HTMLElement | null>(null);
+  const measureRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const navElement = navRef.current;
+    const measureElement = measureRef.current;
+    if (!navElement || !measureElement) return;
+
+    let active = true;
+
+    const measureNavigation = () => {
+      if (!active) return;
+
+      const availableWidth = navElement.clientWidth;
+      const measuredItems = Array.from(measureElement.children)
+        .slice(0, maxVisibleCount)
+        .map((item) => item.getBoundingClientRect().width);
+      const moreElement = measureElement.lastElementChild;
+      const moreWidth = moreElement?.getBoundingClientRect().width ?? 0;
+      const computedStyle = window.getComputedStyle(navElement);
+      const gap = Number.parseFloat(computedStyle.columnGap) || 0;
+      let nextVisibleCount = 0;
+
+      for (let count = maxVisibleCount; count >= 0; count -= 1) {
+        const hasOverflow = items.length > count;
+        const directWidth = measuredItems
+          .slice(0, count)
+          .reduce((total, width) => total + width, 0);
+        const gapCount = Math.max(count - 1, 0) + (hasOverflow && count > 0 ? 1 : 0);
+        const requiredWidth =
+          directWidth + gap * gapCount + (hasOverflow ? moreWidth : 0);
+
+        if (requiredWidth <= availableWidth) {
+          nextVisibleCount = count;
+          break;
+        }
+      }
+
+      setVisibleCount((currentCount) =>
+        currentCount === nextVisibleCount ? currentCount : nextVisibleCount,
+      );
+      setIsMeasured(true);
+    };
+
+    measureNavigation();
+
+    const resizeObserver = new ResizeObserver(measureNavigation);
+    resizeObserver.observe(navElement);
+    window.addEventListener("resize", measureNavigation);
+
+    const fontsReady = document.fonts?.ready.then(measureNavigation);
+
+    return () => {
+      active = false;
+      resizeObserver.disconnect();
+      window.removeEventListener("resize", measureNavigation);
+      void fontsReady;
+    };
+  }, [items, maxVisibleCount]);
+
+  return (
+    <nav
+      aria-hidden={ariaHidden || undefined}
+      aria-label="Portal navigation"
+      className="portal-dock__nav portal-dock__adaptive-nav"
+      data-dock-ready={isMeasured ? "true" : "false"}
+      ref={navRef}
+    >
+      {items.slice(0, visibleCount).map((item) => (
+        <PortalNavigationItemView item={item} key={item.id} />
+      ))}
+      <PortalMoreMenu items={items.slice(visibleCount)} />
+      <div
+        aria-hidden="true"
+        className="portal-dock__nav-measure"
+        ref={measureRef}
+      >
+        {items.slice(0, maxVisibleCount).map((item) => (
+          <PortalNavigationMeasureItem item={item} key={item.id} />
+        ))}
+        <span className="portal-dock__more-trigger">
+          <Ellipsis aria-hidden="true" className="portal-dock__nav-icon" />
+          <span>More</span>
+        </span>
+      </div>
+    </nav>
+  );
+}
+
 function PortalDropdownNavigationItem({
   item,
   onNavigate,
@@ -494,6 +626,7 @@ export function PortalShell({
   const { user } = useAuthSession();
   const { status: accessStatus, capabilities } = usePortalAccess();
   const [dockCollapsed, setDockCollapsed] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const visibleNavigation = useMemo(
     () =>
       getVisiblePortalNavigation(
@@ -501,11 +634,19 @@ export function PortalShell({
       ),
     [accessStatus, capabilities],
   );
-  const mobileDirectNavigation = visibleNavigation.filter(
-    (item) => item.id === "home" || item.id === "notifications",
+  const mobileDirectNavigation = visibleNavigation.slice(
+    0,
+    PORTAL_MOBILE_DOCK_NAV_LIMIT,
   );
-  const mobileOverflowNavigation = visibleNavigation.filter(
-    (item) => item.id !== "home" && item.id !== "notifications",
+  const mobileOverflowNavigation = visibleNavigation.slice(
+    PORTAL_MOBILE_DOCK_NAV_LIMIT,
+  );
+  const searchItems = useMemo(
+    () =>
+      getVisiblePortalSearchItems(
+        accessStatus === "ready" ? capabilities : [],
+      ),
+    [accessStatus, capabilities],
   );
 
   useEffect(() => {
@@ -520,6 +661,36 @@ export function PortalShell({
         root.dataset.compassFixedActions = previousValue;
       }
     };
+  }, []);
+
+  useEffect(() => {
+    const handleShortcut = (event: KeyboardEvent) => {
+      if (
+        event.key.toLowerCase() !== "k" ||
+        (!event.metaKey && !event.ctrlKey) ||
+        event.altKey ||
+        event.shiftKey
+      ) {
+        return;
+      }
+
+      const target = event.target;
+      if (
+        target instanceof HTMLElement &&
+        (target.isContentEditable ||
+          target instanceof HTMLInputElement ||
+          target instanceof HTMLTextAreaElement ||
+          target instanceof HTMLSelectElement)
+      ) {
+        return;
+      }
+
+      event.preventDefault();
+      setSearchOpen(true);
+    };
+
+    window.addEventListener("keydown", handleShortcut);
+    return () => window.removeEventListener("keydown", handleShortcut);
   }, []);
 
   if (!user) return null;
@@ -542,21 +713,17 @@ export function PortalShell({
             onExpand={() => setDockCollapsed(false)}
           />
 
-          <nav
-            aria-hidden={dockCollapsed || undefined}
-            aria-label="Portal navigation"
-            className="portal-dock__nav"
-          >
-            {visibleNavigation.map((item) => (
-              <PortalNavigationItemView item={item} key={item.id} />
-            ))}
-          </nav>
+          <PortalAdaptiveNavigation
+            ariaHidden={dockCollapsed}
+            items={visibleNavigation}
+          />
 
           <div
             aria-hidden={dockCollapsed || undefined}
             className="portal-dock__utilities"
           >
             <PortalCollapseButton onCollapse={() => setDockCollapsed(true)} />
+            <PortalSearchTrigger onOpen={() => setSearchOpen(true)} />
             <AccountMenu
               isSigningOut={isSigningOut}
               onSignOut={onSignOut}
@@ -572,6 +739,7 @@ export function PortalShell({
             {mobileDirectNavigation.map((item) => (
               <PortalNavigationItemView item={item} key={item.id} />
             ))}
+            <PortalSearchTrigger compact onOpen={() => setSearchOpen(true)} />
             <PortalMoreMenu items={mobileOverflowNavigation} />
             <PortalCollapseButton onCollapse={() => setDockCollapsed(true)} />
             <AccountMenu
@@ -613,6 +781,12 @@ export function PortalShell({
           </div>
         </div>
       </footer>
+
+      <PortalSearchDialog
+        items={searchItems}
+        onOpenChange={setSearchOpen}
+        open={searchOpen}
+      />
     </div>
   );
 }

@@ -6,11 +6,16 @@ import { useEffect, useRef, useState, type FormEvent } from "react";
 
 import { TurnstileField } from "@/components/public/turnstile-field";
 import { PasswordField } from "@/components/auth/password-field";
+import { PasswordRequirements } from "@/components/auth/password-requirements";
 import { Button } from "@/components/ui/button";
 import { FieldError } from "@/components/ui/field";
 import { Label } from "@/components/ui/label";
 import { Spinner } from "@/components/ui/spinner";
 import { AuthApiError, resetPassword } from "@/lib/api/auth";
+import {
+  PASSWORD_MAX_LENGTH,
+  validatePasswordInput,
+} from "@/lib/password-policy";
 
 type ResetState = "checking" | "ready" | "invalid" | "unavailable";
 type ResetFieldErrors = { password?: string; confirmation?: string };
@@ -26,7 +31,7 @@ function resetErrorMessage(error: unknown): string {
 
   switch (error.kind) {
     case "validation":
-      return "Choose a valid password and make sure both entries match.";
+      return "Choose a password that meets the requirements and make sure both entries match.";
     case "rate_limited":
       return "Please wait a little while before trying again.";
     case "unavailable":
@@ -91,14 +96,15 @@ export function RecoveryResetForm() {
   }
 
   function validateForm(): ResetFieldErrors {
-    const errors: ResetFieldErrors = {};
-    if (!password) errors.password = "Enter a new password.";
-    if (password.length > 512) errors.password = "Your password is too long.";
-    if (!confirmation) errors.confirmation = "Confirm your new password.";
-    if (password && confirmation && password !== confirmation) {
-      errors.confirmation = "The passwords must match.";
-    }
-    return errors;
+    const errors = validatePasswordInput({
+      password,
+      confirmation,
+      mode: "recovery-reset",
+    });
+    return {
+      password: errors.password,
+      confirmation: errors.confirmation,
+    };
   }
 
   async function submitReset(event: FormEvent<HTMLFormElement>) {
@@ -197,7 +203,7 @@ export function RecoveryResetForm() {
       <header className="auth-form__header">
         <p className="auth-eyebrow">Password reset</p>
         <h1>Choose a new password.</h1>
-        <p>Use a password you do not use elsewhere.</p>
+        <p>Use the requirements below to choose a new password.</p>
       </header>
 
       {formError ? (
@@ -249,13 +255,18 @@ export function RecoveryResetForm() {
       <div className="auth-field">
         <Label htmlFor="reset-password">New password</Label>
         <PasswordField
-          aria-describedby={fieldErrors.password ? "reset-password-error" : undefined}
+          aria-describedby={[
+            "reset-password-requirements",
+            fieldErrors.password ? "reset-password-error" : null,
+          ]
+            .filter(Boolean)
+            .join(" ")}
           aria-invalid={Boolean(fieldErrors.password)}
           autoComplete="new-password"
           autoFocus
           disabled={pending}
           id="reset-password"
-          maxLength={512}
+          maxLength={PASSWORD_MAX_LENGTH}
           name="new-password"
           onChange={(event) => {
             setPassword(event.target.value);
@@ -268,6 +279,13 @@ export function RecoveryResetForm() {
         {fieldErrors.password ? (
           <FieldError id="reset-password-error">{fieldErrors.password}</FieldError>
         ) : null}
+        <PasswordRequirements
+          confirmation={confirmation}
+          disabled={pending}
+          id="reset-password-requirements"
+          mode="recovery-reset"
+          password={password}
+        />
       </div>
 
       <div className="auth-field">
@@ -278,7 +296,7 @@ export function RecoveryResetForm() {
           autoComplete="new-password"
           disabled={pending}
           id="reset-confirmation"
-          maxLength={512}
+          maxLength={PASSWORD_MAX_LENGTH}
           name="new-password-confirmation"
           onChange={(event) => {
             setConfirmation(event.target.value);
