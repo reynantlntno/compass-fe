@@ -1,21 +1,20 @@
 "use client";
 
-import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import {
   ArchiveRestore,
   ChevronDown,
-  ChevronLeft,
-  ChevronRight,
   CircleAlert,
   DatabaseBackup,
   FileCheck2,
+  MoreHorizontal,
   RefreshCw,
   ShieldCheck,
   Upload,
   XCircle,
 } from "lucide-react";
 import {
+  Fragment,
   useEffect,
   useRef,
   useState,
@@ -23,11 +22,11 @@ import {
   type ReactNode,
 } from "react";
 
-import { CompassFrame } from "@/components/compass/compass-frame";
-import { PortalBreadcrumb } from "@/components/portal/portal-breadcrumb";
 import { usePortalAccess } from "@/components/portal/portal-access-provider";
+import { PortalCollectionFrame } from "@/components/portal/portal-collection-frame";
 import { PORTAL_CAPABILITIES } from "@/components/portal/portal-navigation";
-import { PortalViewMenu } from "@/components/portal/portal-view-menu";
+import { PortalPageHeader } from "@/components/portal/portal-page-header";
+import { PortalWorkspaceNav } from "@/components/portal/portal-workspace-nav";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -38,6 +37,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -47,9 +47,31 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
 import {
   authorizeBackupRestore,
@@ -315,25 +337,27 @@ function BackupsPagination({
   if (pages <= 1) return null;
 
   return (
-    <nav aria-label={`${label} pages`} className="portal-backups__pagination">
-      {page.page > 1 ? (
-        <Link className="portal-backups__pagination-link" href={sectionHref(section, page.page - 1)}>
-          <ChevronLeft aria-hidden="true" />
-          Previous
-        </Link>
-      ) : (
-        <span className="portal-backups__pagination-placeholder" />
-      )}
-      <span aria-live="polite">Page {page.page} of {pages}</span>
-      {page.page < pages ? (
-        <Link className="portal-backups__pagination-link" href={sectionHref(section, page.page + 1)}>
-          Next
-          <ChevronRight aria-hidden="true" />
-        </Link>
-      ) : (
-        <span className="portal-backups__pagination-placeholder" />
-      )}
-    </nav>
+    <Pagination aria-label={`${label} pages`} className="portal-backups__pagination">
+      <PaginationContent>
+        <PaginationItem>
+          {page.page > 1 ? (
+            <PaginationPrevious href={sectionHref(section, page.page - 1)} />
+          ) : (
+            <span aria-hidden="true" className="portal-backups__pagination-placeholder" />
+          )}
+        </PaginationItem>
+        <PaginationItem className="portal-backups__pagination-current">
+          <span aria-live="polite">Page {page.page} of {pages}</span>
+        </PaginationItem>
+        <PaginationItem>
+          {page.page < pages ? (
+            <PaginationNext href={sectionHref(section, page.page + 1)} />
+          ) : (
+            <span aria-hidden="true" className="portal-backups__pagination-placeholder" />
+          )}
+        </PaginationItem>
+      </PaginationContent>
+    </Pagination>
   );
 }
 
@@ -374,6 +398,57 @@ function BackupsUnavailableState({
 
 function BackupsEmptyState({ children }: { children: ReactNode }) {
   return <div className="portal-backups__empty" role="status">{children}</div>;
+}
+
+type BackupRowAction = {
+  destructive?: boolean;
+  icon: ReactNode;
+  label: string;
+  onSelect: () => void;
+};
+
+function BackupRowActions({
+  actions,
+  label,
+}: {
+  actions: readonly BackupRowAction[];
+  label: string;
+}) {
+  if (actions.length === 0) return null;
+
+  return (
+    <DropdownMenu modal={false}>
+      <DropdownMenuTrigger
+        render={
+          <Button
+            aria-label={`Open actions for ${label}`}
+            className="portal-backups__action-trigger"
+            size="icon-sm"
+            type="button"
+            variant="outline"
+          />
+        }
+      >
+        <MoreHorizontal aria-hidden="true" />
+      </DropdownMenuTrigger>
+      <DropdownMenuContent
+        align="end"
+        aria-label={`${label} actions`}
+        className="compass-surface portal-backups__action-menu"
+      >
+        {actions.map((action) => (
+          <DropdownMenuItem
+            key={action.label}
+            onClick={action.onSelect}
+            variant={action.destructive ? "destructive" : "default"}
+          >
+            {action.icon}
+            {action.label}
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
 }
 
 function BackupOverviewSection({
@@ -591,81 +666,120 @@ function BackupJobsSection({
       {page.kind === "ready" ? (
         page.data.items.length > 0 ? (
           <>
-            <ul aria-label="Backup jobs" className="portal-backups__list">
-              {page.data.items.map((job, index) => {
-                const expanded = expandedId === job.id;
-                const latest = jobLatestTimestamp(job);
-                const canQueue = canOperate && job.status === "requested";
-                const canVerify = job.status === "succeeded";
-                const canCancel = canOperate && ["requested", "queued", "running"].includes(job.status);
-                const canRequestRestore = canRestore && ["succeeded", "verified"].includes(job.status);
-                return (
-                  <li className="portal-backups__row" key={job.id}>
-                    <div className="portal-backups__row-topline">
-                      <span className="portal-backups__status" data-tone={statusTone(job.status)}>{jobStatusLabel(job)}</span>
-                      {latest ? <time dateTime={latest}>{formatTimestamp(latest)}</time> : null}
-                    </div>
-                    <div className="portal-backups__row-heading">
-                      <div>
-                        <h3>{valueLabel(job.scope, BACKUP_SCOPE_OPTIONS)} backup</h3>
-                        <p>{job.environment}</p>
-                      </div>
-                      <Button
-                        aria-controls={`portal-backup-job-details-${index}`}
-                        aria-expanded={expanded}
-                        onClick={() => onExpand(job)}
-                        size="sm"
-                        type="button"
-                        variant="outline"
-                      >
-                        <ChevronDown aria-hidden="true" className="portal-backups__chevron" />
-                        {expanded ? "Hide details" : "Details"}
-                      </Button>
-                    </div>
-                    <dl className="portal-backups__fact-grid portal-backups__fact-grid--row">
-                      <Fact label="Retention" value={formatLabel(job.retention_class)} />
-                      <Fact label="Size" value={formatBytes(job.total_size_bytes)} />
-                      <Fact label="Artifacts" value={job.artifact_count} />
-                    </dl>
-                    {canQueue || canVerify || canCancel || canRequestRestore ? (
-                      <div className="portal-backups__row-actions">
-                        {canQueue ? (
-                          <Button onClick={() => onAction("queue", job)} size="sm" type="button" variant="outline">
-                            <Upload aria-hidden="true" /> Queue
-                          </Button>
+            <div className="portal-backups__table-wrap">
+              <Table className="portal-backups__table portal-backups__table--jobs">
+                <TableCaption className="sr-only">Backup jobs</TableCaption>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Scope</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Environment</TableHead>
+                    <TableHead>Latest activity</TableHead>
+                    <TableHead>Size &amp; artifacts</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {page.data.items.map((job) => {
+                    const expanded = expandedId === job.id;
+                    const latest = jobLatestTimestamp(job);
+                    const canQueue = canOperate && job.status === "requested";
+                    const canVerify = job.status === "succeeded";
+                    const canCancel = canOperate && ["requested", "queued", "running"].includes(job.status);
+                    const canRequestRestore = canRestore && ["succeeded", "verified"].includes(job.status);
+                    const actions: BackupRowAction[] = [];
+
+                    if (canQueue) {
+                      actions.push({
+                        icon: <Upload aria-hidden="true" />,
+                        label: "Queue",
+                        onSelect: () => onAction("queue", job),
+                      });
+                    }
+                    if (canVerify) {
+                      actions.push({
+                        icon: <ShieldCheck aria-hidden="true" />,
+                        label: "Verify",
+                        onSelect: () => onAction("verify", job),
+                      });
+                    }
+                    if (canCancel) {
+                      actions.push({
+                        destructive: true,
+                        icon: <XCircle aria-hidden="true" />,
+                        label: "Cancel",
+                        onSelect: () => onAction("cancel", job),
+                      });
+                    }
+                    if (canRequestRestore) {
+                      actions.push({
+                        icon: <ArchiveRestore aria-hidden="true" />,
+                        label: "Request restore",
+                        onSelect: () => onRequestRestore(job),
+                      });
+                    }
+
+                    return (
+                      <Fragment key={job.id}>
+                        <TableRow aria-expanded={expanded}>
+                          <TableCell className="portal-backups__table-cell portal-backups__table-cell--primary" data-label="Scope">
+                            {valueLabel(job.scope, BACKUP_SCOPE_OPTIONS)}
+                          </TableCell>
+                          <TableCell className="portal-backups__table-cell portal-backups__table-cell--status" data-label="Status">
+                            <Badge data-tone={statusTone(job.status)} variant="outline">
+                              {jobStatusLabel(job)}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="portal-backups__table-cell" data-label="Environment">
+                            {job.environment}
+                          </TableCell>
+                          <TableCell className="portal-backups__table-cell" data-label="Latest activity">
+                            {latest ? <time dateTime={latest}>{formatTimestamp(latest)}</time> : "Not recorded"}
+                          </TableCell>
+                          <TableCell className="portal-backups__table-cell" data-label="Size & artifacts">
+                            <span className="portal-backups__table-stack">
+                              <span>{formatBytes(job.total_size_bytes)}</span>
+                              <span>{job.artifact_count} {job.artifact_count === 1 ? "artifact" : "artifacts"}</span>
+                            </span>
+                          </TableCell>
+                          <TableCell className="portal-backups__table-cell portal-backups__table-cell--action" data-label="Actions">
+                            <Button
+                              aria-controls={`portal-backup-job-details-${job.id}`}
+                              aria-expanded={expanded}
+                              aria-label={`${expanded ? "Hide" : "Show"} details for ${valueLabel(job.scope, BACKUP_SCOPE_OPTIONS)} backup`}
+                              className="portal-backups__details-trigger"
+                              onClick={() => onExpand(job)}
+                              size="sm"
+                              type="button"
+                              variant="outline"
+                            >
+                              <ChevronDown aria-hidden="true" className="portal-backups__chevron" />
+                              <span>{expanded ? "Hide" : "Details"}</span>
+                            </Button>
+                            <BackupRowActions actions={actions} label={`${valueLabel(job.scope, BACKUP_SCOPE_OPTIONS)} backup`} />
+                          </TableCell>
+                        </TableRow>
+                        {expanded ? (
+                          <TableRow className="portal-backups__detail-row">
+                            <TableCell colSpan={6}>
+                              <div className="portal-backups__row-details" id={`portal-backup-job-details-${job.id}`}>
+                                <BackupJobDetails
+                                  artifacts={artifacts}
+                                  detail={detail}
+                                  jobId={job.id}
+                                  onRetryArtifacts={onRetryArtifacts}
+                                  onRetryDetail={onRetryDetail}
+                                />
+                              </div>
+                            </TableCell>
+                          </TableRow>
                         ) : null}
-                        {canVerify ? (
-                          <Button onClick={() => onAction("verify", job)} size="sm" type="button" variant="outline">
-                            <ShieldCheck aria-hidden="true" /> Verify
-                          </Button>
-                        ) : null}
-                        {canCancel ? (
-                          <Button onClick={() => onAction("cancel", job)} size="sm" type="button" variant="ghost">
-                            <XCircle aria-hidden="true" /> Cancel
-                          </Button>
-                        ) : null}
-                        {canRequestRestore ? (
-                          <Button onClick={() => onRequestRestore(job)} size="sm" type="button" variant="outline">
-                            <ArchiveRestore aria-hidden="true" /> Request restore
-                          </Button>
-                        ) : null}
-                      </div>
-                    ) : null}
-                    {expanded ? (
-                      <div className="portal-backups__row-details" id={`portal-backup-job-details-${index}`}>
-                        <BackupJobDetails
-                          artifacts={artifacts}
-                          detail={detail}
-                          jobId={job.id}
-                          onRetryArtifacts={onRetryArtifacts}
-                          onRetryDetail={onRetryDetail}
-                        />
-                      </div>
-                    ) : null}
-                  </li>
-                );
-              })}
-            </ul>
+                      </Fragment>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </div>
             <BackupsPagination
               label="Backup jobs"
               page={page.data}
@@ -754,73 +868,107 @@ function BackupRestoresSection({
       {page.kind === "ready" ? (
         page.data.items.length > 0 ? (
           <>
-            <ul aria-label="Restore requests" className="portal-backups__list">
-              {page.data.items.map((restore, index) => {
-                const expanded = expandedId === restore.id;
-                const canAuthorize = canOperate && restore.status === "requested";
-                const canDryRun = canOperate && ["requested", "authorized"].includes(restore.status);
-                const canCancel = canOperate && !["restore_completed", "restore_failed", "cancelled"].includes(restore.status);
-                const timestamp = restore.updated_at ?? restore.created_at;
-                const restoreDetailReady = detail.kind === "ready" && detail.id === restore.id;
-                const restoreDetailUnavailable = detail.kind === "unavailable" && detail.id === restore.id;
-                return (
-                  <li className="portal-backups__row" key={restore.id}>
-                    <div className="portal-backups__row-topline">
-                      <span className="portal-backups__status" data-tone={statusTone(restore.status)}>{restoreStatusLabel(restore)}</span>
-                      {timestamp ? <time dateTime={timestamp}>{formatTimestamp(timestamp)}</time> : null}
-                    </div>
-                    <div className="portal-backups__row-heading">
-                      <div>
-                        <h3>{valueLabel(restore.restore_scope, RESTORE_SCOPE_OPTIONS)} restore</h3>
-                        <p>{formatLabel(restore.safe_reason_code)}</p>
-                      </div>
-                      <Button
-                        aria-controls={`portal-backup-restore-details-${index}`}
-                        aria-expanded={expanded}
-                        onClick={() => onExpand(restore)}
-                        size="sm"
-                        type="button"
-                        variant="outline"
-                      >
-                        <ChevronDown aria-hidden="true" className="portal-backups__chevron" />
-                        {expanded ? "Hide details" : "Details"}
-                      </Button>
-                    </div>
-                    <dl className="portal-backups__fact-grid portal-backups__fact-grid--row">
-                      <Fact label="Authorization" value={restore.institutional_authorization_type ? formatLabel(restore.institutional_authorization_type) : "Not recorded"} />
-                      <Fact label="Checklist items" value={restore.checklist.length} />
-                      <Fact label="Dry run" value={restore.dry_run_result_code ? formatLabel(restore.dry_run_result_code) : "Not run"} />
-                    </dl>
-                    {canAuthorize || canDryRun || canCancel ? (
-                      <div className="portal-backups__row-actions">
-                        {canAuthorize ? (
-                          <Button onClick={() => onAction("authorize", restore)} size="sm" type="button" variant="outline">
-                            <ShieldCheck aria-hidden="true" /> Record authorization
-                          </Button>
+            <div className="portal-backups__table-wrap">
+              <Table className="portal-backups__table portal-backups__table--restores">
+                <TableCaption className="sr-only">Restore requests</TableCaption>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Restore scope</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Authorization</TableHead>
+                    <TableHead>Dry run</TableHead>
+                    <TableHead>Updated</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {page.data.items.map((restore) => {
+                    const expanded = expandedId === restore.id;
+                    const canAuthorize = canOperate && restore.status === "requested";
+                    const canDryRun = canOperate && ["requested", "authorized"].includes(restore.status);
+                    const canCancel = canOperate && !["restore_completed", "restore_failed", "cancelled"].includes(restore.status);
+                    const timestamp = restore.updated_at ?? restore.created_at;
+                    const restoreDetailReady = detail.kind === "ready" && detail.id === restore.id;
+                    const restoreDetailUnavailable = detail.kind === "unavailable" && detail.id === restore.id;
+                    const actions: BackupRowAction[] = [];
+
+                    if (canAuthorize) {
+                      actions.push({
+                        icon: <ShieldCheck aria-hidden="true" />,
+                        label: "Record authorization",
+                        onSelect: () => onAction("authorize", restore),
+                      });
+                    }
+                    if (canDryRun) {
+                      actions.push({
+                        icon: <FileCheck2 aria-hidden="true" />,
+                        label: "Run dry-run",
+                        onSelect: () => onAction("dry-run", restore),
+                      });
+                    }
+                    if (canCancel) {
+                      actions.push({
+                        destructive: true,
+                        icon: <XCircle aria-hidden="true" />,
+                        label: "Cancel restore",
+                        onSelect: () => onAction("cancel", restore),
+                      });
+                    }
+
+                    return (
+                      <Fragment key={restore.id}>
+                        <TableRow aria-expanded={expanded}>
+                          <TableCell className="portal-backups__table-cell portal-backups__table-cell--primary" data-label="Restore scope">
+                            {valueLabel(restore.restore_scope, RESTORE_SCOPE_OPTIONS)}
+                          </TableCell>
+                          <TableCell className="portal-backups__table-cell portal-backups__table-cell--status" data-label="Status">
+                            <Badge data-tone={statusTone(restore.status)} variant="outline">
+                              {restoreStatusLabel(restore)}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="portal-backups__table-cell" data-label="Authorization">
+                            {restore.institutional_authorization_type ? "Recorded" : "Not recorded"}
+                          </TableCell>
+                          <TableCell className="portal-backups__table-cell" data-label="Dry run">
+                            {restore.dry_run_result_code ? formatLabel(restore.dry_run_result_code) : "Not run"}
+                          </TableCell>
+                          <TableCell className="portal-backups__table-cell" data-label="Updated">
+                            {timestamp ? <time dateTime={timestamp}>{formatTimestamp(timestamp)}</time> : "Not recorded"}
+                          </TableCell>
+                          <TableCell className="portal-backups__table-cell portal-backups__table-cell--action" data-label="Actions">
+                            <Button
+                              aria-controls={`portal-backup-restore-details-${restore.id}`}
+                              aria-expanded={expanded}
+                              aria-label={`${expanded ? "Hide" : "Show"} details for ${valueLabel(restore.restore_scope, RESTORE_SCOPE_OPTIONS)} restore`}
+                              className="portal-backups__details-trigger"
+                              onClick={() => onExpand(restore)}
+                              size="sm"
+                              type="button"
+                              variant="outline"
+                            >
+                              <ChevronDown aria-hidden="true" className="portal-backups__chevron" />
+                              <span>{expanded ? "Hide" : "Details"}</span>
+                            </Button>
+                            <BackupRowActions actions={actions} label={`${valueLabel(restore.restore_scope, RESTORE_SCOPE_OPTIONS)} restore`} />
+                          </TableCell>
+                        </TableRow>
+                        {expanded ? (
+                          <TableRow className="portal-backups__detail-row">
+                            <TableCell colSpan={6}>
+                              <div className="portal-backups__row-details" id={`portal-backup-restore-details-${restore.id}`}>
+                                {!restoreDetailReady && !restoreDetailUnavailable ? <BackupsLoadingState label="restore details" /> : null}
+                                {restoreDetailUnavailable ? <BackupsUnavailableState error={detail.error} label="restore details" onRetry={onRetryDetail} /> : null}
+                                {restoreDetailReady ? <RestoreDetails restore={detail.data} /> : null}
+                              </div>
+                            </TableCell>
+                          </TableRow>
                         ) : null}
-                        {canDryRun ? (
-                          <Button onClick={() => onAction("dry-run", restore)} size="sm" type="button" variant="outline">
-                            <FileCheck2 aria-hidden="true" /> Run dry-run
-                          </Button>
-                        ) : null}
-                        {canCancel ? (
-                          <Button onClick={() => onAction("cancel", restore)} size="sm" type="button" variant="ghost">
-                            <XCircle aria-hidden="true" /> Cancel restore
-                          </Button>
-                        ) : null}
-                      </div>
-                    ) : null}
-                    {expanded ? (
-                      <div className="portal-backups__row-details" id={`portal-backup-restore-details-${index}`}>
-                        {!restoreDetailReady && !restoreDetailUnavailable ? <BackupsLoadingState label="restore details" /> : null}
-                        {restoreDetailUnavailable ? <BackupsUnavailableState error={detail.error} label="restore details" onRetry={onRetryDetail} /> : null}
-                        {restoreDetailReady ? <RestoreDetails restore={detail.data} /> : null}
-                      </div>
-                    ) : null}
-                  </li>
-                );
-              })}
-            </ul>
+                      </Fragment>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </div>
             <BackupsPagination
               label="Restore requests"
               page={page.data}
@@ -836,33 +984,28 @@ function BackupRestoresSection({
   );
 }
 
-function BackupsPageHeader() {
-  return (
-    <header className="portal-backups__header">
-      <h1 id="portal-backups-heading">Backups &amp; restore</h1>
-      <p>Review backup jobs, restore requests, and the safeguards around recovery work.</p>
-    </header>
-  );
-}
-
 function BackupsNavSkeleton() {
   return (
-    <div aria-hidden="true" className="portal-view-menu portal-backups__nav-skeleton">
-      {Array.from({ length: 3 }, (_, index) => <Skeleton className="portal-backups__skeleton-tab" key={index} />)}
+    <div aria-hidden="true" className="compass-surface portal-workspace-nav portal-backups__nav-skeleton" data-tone="subtle">
+      <div className="portal-workspace-nav__skeleton-list">
+        {BACKUPS_NAV_ITEMS.map((item) => (
+          <Skeleton className="portal-backups__skeleton-tab" key={item.value} />
+        ))}
+      </div>
     </div>
   );
 }
 
 function BackupsFrameSkeleton() {
   return (
-    <CompassFrame aria-hidden="true" className="portal-backups__frame portal-backups__frame--loading">
+    <PortalCollectionFrame aria-hidden="true" as="div" className="portal-backups__frame portal-backups__frame--loading">
       <Skeleton className="portal-backups__skeleton-line portal-backups__skeleton-line--short" />
       <Skeleton className="portal-backups__skeleton-line portal-backups__skeleton-line--heading" />
       <Skeleton className="portal-backups__skeleton-line portal-backups__skeleton-line--long" />
       <div className="portal-backups__skeleton-grid">
         {Array.from({ length: 4 }, (_, index) => <Skeleton className="portal-backups__skeleton-block" key={index} />)}
       </div>
-    </CompassFrame>
+    </PortalCollectionFrame>
   );
 }
 
@@ -870,13 +1013,16 @@ export function PortalBackupsLoading() {
   return (
     <section aria-busy="true" aria-labelledby="portal-backups-loading-heading" className="portal-backups portal-backups--loading" role="status">
       <span className="sr-only">Loading backups and restore…</span>
-      <PortalBreadcrumb current="Backups & restore" />
-      <header className="portal-backups__header">
-        <h1 id="portal-backups-loading-heading">Backups &amp; restore</h1>
-        <p>Review backup jobs, restore requests, and the safeguards around recovery work.</p>
-      </header>
-      <BackupsNavSkeleton />
-      <BackupsFrameSkeleton />
+      <PortalPageHeader
+        current="Backups & restore"
+        description="Review backup jobs, restore requests, and the safeguards around recovery work."
+        headingId="portal-backups-loading-heading"
+        title="Backups & restore"
+      />
+      <div className="portal-backups__workspace">
+        <BackupsNavSkeleton />
+        <BackupsFrameSkeleton />
+      </div>
     </section>
   );
 }
@@ -890,9 +1036,13 @@ function BackupsAccessState({
 }) {
   return (
     <section aria-labelledby="portal-backups-access-heading" className="portal-backups portal-backups--state" role={kind === "unavailable" ? "alert" : undefined}>
-      <PortalBreadcrumb current="Backups & restore" />
-      <BackupsPageHeader />
-      <CompassFrame className="portal-backups__frame portal-backups__frame--state">
+      <PortalPageHeader
+        current="Backups & restore"
+        description="Review backup jobs, restore requests, and the safeguards around recovery work."
+        headingId="portal-backups-heading"
+        title="Backups & restore"
+      />
+      <PortalCollectionFrame as="div" className="portal-backups__frame portal-backups__frame--state">
         <CircleAlert aria-hidden="true" className="portal-backups__state-icon" />
         <h2 id="portal-backups-access-heading">
           {kind === "forbidden" ? "This page isn’t available for this account." : "Backups & restore isn’t available right now."}
@@ -904,7 +1054,7 @@ function BackupsAccessState({
             Try again
           </Button>
         ) : null}
-      </CompassFrame>
+      </PortalCollectionFrame>
     </section>
   );
 }
@@ -1414,13 +1564,27 @@ function BackupsWorkspace() {
 
   return (
     <section aria-labelledby="portal-backups-heading" className="portal-backups">
-      <PortalBreadcrumb current="Backups & restore" />
-      <BackupsPageHeader />
-      <PortalViewMenu activeValue={activeSection} ariaLabel="Backups and restore sections" items={navItems} label="Section" />
-      <CompassFrame aria-busy={jobMutation === "pending" || restoreMutation === "pending" || backupRequestSubmitting || restoreRequestSubmitting} className="portal-backups__frame">
-        {notice ? <p aria-live="polite" className="portal-backups__notice" role="status">{notice}</p> : null}
-        {renderActiveSection()}
-      </CompassFrame>
+      <PortalPageHeader
+        current="Backups & restore"
+        description="Review backup jobs, restore requests, and the safeguards around recovery work."
+        headingId="portal-backups-heading"
+        title="Backups & restore"
+      />
+      <div className="portal-backups__workspace">
+        <PortalWorkspaceNav
+          activeValue={activeSection}
+          ariaLabel="Backups and restore sections"
+          items={navItems}
+        />
+        <PortalCollectionFrame
+          aria-busy={jobMutation === "pending" || restoreMutation === "pending" || backupRequestSubmitting || restoreRequestSubmitting}
+          as="div"
+          className="portal-backups__frame"
+        >
+          {notice ? <p aria-live="polite" className="portal-backups__notice" role="status">{notice}</p> : null}
+          {renderActiveSection()}
+        </PortalCollectionFrame>
+      </div>
 
       <AlertDialog onOpenChange={closeJobAction} open={jobAction !== null}>
         <AlertDialogContent className="compass-surface portal-backups__dialog">
