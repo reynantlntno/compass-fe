@@ -1,10 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { ArrowLeft, ArrowRight, RefreshCw } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { useAuthSession } from "@/components/auth/auth-session-provider";
+import { PortalBreadcrumb } from "@/components/portal/portal-breadcrumb";
 import {
   cleanPortalValue,
   getPortalAccountName,
@@ -256,10 +256,13 @@ export function PortalAccountLoading() {
       className="portal-account portal-account--loading"
       role="status"
     >
+      <PortalBreadcrumb current="Account information" />
       <Skeleton aria-hidden="true" className="portal-account__skeleton-eyebrow" />
       <Skeleton aria-hidden="true" className="portal-account__skeleton-title" />
       <Skeleton aria-hidden="true" className="portal-account__skeleton-summary" />
-      <AccountEnrichmentSkeleton label="Account" />
+      <div className="portal-account__frame">
+        <AccountEnrichmentSkeleton label="Account" />
+      </div>
     </section>
   );
 }
@@ -386,60 +389,59 @@ export function PortalAccountInformation() {
 
   return (
     <section aria-labelledby="portal-account-heading" className="portal-account">
+      <PortalBreadcrumb current="Account information" />
       <header className="portal-account__header">
-        <Link className="portal-account__back-link" href="/portal">
-          <ArrowLeft aria-hidden="true" />
-          Back to portal home
-        </Link>
         <h1 id="portal-account-heading">Account information</h1>
         <p>Review the information currently connected to your COMPASS account.</p>
       </header>
 
-      {hasUnavailableEnrichment ? (
-        <div className="portal-account__status" role="status" aria-live="polite">
-          <p>Some account information is unavailable right now.</p>
-          <Button
-            onClick={() => {
-              setCoveragePage(1);
-              setRetryKey((value) => value + 1);
-            }}
-            type="button"
-            variant="outline"
-          >
-            <RefreshCw aria-hidden="true" />
-            Try again
-          </Button>
-        </div>
-      ) : null}
-
-      <div className="portal-account__sections">
-        <AccountIdentity
-          accountName={getPortalAccountName(user)}
-          email={user.email}
-          role={getPortalRoleLabel(user.role)}
-        />
-
-        {currentProfileState.kind === "loading" ? (
-          <AccountEnrichmentSkeleton label="Profile" />
-        ) : currentProfileState.kind === "ready" ? (
-          <ProfileDetails fields={profileFields} />
+      <div className="portal-account__frame">
+        {hasUnavailableEnrichment ? (
+          <div className="portal-account__status" role="status" aria-live="polite">
+            <p>Some account information is unavailable right now.</p>
+            <Button
+              onClick={() => {
+                setCoveragePage(1);
+                setRetryKey((value) => value + 1);
+              }}
+              type="button"
+              variant="outline"
+            >
+              <RefreshCw aria-hidden="true" />
+              Try again
+            </Button>
+          </div>
         ) : null}
 
-        {currentAppointmentState.kind === "loading" ? (
-          <AccountEnrichmentSkeleton label="Current appointment" />
-        ) : currentAppointmentState.kind === "ready" ? (
-          <CurrentAppointment label={currentAppointmentState.appointment.label} />
-        ) : null}
-
-        {currentCoverageState.kind === "loading" ? (
-          <AccountEnrichmentSkeleton label="Current coverage" />
-        ) : currentCoverageState.kind === "ready" ? (
-          <CurrentCoverage
-            coverage={currentCoverageState.coverage}
-            onNext={() => setCoveragePage((page) => page + 1)}
-            onPrevious={() => setCoveragePage((page) => Math.max(1, page - 1))}
+        <div className="portal-account__sections">
+          <AccountIdentity
+            accountName={getPortalAccountName(user)}
+            email={user.email}
+            role={getPortalRoleLabel(user.role)}
           />
-        ) : null}
+
+          {currentProfileState.kind === "loading" ? (
+            <AccountEnrichmentSkeleton label="Profile" />
+          ) : currentProfileState.kind === "ready" ? (
+            <ProfileDetails fields={profileFields} />
+          ) : null}
+
+          {currentAppointmentState.kind === "loading" ? (
+            <AccountEnrichmentSkeleton label="Current appointment" />
+          ) : currentAppointmentState.kind === "ready" ? (
+            <CurrentAppointment label={currentAppointmentState.appointment.label} />
+          ) : null}
+
+          {currentCoverageState.kind === "loading" ? (
+            <AccountEnrichmentSkeleton label="Current coverage" />
+          ) : currentCoverageState.kind === "ready" ? (
+            <CurrentCoverage
+              coverage={currentCoverageState.coverage}
+              onNext={() => setCoveragePage((page) => page + 1)}
+              onPrevious={() => setCoveragePage((page) => Math.max(1, page - 1))}
+            />
+          ) : null}
+        </div>
       </div>
     </section>
   );

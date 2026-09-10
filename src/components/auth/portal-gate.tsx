@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState, type ReactNode } from "react";
 
+import { AuthBrand } from "@/components/auth/auth-brand";
+import { AuthCard } from "@/components/auth/auth-card";
 import { PortalAccessProvider } from "@/components/portal/portal-access-provider";
 import { PortalNotificationsProvider } from "@/components/portal/portal-notifications-provider";
 import { PortalShell } from "@/components/portal/portal-shell";
@@ -52,17 +54,30 @@ export function PortalGate({
   if (status === "unavailable" || !user) {
     return (
       <main className="portal-gate" aria-labelledby="portal-unavailable-heading">
-        <div className="portal-gate__panel">
-          <p className="portal-eyebrow">{branding.productName}</p>
-          <h1 id="portal-unavailable-heading">We couldn’t check your session.</h1>
-          <p>Try again when the connection is ready.</p>
-          <Button onClick={() => void refreshSession()} type="button">
-            Try again
-          </Button>
-          <Link className="portal-gate__back-link" href="/">
-            Back to {branding.productName}
-          </Link>
-        </div>
+        <section
+          aria-label={`${branding.productName} session access`}
+          className="portal-gate__stack"
+        >
+          <AuthCard as="header" variant="identity">
+            <AuthBrand branding={branding} />
+          </AuthCard>
+          <AuthCard as="section" className="portal-gate__state" variant="state">
+            <h1 id="portal-unavailable-heading">We couldn’t check your session.</h1>
+            <p>Try again when the connection is ready.</p>
+            <Button onClick={() => void refreshSession()} type="button">
+              Try again
+            </Button>
+            <Link className="portal-gate__back-link" href="/">
+              Back to {branding.productName}
+            </Link>
+          </AuthCard>
+          <AuthCard as="footer" variant="notice">
+            <p>
+              {branding.productName} handles account information as described in the{" "}
+              <Link href="/privacy">COMPASS Privacy Notice</Link>.
+            </p>
+          </AuthCard>
+        </section>
       </main>
     );
   }

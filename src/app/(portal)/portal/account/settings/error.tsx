@@ -4,6 +4,7 @@ import Link from "next/link";
 
 import { RefreshCw } from "lucide-react";
 
+import { PortalBreadcrumb } from "@/components/portal/portal-breadcrumb";
 import { Button } from "@/components/ui/button";
 
 export default function Error({ reset }: { reset: () => void }) {
@@ -13,6 +14,7 @@ export default function Error({ reset }: { reset: () => void }) {
       className="portal-settings-error"
       role="alert"
     >
+      <PortalBreadcrumb current="Account settings" />
       <h1 id="portal-settings-error-heading">We couldn’t load account settings.</h1>
       <p>Try again, or return to your workspace.</p>
       <div className="portal-settings-error__actions">

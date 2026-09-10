@@ -1,3 +1,5 @@
+import { requestSessionRefresh } from "@/lib/api/session-refresh";
+
 type CompassRequestOptions = RequestInit & {
   schema?: unknown;
 };
@@ -21,6 +23,21 @@ function resolveUrl(url: string) {
   }
 
   return `${getApiOrigin()}${url}`;
+}
+
+function shouldRefreshOnUnauthorized(
+  url: string,
+  options: RequestInit,
+): boolean {
+  const headers = new Headers(options.headers);
+  if (headers.get("X-COMPASS-Auth-Transport") !== "cookie") return false;
+
+  try {
+    const path = new URL(resolveUrl(url), "http://compass.invalid").pathname;
+    return !path.startsWith("/api/v1/auth/");
+  } catch {
+    return !url.includes("/api/v1/auth/");
+  }
 }
 
 async function readResponseBody<T>(response: Response) {
@@ -48,10 +65,26 @@ export async function compassFetch<T>(
 ): Promise<T> {
   const requestOptions = { ...options };
   delete requestOptions.schema;
-  const response = await fetch(resolveUrl(url), {
+  const fetchOptions = {
     ...requestOptions,
     credentials: requestOptions.credentials ?? "include",
-  });
+  } satisfies RequestInit;
+  const resolvedUrl = resolveUrl(url);
+  let response = await fetch(resolvedUrl, fetchOptions);
+
+  if (
+    response.status === 401 &&
+    shouldRefreshOnUnauthorized(url, fetchOptions)
+  ) {
+    try {
+      if (await requestSessionRefresh()) {
+        response = await fetch(resolvedUrl, fetchOptions);
+      }
+    } catch {
+      // Return the original unauthorized response. The auth provider will
+      // surface transport failures through its own session check.
+    }
+  }
 
   return {
     data: await readResponseBody<T>(response),

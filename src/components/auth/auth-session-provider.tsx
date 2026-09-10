@@ -13,7 +13,9 @@ import {
 import {
   getCurrentAuthSession,
   logoutCurrentSession,
+  refreshAuthSession,
 } from "@/lib/api/auth";
+import { registerSessionRefresh } from "@/lib/api/session-refresh";
 import type { MeSchema } from "@/lib/api/generated/model";
 
 export type AuthSessionStatus =
@@ -30,6 +32,7 @@ type AuthSessionContextValue = {
 };
 
 const AuthSessionContext = createContext<AuthSessionContextValue | null>(null);
+const SESSION_REVALIDATION_INTERVAL_MS = 5 * 60 * 1000;
 
 function isAbortError(error: unknown): boolean {
   return error instanceof Error && error.name === "AbortError";
@@ -100,6 +103,18 @@ export function AuthSessionProvider({ children }: { children: ReactNode }) {
       activeRequestRef.current?.abort();
     };
   }, [refreshSession]);
+
+  useEffect(() => registerSessionRefresh(refreshAuthSession), []);
+
+  useEffect(() => {
+    if (status !== "authenticated") return;
+
+    const intervalId = window.setInterval(() => {
+      if (document.visibilityState === "visible") void refreshSession();
+    }, SESSION_REVALIDATION_INTERVAL_MS);
+
+    return () => window.clearInterval(intervalId);
+  }, [refreshSession, status]);
 
   useEffect(() => {
     const revalidateAfterRecovery = () => {

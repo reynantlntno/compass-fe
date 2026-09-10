@@ -1,4 +1,5 @@
 import {
+  notificationsArchiveBulk,
   notificationsArchive,
   notificationsList,
   notificationsRead,
@@ -25,6 +26,16 @@ export type PortalNotificationsPageState =
 
 export type PortalNotificationMutationState =
   | { kind: "success"; notification: NotificationSchema }
+  | { kind: "conflict" }
+  | { kind: "unavailable" };
+
+export type PortalNotificationBulkArchiveItem = {
+  notification_id: string;
+  expected_status: "unread" | "read";
+};
+
+export type PortalNotificationBulkArchiveState =
+  | { kind: "success"; count: number; notifications: NotificationSchema[] }
   | { kind: "conflict" }
   | { kind: "unavailable" };
 
@@ -103,6 +114,23 @@ function isNotificationPage(value: unknown): value is NotificationPageSchema {
 
 function isUnreadCount(value: unknown): value is number {
   return isSafeNonNegativeInteger(value);
+}
+
+function isNotificationBulkArchiveResult(
+  value: unknown,
+): value is { items: NotificationSchema[]; count: number } {
+  if (!isRecord(value)) return false;
+  if (!isSafeNonNegativeInteger(value.count) || value.count < 1 || value.count > 100) {
+    return false;
+  }
+
+  return (
+    Array.isArray(value.items) &&
+    value.items.length === value.count &&
+    value.items.every(
+      (notification) => isNotification(notification) && notification.status === "archived",
+    )
+  );
 }
 
 export async function getPortalUnreadNotificationCount(
@@ -209,4 +237,32 @@ export function archivePortalNotification(
     idempotencyKey,
     signal,
   );
+}
+
+export async function archivePortalNotifications(
+  items: readonly PortalNotificationBulkArchiveItem[],
+  idempotencyKey: IdempotencyKey,
+  signal?: AbortSignal,
+): Promise<PortalNotificationBulkArchiveState> {
+  try {
+    const options = await cookieSessionMutationOptions(signal);
+    const response = await notificationsArchiveBulk(
+      { items: [...items] },
+      withIdempotencyKey(idempotencyKey, options),
+    );
+
+    if (response.status === 200 && isNotificationBulkArchiveResult(response.data)) {
+      return {
+        kind: "success",
+        count: response.data.count,
+        notifications: response.data.items,
+      };
+    }
+
+    if (response.status === 409) return { kind: "conflict" };
+    return { kind: "unavailable" };
+  } catch (error) {
+    if (isAbortError(error)) throw error;
+    return { kind: "unavailable" };
+  }
 }

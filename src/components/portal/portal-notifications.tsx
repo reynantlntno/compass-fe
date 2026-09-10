@@ -1,22 +1,33 @@
 "use client";
 
 import Link from "next/link";
-import { Archive, Bell, ChevronLeft, ChevronRight, RefreshCw } from "lucide-react";
+import {
+  Archive,
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  RefreshCw,
+} from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import { usePortalNotifications } from "@/components/portal/portal-notifications-provider";
+import { PortalBreadcrumb } from "@/components/portal/portal-breadcrumb";
+import { PortalSectionNav } from "@/components/portal/portal-section-nav";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Skeleton } from "@/components/ui/skeleton";
 import type {
   NotificationPageSchema,
   NotificationSchema,
 } from "@/lib/api/generated/model";
 import {
+  archivePortalNotifications,
   archivePortalNotification,
   getPortalNotifications,
   markPortalNotificationRead,
   type PortalNotificationFilter,
+  type PortalNotificationBulkArchiveItem,
 } from "@/lib/api/notifications";
 import {
   createIdempotencyKey,
@@ -63,6 +74,20 @@ type NotificationMutation = {
   message?: string;
 };
 
+type BulkNotificationMutation = {
+  scope: string;
+  items: PortalNotificationBulkArchiveItem[];
+  key: IdempotencyKey | null;
+  state: "pending" | "error";
+  message: string;
+};
+
+type BulkNotificationNotice = {
+  scope: string;
+  kind: "success" | "error";
+  message: string;
+};
+
 function isAbortError(error: unknown) {
   return error instanceof Error && error.name === "AbortError";
 }
@@ -91,27 +116,14 @@ function filterHref(filter: PortalNotificationFilter, page = 1) {
   return query ? `/portal/notifications?${query}` : "/portal/notifications";
 }
 
-function notificationStatusLabel(status: NotificationSchema["status"]) {
-  switch (status) {
-    case "unread":
-      return "Unread";
-    case "read":
-      return "Read";
-    case "archived":
-      return "Archived";
-    default:
-      return "Notification";
-  }
-}
-
 function notificationPriorityLabel(priority: NotificationSchema["priority"]) {
   switch (priority) {
     case "urgent":
-      return "Urgent priority";
+      return "Urgent";
     case "high":
-      return "High priority";
+      return "High";
     default:
-      return "Normal priority";
+      return null;
   }
 }
 
@@ -129,27 +141,35 @@ function formatNotificationDate(value: string | null | undefined) {
 
 function NotificationsLoading() {
   return (
-    <section
+      <section
       aria-busy="true"
       aria-label="Loading notifications"
       className="portal-notifications portal-notifications--loading"
       role="status"
     >
       <span className="sr-only">Loading notifications…</span>
-      <Skeleton aria-hidden="true" className="portal-notifications__skeleton-heading" />
-      <Skeleton aria-hidden="true" className="portal-notifications__skeleton-summary" />
-      <div aria-hidden="true" className="portal-notifications__skeleton-filters">
+      <PortalBreadcrumb current="Notifications" />
+      <header className="portal-notifications__header">
+        <Skeleton aria-hidden="true" className="portal-notifications__skeleton-heading" />
+        <Skeleton aria-hidden="true" className="portal-notifications__skeleton-summary" />
+      </header>
+      <div
+        aria-hidden="true"
+        className="portal-section-nav portal-notifications__filters--loading"
+      >
         <Skeleton />
         <Skeleton />
         <Skeleton />
       </div>
-      <div aria-hidden="true" className="portal-notifications__skeleton-list">
-        {Array.from({ length: 4 }, (_, index) => (
-          <div className="portal-notifications__skeleton-row" key={index}>
-            <Skeleton />
-            <Skeleton />
-          </div>
-        ))}
+      <div className="portal-notifications__inbox">
+        <div aria-hidden="true" className="portal-notifications__skeleton-list">
+          {Array.from({ length: 4 }, (_, index) => (
+            <div className="portal-notifications__skeleton-row" key={index}>
+              <Skeleton />
+              <Skeleton />
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   );
@@ -162,17 +182,30 @@ export function PortalNotificationsLoading() {
 function NotificationsUnavailable({ onRetry }: { onRetry: () => void }) {
   return (
     <section
-      aria-labelledby="portal-notifications-unavailable-heading"
-      className="portal-notifications portal-notifications--state"
+      aria-labelledby="portal-notifications-heading"
+      className="portal-notifications"
     >
-      <h1 id="portal-notifications-unavailable-heading">
-        Notifications are unavailable right now.
-      </h1>
-      <p>Try again when the connection is ready.</p>
-      <Button onClick={onRetry} type="button" variant="outline">
-        <RefreshCw aria-hidden="true" />
-        Try again
-      </Button>
+      <PortalBreadcrumb current="Notifications" />
+      <header className="portal-notifications__header">
+        <h1 id="portal-notifications-heading">Notifications</h1>
+        <p>Updates sent to your COMPASS account.</p>
+      </header>
+      <div className="portal-notifications__inbox">
+        <div
+          aria-labelledby="portal-notifications-unavailable-heading"
+          className="portal-notifications__state"
+          role="status"
+        >
+          <h2 id="portal-notifications-unavailable-heading">
+            Notifications are unavailable right now.
+          </h2>
+          <p>Try again when the connection is ready.</p>
+          <Button onClick={onRetry} type="button" variant="outline">
+            <RefreshCw aria-hidden="true" />
+            Try again
+          </Button>
+        </div>
+      </div>
     </section>
   );
 }
@@ -186,7 +219,6 @@ function NotificationsEmpty({ filter }: { filter: PortalNotificationFilter }) {
       className="portal-notifications__empty"
       role="status"
     >
-      <Bell aria-hidden="true" className="portal-notifications__empty-icon" />
       <h2 id="portal-notifications-empty-heading">{definition.emptyTitle}</h2>
       <p>{definition.emptyDescription}</p>
     </section>
@@ -197,58 +229,94 @@ function NotificationRow({
   expanded,
   mutation,
   notification,
+  selected,
+  selectionDisabled,
   onArchive,
   onRetry,
+  onSelect,
   onToggle,
 }: {
   expanded: boolean;
   mutation: NotificationMutation | null;
   notification: NotificationSchema;
+  selected: boolean;
+  selectionDisabled: boolean;
   onArchive: (notification: NotificationSchema) => void;
   onRetry: (notification: NotificationSchema) => void;
+  onSelect: (selected: boolean) => void;
   onToggle: (notification: NotificationSchema) => void;
 }) {
   const formattedDate = formatNotificationDate(notification.created_at);
-  const statusLabel = notificationStatusLabel(notification.status);
   const priorityLabel = notificationPriorityLabel(notification.priority);
   const detailsId = `notification-details-${notification.id}`;
   const mutationForRow =
     mutation?.notificationId === notification.id ? mutation : null;
   const isUpdating = mutationForRow?.state === "pending";
+  const isSelectable = notification.status !== "archived";
 
   return (
     <li
       className={`portal-notification${notification.status === "unread" ? " is-unread" : ""}`}
       data-status={notification.status}
     >
-      <button
-        aria-controls={detailsId}
-        aria-expanded={expanded}
-        className="portal-notification__toggle"
-        onClick={() => onToggle(notification)}
-        type="button"
-      >
-        <span className="portal-notification__toggle-copy">
-          <span className="portal-notification__meta">
-            <span className="portal-notification__status">{statusLabel}</span>
-            <span>{priorityLabel}</span>
+      <div className="portal-notification__row">
+        {isSelectable ? (
+          <Checkbox
+            aria-label={`Select notification: ${notification.title}`}
+            checked={selected}
+            className="portal-notification__selection-checkbox"
+            disabled={selectionDisabled}
+            onCheckedChange={(checked) => onSelect(checked === true)}
+          />
+        ) : (
+          <span
+            aria-hidden="true"
+            className="portal-notification__selection-placeholder"
+          />
+        )}
+        <button
+          aria-controls={detailsId}
+          aria-expanded={expanded}
+          className="portal-notification__toggle"
+          disabled={selectionDisabled}
+          onClick={() => onToggle(notification)}
+          type="button"
+        >
+          <span className="portal-notification__toggle-copy">
+            {priorityLabel || notification.status === "archived" ? (
+              <span className="portal-notification__meta">
+                {priorityLabel ? (
+                  <span className="portal-notification__priority">{priorityLabel}</span>
+                ) : null}
+                {notification.status === "archived" ? (
+                  <span className="portal-notification__archived">Archived</span>
+                ) : null}
+              </span>
+            ) : null}
+            <span className="portal-notification__title">
+              {notification.status === "unread" ? (
+                <span className="sr-only">Unread notification: </span>
+              ) : null}
+              {notification.title}
+            </span>
+            {!expanded ? (
+              <span className="portal-notification__preview">
+                {notification.body_preview}
+              </span>
+            ) : null}
           </span>
-          <span className="portal-notification__title">{notification.title}</span>
-          <span className="portal-notification__preview">
-            {notification.body_preview}
+          <span className="portal-notification__toggle-date">
+            {formattedDate ? (
+              <time dateTime={notification.created_at ?? undefined}>
+                {formattedDate}
+              </time>
+            ) : null}
+            <span aria-hidden="true" className="portal-notification__toggle-indicator">
+              <ChevronDown className={expanded ? "is-expanded" : undefined} />
+            </span>
           </span>
-        </span>
-        <span className="portal-notification__toggle-date">
-          {formattedDate ? (
-            <time dateTime={notification.created_at ?? undefined}>
-              {formattedDate}
-            </time>
-          ) : null}
-          <span aria-hidden="true" className="portal-notification__toggle-indicator">
-            {expanded ? "−" : "+"}
-          </span>
-        </span>
-      </button>
+        </button>
+      </div>
 
       {expanded ? (
         <div className="portal-notification__details" id={detailsId}>
@@ -297,18 +365,55 @@ export function PortalNotificationsPage() {
   });
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [mutation, setMutation] = useState<NotificationMutation | null>(null);
+  const [selection, setSelection] = useState<{
+    scope: string;
+    ids: Set<string>;
+  }>({ scope: "", ids: new Set() });
+  const [bulkMutation, setBulkMutation] = useState<BulkNotificationMutation | null>(null);
+  const [bulkNotice, setBulkNotice] = useState<BulkNotificationNotice | null>(null);
   const [reloadKey, setReloadKey] = useState(0);
   const mutationRequestRef = useRef<AbortController | null>(null);
+  const bulkMutationRequestRef = useRef<AbortController | null>(null);
   const mountedRef = useRef(true);
-  const { refreshUnreadCount } = usePortalNotifications();
+  const {
+    refreshUnreadCount,
+    status: unreadCountStatus,
+    unreadCount,
+  } = usePortalNotifications();
+  const visibleUnreadCount =
+    unreadCountStatus === "ready" &&
+    typeof unreadCount === "number" &&
+    Number.isSafeInteger(unreadCount) &&
+    unreadCount > 0
+      ? unreadCount
+      : null;
+  const unreadCountLabel =
+    visibleUnreadCount !== null && visibleUnreadCount > 99
+      ? "99+"
+      : visibleUnreadCount !== null
+        ? String(visibleUnreadCount)
+        : null;
 
   useEffect(() => {
     mountedRef.current = true;
     return () => {
       mountedRef.current = false;
       mutationRequestRef.current?.abort();
+      bulkMutationRequestRef.current?.abort();
     };
   }, []);
+
+  const viewScope = `${filter}:${pageNumber}`;
+  const selectionScope = `${viewScope}:${reloadKey}`;
+  const selectedIds =
+    selection.scope === selectionScope ? selection.ids : new Set<string>();
+  const currentBulkMutation =
+    bulkMutation?.scope === selectionScope ? bulkMutation : null;
+  const currentBulkNotice = bulkNotice?.scope === viewScope ? bulkNotice : null;
+
+  useEffect(() => {
+    bulkMutationRequestRef.current?.abort();
+  }, [selectionScope]);
 
   useEffect(() => {
     const controller = new AbortController();
@@ -343,6 +448,29 @@ export function PortalNotificationsPage() {
     : false;
   const expandedNotification = notifications.find(
     (notification) => notification.id === expandedId,
+  );
+  const eligibleNotifications = notifications.filter(
+    (notification) => notification.status === "unread" || notification.status === "read",
+  );
+  const selectedNotifications = eligibleNotifications.filter((notification) =>
+    selectedIds.has(notification.id),
+  );
+  const selectedCount = selectedNotifications.length;
+  const allSelected =
+    eligibleNotifications.length > 0 &&
+    selectedCount === eligibleNotifications.length;
+  const partiallySelected = selectedCount > 0 && !allSelected;
+  const selectedBulkItems = useMemo<PortalNotificationBulkArchiveItem[]>(
+    () =>
+      selectedNotifications
+        .map((notification) => ({
+          notification_id: notification.id,
+          expected_status: notification.status as "unread" | "read",
+        }))
+        .sort((left, right) =>
+          left.notification_id.localeCompare(right.notification_id),
+        ),
+    [selectedNotifications],
   );
 
   const applyNotification = (nextNotification: NotificationSchema) => {
@@ -490,6 +618,145 @@ export function PortalNotificationsPage() {
     void runMutation(retryKind, notification);
   };
 
+  const handleSelect = (notification: NotificationSchema, selected: boolean) => {
+    if (notification.status === "archived" || currentBulkMutation?.state === "pending") return;
+    setBulkMutation(null);
+    setBulkNotice(null);
+    setSelection((current) => {
+      const next = new Set(current.scope === selectionScope ? current.ids : []);
+      if (selected) next.add(notification.id);
+      else next.delete(notification.id);
+      return { scope: selectionScope, ids: next };
+    });
+  };
+
+  const handleSelectAll = (selected: boolean) => {
+    if (currentBulkMutation?.state === "pending") return;
+    setBulkMutation(null);
+    setBulkNotice(null);
+    setSelection({
+      scope: selectionScope,
+      ids: selected
+        ? new Set(eligibleNotifications.map((notification) => notification.id))
+        : new Set(),
+    });
+  };
+
+  const sameBulkItems = (
+    left: readonly PortalNotificationBulkArchiveItem[],
+    right: readonly PortalNotificationBulkArchiveItem[],
+  ) =>
+    left.length === right.length &&
+    left.every(
+      (item, index) =>
+        item.notification_id === right[index]?.notification_id &&
+        item.expected_status === right[index]?.expected_status,
+    );
+
+  const runBulkArchive = async () => {
+    if (
+      selectedBulkItems.length === 0 ||
+      mutation?.state === "pending" ||
+      currentBulkMutation?.state === "pending"
+    ) {
+      return;
+    }
+
+    const previousMutation = currentBulkMutation;
+    let idempotencyKey: IdempotencyKey | null;
+    try {
+      idempotencyKey =
+        previousMutation?.key && sameBulkItems(previousMutation.items, selectedBulkItems)
+          ? previousMutation.key
+          : createIdempotencyKey();
+    } catch {
+      setBulkMutation({
+        scope: selectionScope,
+        items: selectedBulkItems,
+        key: null,
+        state: "error",
+        message: "This action is temporarily unavailable. Please try again later.",
+      });
+      return;
+    }
+
+    if (!idempotencyKey) return;
+
+    setBulkMutation({
+      scope: selectionScope,
+      items: selectedBulkItems,
+      key: idempotencyKey,
+      state: "pending",
+      message: "Archiving selected notifications…",
+    });
+    bulkMutationRequestRef.current?.abort();
+    const controller = new AbortController();
+    bulkMutationRequestRef.current = controller;
+
+    let result;
+    try {
+      result = await archivePortalNotifications(
+        selectedBulkItems,
+        idempotencyKey,
+        controller.signal,
+      );
+    } catch (error) {
+      if (isAbortError(error)) return;
+      if (!mountedRef.current || controller.signal.aborted) return;
+      if (bulkMutationRequestRef.current === controller) {
+        bulkMutationRequestRef.current = null;
+      }
+      setBulkMutation({
+        scope: selectionScope,
+        items: selectedBulkItems,
+        key: idempotencyKey,
+        state: "error",
+        message: "We couldn’t archive the selected notifications. Try again.",
+      });
+      return;
+    }
+
+    if (!mountedRef.current || controller.signal.aborted) return;
+    if (bulkMutationRequestRef.current === controller) {
+      bulkMutationRequestRef.current = null;
+    }
+
+    if (result.kind === "success") {
+      setSelection({ scope: selectionScope, ids: new Set() });
+      setBulkMutation(null);
+      setBulkNotice({
+        scope: viewScope,
+        kind: "success",
+        message: `${result.count} notification${result.count === 1 ? "" : "s"} archived.`,
+      });
+      setExpandedId(null);
+      setReloadKey((value) => value + 1);
+      void refreshUnreadCount();
+      return;
+    }
+
+    if (result.kind === "conflict") {
+      setSelection({ scope: selectionScope, ids: new Set() });
+      setBulkMutation(null);
+      setBulkNotice({
+        scope: viewScope,
+        kind: "error",
+        message: "Some selected notifications changed. Refresh the list and select them again.",
+      });
+      setExpandedId(null);
+      setReloadKey((value) => value + 1);
+      return;
+    }
+
+    setBulkMutation({
+      scope: selectionScope,
+      items: selectedBulkItems,
+      key: idempotencyKey,
+      state: "error",
+      message: "We couldn’t archive the selected notifications. Try again.",
+    });
+  };
+
   if (loadState.kind === "loading") return <NotificationsLoading />;
   if (loadState.kind === "unavailable") {
     return (
@@ -501,67 +768,141 @@ export function PortalNotificationsPage() {
 
   return (
     <section aria-labelledby="portal-notifications-heading" className="portal-notifications">
+      <PortalBreadcrumb current="Notifications" />
       <header className="portal-notifications__header">
-        <h1 id="portal-notifications-heading">Notifications</h1>
+        <div className="portal-notifications__title-row">
+          <h1 id="portal-notifications-heading">Notifications</h1>
+          {unreadCountLabel ? (
+            <span
+              aria-label={`${unreadCountLabel} unread notifications`}
+              className="portal-notifications__unread-summary"
+            >
+              {unreadCountLabel} unread
+            </span>
+          ) : null}
+        </div>
         <p>Updates sent to your COMPASS account.</p>
       </header>
 
-      <nav aria-label="Notification views" className="portal-notifications__filters">
-        {FILTERS.map((entry) => (
-          <Link
-            aria-current={entry.value === filter ? "page" : undefined}
-            className={`portal-notifications__filter${entry.value === filter ? " is-current" : ""}`}
-            href={filterHref(entry.value)}
-            key={entry.value}
-          >
-            {entry.label}
-          </Link>
-        ))}
-      </nav>
+      <PortalSectionNav
+        activeValue={filter}
+        ariaLabel="Notification views"
+        items={FILTERS.map((entry) => ({
+          href: filterHref(entry.value),
+          label: entry.label,
+          value: entry.value,
+        }))}
+      />
 
-      {notifications.length === 0 ? (
-        <NotificationsEmpty filter={filter} />
-      ) : (
-        <>
-          <ul aria-label={`${filterDefinitionValue.label} notifications`} className="portal-notifications__list">
-            {notifications.map((notification) => (
-              <NotificationRow
-                expanded={notification.id === expandedId}
-                key={notification.id}
-                mutation={mutation}
-                notification={notification}
-                onArchive={handleArchive}
-                onRetry={handleRetry}
-                onToggle={handleToggle}
-              />
-            ))}
-          </ul>
+      <div className="portal-notifications__inbox">
+        {notifications.length === 0 ? (
+          <NotificationsEmpty filter={filter} />
+        ) : (
+          <>
+            {eligibleNotifications.length > 0 ? (
+              <div
+                aria-busy={currentBulkMutation?.state === "pending"}
+                aria-label="Notification selection"
+                className="portal-notifications__selection-toolbar"
+              >
+                <label className="portal-notifications__selection-control">
+                  <Checkbox
+                    aria-label="Select all notifications on this page"
+                    checked={allSelected}
+                    className="portal-notifications__selection-checkbox"
+                    disabled={currentBulkMutation?.state === "pending"}
+                    indeterminate={partiallySelected}
+                    onCheckedChange={(checked) => handleSelectAll(checked === true)}
+                  />
+                  <span>Select all on this page</span>
+                </label>
+                <div className="portal-notifications__selection-actions">
+                  {selectedCount > 0 ? (
+                    <span className="portal-notifications__selection-count">
+                      {selectedCount} selected
+                    </span>
+                  ) : null}
+                  {selectedCount > 0 ? (
+                    <Button
+                      disabled={
+                        mutation?.state === "pending" ||
+                        currentBulkMutation?.state === "pending"
+                      }
+                      onClick={() => void runBulkArchive()}
+                      type="button"
+                      variant="outline"
+                    >
+                      <Archive aria-hidden="true" />
+                      Archive selected
+                    </Button>
+                  ) : null}
+                </div>
+              </div>
+            ) : null}
+            {currentBulkMutation?.state === "error" ? (
+              <div
+                aria-live="polite"
+                className="portal-notifications__bulk-error"
+                role="alert"
+              >
+                <p>{currentBulkMutation.message}</p>
+                <Button onClick={() => void runBulkArchive()} type="button" variant="outline">
+                  Try again
+                </Button>
+              </div>
+            ) : null}
+            {currentBulkNotice ? (
+              <p
+                aria-live="polite"
+                className={`portal-notifications__bulk-notice is-${currentBulkNotice.kind}`}
+                role={currentBulkNotice.kind === "error" ? "alert" : "status"}
+              >
+                {currentBulkNotice.message}
+              </p>
+            ) : null}
+            <ul aria-label={`${filterDefinitionValue.label} notifications`} className="portal-notifications__list">
+              {notifications.map((notification) => (
+                <NotificationRow
+                  expanded={notification.id === expandedId}
+                  key={notification.id}
+                  mutation={mutation}
+                  notification={notification}
+                  selected={selectedIds.has(notification.id)}
+                  selectionDisabled={currentBulkMutation?.state === "pending"}
+                  onArchive={handleArchive}
+                  onRetry={handleRetry}
+                  onSelect={(selected) => handleSelect(notification, selected)}
+                  onToggle={handleToggle}
+                />
+              ))}
+            </ul>
 
-          {page && (hasPreviousPage || hasNextPage) ? (
-            <nav aria-label="Notification pages" className="portal-notifications__pagination">
-              {hasPreviousPage ? (
-                <Link className="portal-notifications__pagination-link" href={filterHref(filter, pageNumber - 1)}>
-                  <ChevronLeft aria-hidden="true" />
-                  Previous
-                </Link>
-              ) : (
-                <span aria-hidden="true" />
-              )}
-              <span aria-current="page" className="portal-notifications__pagination-current">
-                Page {pageNumber} of {Math.max(1, Math.ceil(page.total / page.page_size))}
-              </span>
-              {hasNextPage ? (
-                <Link className="portal-notifications__pagination-link" href={filterHref(filter, pageNumber + 1)}>
-                  Next
-                  <ChevronRight aria-hidden="true" />
-                </Link>
-              ) : (
-                <span aria-hidden="true" />
-              )}
-            </nav>
-          ) : null}
-        </>
-      )}
+            {page && (hasPreviousPage || hasNextPage) ? (
+              <nav aria-label="Notification pages" className="portal-notifications__pagination">
+                {hasPreviousPage ? (
+                  <Link className="portal-notifications__pagination-link" href={filterHref(filter, pageNumber - 1)}>
+                    <ChevronLeft aria-hidden="true" />
+                    Previous
+                  </Link>
+                ) : (
+                  <span aria-hidden="true" />
+                )}
+                <span aria-current="page" className="portal-notifications__pagination-current">
+                  Page {pageNumber} of {Math.max(1, Math.ceil(page.total / page.page_size))}
+                </span>
+                {hasNextPage ? (
+                  <Link className="portal-notifications__pagination-link" href={filterHref(filter, pageNumber + 1)}>
+                    Next
+                    <ChevronRight aria-hidden="true" />
+                  </Link>
+                ) : (
+                  <span aria-hidden="true" />
+                )}
+              </nav>
+            ) : null}
+          </>
+        )}
+      </div>
 
       {expandedNotification ? <span className="sr-only">Notification expanded.</span> : null}
     </section>

@@ -68,6 +68,7 @@ export type LoginResult =
   | { kind: "challenge"; challenge: LoginChallengeSchema };
 
 let csrfToken: string | null = null;
+let refreshInFlight: Promise<boolean> | null = null;
 
 function isAbortError(error: unknown): boolean {
   return error instanceof Error && error.name === "AbortError";
@@ -283,14 +284,11 @@ export async function getCurrentAuthSession(
   throwResponseError(response.status, response.data, "verification");
 }
 
-export async function refreshAuthSession(signal?: AbortSignal): Promise<boolean> {
-  const csrf = await getCsrfToken(signal);
+async function performRefreshAuthSession(): Promise<boolean> {
+  const csrf = await getCsrfToken();
   let response;
   try {
-    response = await authTokenRefresh(
-      {},
-      sessionMutationOptions(csrf, signal),
-    );
+    response = await authTokenRefresh({}, sessionMutationOptions(csrf));
   } catch (error) {
     return throwTransportError(error);
   }
@@ -299,6 +297,20 @@ export async function refreshAuthSession(signal?: AbortSignal): Promise<boolean>
   if ([400, 401, 403, 404].includes(response.status)) return false;
 
   throwResponseError(response.status, response.data, "verification");
+}
+
+export function refreshAuthSession(signal?: AbortSignal): Promise<boolean> {
+  // A shared refresh must outlive an individual request so another caller can
+  // receive the rotated refresh cookie instead of reusing the old token.
+  void signal;
+
+  if (refreshInFlight) return refreshInFlight;
+
+  refreshInFlight = performRefreshAuthSession().finally(() => {
+    refreshInFlight = null;
+  });
+
+  return refreshInFlight;
 }
 
 export async function loginWithPassword(

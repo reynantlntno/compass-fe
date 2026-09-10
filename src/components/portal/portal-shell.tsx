@@ -584,7 +584,7 @@ export function PortalShell({
       </header>
 
       <main className="portal-shell__main" id="portal-main">
-        {children}
+        <div className="portal-shell__content">{children}</div>
       </main>
 
       <footer className="portal-shell__footer">

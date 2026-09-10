@@ -1,9 +1,7 @@
 "use client";
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
-  ArrowLeft,
   Check,
   ChevronLeft,
   ChevronRight,
@@ -32,6 +30,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
+import { PortalBreadcrumb } from "@/components/portal/portal-breadcrumb";
+import { PortalSectionNav } from "@/components/portal/portal-section-nav";
 import {
   AccountSettingsApiError,
   changeAccountPassword,
@@ -75,6 +75,38 @@ type SettingsSectionId =
   | "trustedDevices"
   | "preferences"
   | "activity";
+
+type SettingsAreaId = "security" | "access" | "preferences" | "activity";
+
+const SETTINGS_AREA_IDS: readonly SettingsAreaId[] = [
+  "security",
+  "access",
+  "preferences",
+  "activity",
+];
+
+const SETTINGS_AREA_NAV_ITEMS = [
+  {
+    href: "/portal/account/settings?section=security",
+    label: "Security",
+    value: "security",
+  },
+  {
+    href: "/portal/account/settings?section=access",
+    label: "Access",
+    value: "access",
+  },
+  {
+    href: "/portal/account/settings?section=preferences",
+    label: "Preferences",
+    value: "preferences",
+  },
+  {
+    href: "/portal/account/settings?section=activity",
+    label: "Activity",
+    value: "activity",
+  },
+] as const;
 
 type PasswordFieldName = "current" | "new" | "confirmation";
 type PasswordValues = Record<PasswordFieldName, string>;
@@ -144,6 +176,10 @@ function readErrorMessage(kind: AccountSettingsErrorKind) {
   return "We couldn’t load this section right now.";
 }
 
+function isSettingsAreaId(value: string | null): value is SettingsAreaId {
+  return value !== null && SETTINGS_AREA_IDS.includes(value as SettingsAreaId);
+}
+
 function mutationErrorMessage(
   kind: AccountSettingsErrorKind,
   subject: string,
@@ -165,24 +201,43 @@ function mutationErrorMessage(
 function SettingsSection({
   children,
   description,
-  eyebrow,
   id,
   title,
 }: {
   children: ReactNode;
   description?: string;
-  eyebrow: string;
   id: string;
   title: string;
 }) {
   return (
-    <section aria-labelledby={id} className="portal-settings__section">
-      <div className="portal-settings__section-heading">
-        <p className="portal-eyebrow">{eyebrow}</p>
-        <h2 id={id}>{title}</h2>
+    <section aria-labelledby={id} className="portal-settings__subsection">
+      <div className="portal-settings__subsection-heading">
+        <h3 id={id}>{title}</h3>
         {description ? <p>{description}</p> : null}
       </div>
-      <div className="portal-settings__section-body">{children}</div>
+      <div className="portal-settings__subsection-body">{children}</div>
+    </section>
+  );
+}
+
+function SettingsArea({
+  children,
+  description,
+  id,
+  title,
+}: {
+  children: ReactNode;
+  description: string;
+  id: string;
+  title: string;
+}) {
+  return (
+    <section aria-labelledby={id} className="portal-settings__area">
+      <header className="portal-settings__area-heading">
+        <h2 id={id}>{title}</h2>
+        <p>{description}</p>
+      </header>
+      <div className="portal-settings__area-body">{children}</div>
     </section>
   );
 }
@@ -333,17 +388,22 @@ export function PortalAccountSettingsLoading() {
       role="status"
     >
       <span className="sr-only">Loading account settings…</span>
-      <Skeleton aria-hidden="true" className="portal-settings__skeleton-eyebrow" />
-      <Skeleton aria-hidden="true" className="portal-settings__skeleton-title" />
-      <Skeleton aria-hidden="true" className="portal-settings__skeleton-summary" />
-      <div aria-hidden="true" className="portal-settings__loading-sections">
-        {Array.from({ length: 5 }, (_, index) => (
-          <div className="portal-settings__loading-section" key={index}>
-            <Skeleton className="portal-settings__skeleton-line portal-settings__skeleton-line--short" />
-            <Skeleton className="portal-settings__skeleton-line" />
-            <Skeleton className="portal-settings__skeleton-line portal-settings__skeleton-line--long" />
-          </div>
-        ))}
+      <PortalBreadcrumb current="Account settings" />
+      <header className="portal-settings__header">
+        <Skeleton aria-hidden="true" className="portal-settings__skeleton-title" />
+        <Skeleton aria-hidden="true" className="portal-settings__skeleton-summary" />
+      </header>
+      <div aria-hidden="true" className="portal-settings__loading-layout">
+        <div className="portal-section-nav portal-settings__loading-navigation">
+          {Array.from({ length: 4 }, (_, index) => (
+            <Skeleton className="portal-settings__skeleton-tab" key={index} />
+          ))}
+        </div>
+        <div className="portal-settings__loading-area">
+          <Skeleton className="portal-settings__skeleton-line portal-settings__skeleton-line--short" />
+          <Skeleton className="portal-settings__skeleton-line" />
+          <Skeleton className="portal-settings__skeleton-line portal-settings__skeleton-line--long" />
+        </div>
       </div>
     </section>
   );
@@ -351,8 +411,13 @@ export function PortalAccountSettingsLoading() {
 
 export function PortalAccountSettings() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { refreshSession, user } = useAuthSession();
   const userId = user?.id ?? null;
+  const requestedArea = searchParams.get("section");
+  const activeArea: SettingsAreaId = isSettingsAreaId(requestedArea)
+    ? requestedArea
+    : "security";
 
   const [retryCounts, setRetryCounts] = useState(INITIAL_RETRIES);
   const [sessionsPage, setSessionsPage] = useState(1);
@@ -954,11 +1019,8 @@ export function PortalAccountSettings() {
 
   return (
     <section aria-labelledby="portal-settings-heading" className="portal-settings">
+      <PortalBreadcrumb current="Account settings" />
       <header className="portal-settings__header">
-        <Link className="portal-settings__back-link" href="/portal/account">
-          <ArrowLeft aria-hidden="true" />
-          Back to account information
-        </Link>
         <h1 id="portal-settings-heading">Account settings</h1>
         <p>
           Manage sign-in security, active access, trusted browsers, notifications,
@@ -966,13 +1028,24 @@ export function PortalAccountSettings() {
         </p>
       </header>
 
-      <div className="portal-settings__sections">
-        <SettingsSection
-          description="Change the password used to sign in to COMPASS."
-          eyebrow="Security"
-          id="portal-settings-password-heading"
-          title="Password"
-        >
+      <div className="portal-settings__workspace">
+        <PortalSectionNav
+          activeValue={activeArea}
+          ariaLabel="Account settings sections"
+          items={SETTINGS_AREA_NAV_ITEMS}
+        />
+        <div className="portal-settings__panel">
+        {activeArea === "security" ? (
+          <SettingsArea
+            description="Manage your password and two-factor sign-in checks."
+            id="portal-settings-security-heading"
+            title="Security"
+          >
+            <SettingsSection
+              description="Change the password used to sign in to COMPASS."
+              id="portal-settings-password-heading"
+              title="Password"
+            >
           <form
             aria-busy={passwordStatus.kind === "submitting"}
             className="portal-settings__form"
@@ -1046,7 +1119,6 @@ export function PortalAccountSettings() {
 
         <SettingsSection
           description="Use a one-time code as an additional sign-in check when the account policy allows changes."
-          eyebrow="Security"
           id="portal-settings-two-factor-heading"
           title="Two-factor authentication"
         >
@@ -1191,14 +1263,21 @@ export function PortalAccountSettings() {
               ) : null}
             </div>
           )}
-        </SettingsSection>
+            </SettingsSection>
+          </SettingsArea>
+        ) : null}
 
-        <SettingsSection
-          description="Review active sign-ins and end sessions you no longer use."
-          eyebrow="Access"
-          id="portal-settings-sessions-heading"
-          title="Active sessions"
-        >
+        {activeArea === "access" ? (
+          <SettingsArea
+            description="Review active sign-ins and trusted browsers."
+            id="portal-settings-access-heading"
+            title="Access"
+          >
+            <SettingsSection
+              description="Review active sign-ins and end sessions you no longer use."
+              id="portal-settings-sessions-heading"
+              title="Active sessions"
+            >
           {sessionsState.kind === "loading" ? (
             <SettingsSectionLoading label="active sessions" />
           ) : sessionsState.kind === "unavailable" ? (
@@ -1301,7 +1380,6 @@ export function PortalAccountSettings() {
 
         <SettingsSection
           description="A trusted browser can skip the one-time code according to the account security policy."
-          eyebrow="Access"
           id="portal-settings-trusted-heading"
           title="Trusted browsers"
         >
@@ -1393,14 +1471,21 @@ export function PortalAccountSettings() {
               ) : null}
             </div>
           )}
-        </SettingsSection>
+            </SettingsSection>
+          </SettingsArea>
+        ) : null}
 
-        <SettingsSection
-          description="Choose the supported channels for each notification. Required preferences stay enabled."
-          eyebrow="Preferences"
-          id="portal-settings-preferences-heading"
-          title="Notification preferences"
-        >
+        {activeArea === "preferences" ? (
+          <SettingsArea
+            description="Choose how COMPASS sends supported notifications."
+            id="portal-settings-preferences-area-heading"
+            title="Preferences"
+          >
+            <SettingsSection
+              description="Choose the supported channels for each notification. Required preferences stay enabled."
+              id="portal-settings-preferences-heading"
+              title="Notification preferences"
+            >
           {preferencesState.kind === "loading" ? (
             <SettingsSectionLoading label="notification preferences" />
           ) : preferencesState.kind === "unavailable" ? (
@@ -1509,14 +1594,21 @@ export function PortalAccountSettings() {
               ) : null}
             </div>
           )}
-        </SettingsSection>
+            </SettingsSection>
+          </SettingsArea>
+        ) : null}
 
-        <SettingsSection
-          description="A read-only record of recent account security events."
-          eyebrow="History"
-          id="portal-settings-activity-heading"
-          title="Security activity"
-        >
+        {activeArea === "activity" ? (
+          <SettingsArea
+            description="Review recent security events."
+            id="portal-settings-activity-area-heading"
+            title="Activity"
+          >
+            <SettingsSection
+              description="A read-only record of recent account security events."
+              id="portal-settings-activity-heading"
+              title="Security activity"
+            >
           {activityState.kind === "loading" ? (
             <SettingsSectionLoading label="security activity" />
           ) : activityState.kind === "unavailable" ? (
@@ -1565,12 +1657,11 @@ export function PortalAccountSettings() {
               ) : null}
             </div>
           )}
-        </SettingsSection>
+            </SettingsSection>
+          </SettingsArea>
+        ) : null}
+        </div>
       </div>
-
-      <p className="portal-settings__dock-hint">
-        Use the dock below to move around your workspace.
-      </p>
 
       <AlertDialog
         onOpenChange={(open) => {

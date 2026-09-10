@@ -8,6 +8,8 @@
 import type {
   ApiErrorSchema,
   DeadLetterSchema,
+  NotificationBulkArchiveResultSchema,
+  NotificationBulkArchiveSchema,
   NotificationPageSchema,
   NotificationPreferencePageSchema,
   NotificationPreferenceSchema,
@@ -121,6 +123,104 @@ export const notificationsList = async (params?: NotificationsListParams, option
     method: 'GET'
 
 
+  }
+);}
+
+
+export type notificationsArchiveBulkResponse200 = {
+  data: NotificationBulkArchiveResultSchema
+  status: 200
+}
+
+export type notificationsArchiveBulkResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type notificationsArchiveBulkResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type notificationsArchiveBulkResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type notificationsArchiveBulkResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type notificationsArchiveBulkResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type notificationsArchiveBulkResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type notificationsArchiveBulkResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type notificationsArchiveBulkResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type notificationsArchiveBulkResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type notificationsArchiveBulkResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type notificationsArchiveBulkResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type notificationsArchiveBulkResponseSuccess = (notificationsArchiveBulkResponse200) & {
+  headers: Record<string, string>;
+};
+export type notificationsArchiveBulkResponseError = (notificationsArchiveBulkResponse400 | notificationsArchiveBulkResponse401 | notificationsArchiveBulkResponse403 | notificationsArchiveBulkResponse404 | notificationsArchiveBulkResponse405 | notificationsArchiveBulkResponse409 | notificationsArchiveBulkResponse413 | notificationsArchiveBulkResponse422 | notificationsArchiveBulkResponse429 | notificationsArchiveBulkResponse500 | notificationsArchiveBulkResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type notificationsArchiveBulkResponse = (notificationsArchiveBulkResponseSuccess | notificationsArchiveBulkResponseError)
+
+export const getNotificationsArchiveBulkUrl = () => {
+
+
+
+
+  return `/api/v1/notifications/bulk/archive/`
+}
+
+/**
+ * @summary Archive Notifications Bulk Api
+ */
+export const notificationsArchiveBulk = async (notificationBulkArchiveSchema: NotificationBulkArchiveSchema, options?: Parameters<typeof compassFetch>[1]): Promise<notificationsArchiveBulkResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return compassFetch<notificationsArchiveBulkResponse>(getNotificationsArchiveBulkUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(notificationBulkArchiveSchema)
   }
 );}
 

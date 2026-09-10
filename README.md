@@ -39,6 +39,16 @@ export COMPASS_LOCAL_STAGING_TLS_KEY=/path/to/localhost.key
 pnpm start:local -- -p 3100
 ```
 
+For a hot-reloading HTTPS development server, use the same certificate-aware
+wrapper with the local development script:
+
+```bash
+pnpm dev:local -- -p 3100
+```
+
+The browser still uses `https://localhost:3100`; the wrapper keeps the
+development Next.js server on a separate loopback-only port.
+
 PowerShell:
 
 ```powershell

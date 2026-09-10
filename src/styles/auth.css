@@ -12,6 +12,11 @@
     margin-inline: auto;
   }
 
+  .auth-card-stack {
+    display: grid;
+    gap: 0.8rem;
+  }
+
   .auth-skip-link {
     position: absolute;
     width: 1px;
@@ -58,17 +63,34 @@
     text-underline-offset: 0.18rem;
   }
 
-  .auth-panel {
+  .auth-card {
     overflow: hidden;
     border: 2px solid var(--compass-brand-maroon);
-    border-radius: var(--compass-radius-2xl) var(--compass-radius-2xl) 2.5rem 2.5rem;
+    border-radius: var(--compass-radius-xl);
     background-color: var(--compass-surface);
     box-shadow: var(--compass-shadow-md);
   }
 
-  .auth-panel__identity {
+  .auth-card--identity {
     padding: clamp(1rem, 4vw, 1.5rem) clamp(1.25rem, 5vw, 2.25rem);
-    border-bottom: 1px solid var(--compass-border);
+  }
+
+  .auth-card--content {
+    padding: clamp(1.35rem, 5vw, 2.5rem) clamp(1.25rem, 5vw, 2.25rem);
+  }
+
+  .auth-card--state {
+    display: grid;
+    gap: 0.85rem;
+    padding: clamp(1.35rem, 5vw, 2.5rem) clamp(1.25rem, 5vw, 2.25rem);
+  }
+
+  .auth-card--notice {
+    padding: 0.9rem clamp(1.25rem, 5vw, 2.25rem) 1.1rem;
+    background-color: var(--compass-surface-muted);
+    color: var(--muted-foreground);
+    font-size: 0.7rem;
+    line-height: 1.45;
   }
 
   .auth-brand {
@@ -125,24 +147,12 @@
     white-space: nowrap;
   }
 
-  .auth-panel__content {
-    padding: clamp(1.35rem, 5vw, 2.5rem) clamp(1.25rem, 5vw, 2.25rem);
-  }
-
-  .auth-panel__footer {
-    padding: 0.9rem clamp(1.25rem, 5vw, 2.25rem) 1.1rem;
-    border-top: 1px solid var(--compass-border);
-    color: var(--muted-foreground);
-    font-size: 0.7rem;
-    line-height: 1.45;
-  }
-
-  .auth-panel__footer p {
+  .auth-card--notice p {
     max-width: 34rem;
     margin: 0;
   }
 
-  .auth-panel__footer a {
+  .auth-card--notice a {
     color: var(--compass-brand-maroon);
     font-weight: var(--compass-weight-bold);
     text-underline-offset: 0.18rem;
@@ -476,7 +486,7 @@
 }
 
 @media (forced-colors: active) {
-  .auth-panel {
+  .auth-card {
     border-color: CanvasText;
     background-color: Canvas;
     color: CanvasText;
@@ -513,8 +523,10 @@
   .auth-form__error,
   .auth-form__notice,
   .auth-challenge,
-  .auth-panel__identity,
-  .auth-panel__footer {
+  .auth-card--identity,
+  .auth-card--content,
+  .auth-card--state,
+  .auth-card--notice {
     border-color: CanvasText;
     background-color: Canvas;
     color: CanvasText;

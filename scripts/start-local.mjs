@@ -116,6 +116,10 @@ try {
 
 const nextCommand = process.platform === "win32" ? "next.cmd" : "next";
 const forwardedArguments = process.argv.slice(2);
+const useDevelopmentServer = forwardedArguments[0] === "--dev";
+if (useDevelopmentServer) {
+  forwardedArguments.shift();
+}
 if (forwardedArguments[0] === "--") {
   forwardedArguments.shift();
 }
@@ -181,7 +185,7 @@ function replaceNextPort(argumentsList) {
 }
 
 const nextArguments = replaceNextPort(forwardedArguments);
-const child = spawn(nextCommand, ["start", ...nextArguments], {
+const child = spawn(nextCommand, [useDevelopmentServer ? "dev" : "start", ...nextArguments], {
   env: {
     ...process.env,
     NODE_EXTRA_CA_CERTS: resolvedCertificatePath,
@@ -228,6 +232,46 @@ const frontendServer = createHttpsServer(
     request.pipe(upstream);
   },
 );
+
+frontendServer.on("upgrade", (request, socket, head) => {
+  const headers = {
+    ...request.headers,
+    host: `127.0.0.1:${nextPort}`,
+    "x-forwarded-host": request.headers.host ?? `localhost:${frontendPort}`,
+    "x-forwarded-proto": "https",
+  };
+  const upstream = httpRequest({
+    hostname: "127.0.0.1",
+    port: nextPort,
+    method: request.method ?? "GET",
+    path: request.url ?? "/",
+    headers,
+  });
+
+  upstream.once("upgrade", (upstreamResponse, upstreamSocket, upstreamHead) => {
+    const statusLine = `HTTP/${upstreamResponse.httpVersion} ${upstreamResponse.statusCode} ${upstreamResponse.statusMessage ?? ""}\r\n`;
+    const responseHeaders = Object.entries(upstreamResponse.headers)
+      .flatMap(([name, value]) => {
+        if (Array.isArray(value)) {
+          return value.map((entry) => `${name}: ${entry}\r\n`);
+        }
+        return value === undefined ? [] : [`${name}: ${value}\r\n`];
+      })
+      .join("");
+
+    socket.write(`${statusLine}${responseHeaders}\r\n`);
+    if (upstreamHead.length > 0) socket.write(upstreamHead);
+    if (head.length > 0) upstreamSocket.write(head);
+    upstreamSocket.pipe(socket).pipe(upstreamSocket);
+  });
+
+  upstream.once("response", (upstreamResponse) => {
+    upstreamResponse.resume();
+    socket.destroy();
+  });
+  upstream.once("error", () => socket.destroy());
+  request.pipe(upstream);
+});
 
 let shuttingDown = false;
 

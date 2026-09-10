@@ -53,6 +53,7 @@ export class AccountSettingsApiError extends Error {
 }
 
 const MAX_PAGE_SIZE = 100;
+const SETTINGS_PAGE_SIZE = 20;
 const MAX_OPAQUE_TOKEN_LENGTH = 512;
 const MAX_TEXT_LENGTH = 255;
 const MAX_STATE_LABEL_LENGTH = 120;
@@ -315,7 +316,7 @@ export async function getAccountSessions(
 ) {
   return getReadResponse(
     meSessionsList(
-      { page, page_size: MAX_PAGE_SIZE },
+      { page, page_size: SETTINGS_PAGE_SIZE },
       cookieSessionReadOptions(signal),
     ),
     isSessionPage,
@@ -328,7 +329,7 @@ export async function getTrustedDevices(
 ) {
   return getReadResponse(
     meTrustedDevicesList(
-      { page, page_size: MAX_PAGE_SIZE },
+      { page, page_size: SETTINGS_PAGE_SIZE },
       cookieSessionReadOptions(signal),
     ),
     isTrustedDevicePage,
@@ -341,7 +342,7 @@ export async function getNotificationPreferences(
 ) {
   return getReadResponse(
     notificationsPreferencesList(
-      { page, page_size: MAX_PAGE_SIZE },
+      { page, page_size: SETTINGS_PAGE_SIZE },
       cookieSessionReadOptions(signal),
     ),
     isNotificationPreferencePage,
@@ -354,7 +355,7 @@ export async function getSecurityActivity(
 ) {
   return getReadResponse(
     meActivityList(
-      { category: "security", page, page_size: MAX_PAGE_SIZE },
+      { category: "security", page, page_size: SETTINGS_PAGE_SIZE },
       cookieSessionReadOptions(signal),
     ),
     isActivityPage,
