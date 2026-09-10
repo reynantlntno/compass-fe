@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight, RefreshCw } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { useAuthSession } from "@/components/auth/auth-session-provider";
+import { CompassFrame } from "@/components/compass/compass-frame";
 import { PortalBreadcrumb } from "@/components/portal/portal-breadcrumb";
 import {
   cleanPortalValue,
@@ -260,9 +261,9 @@ export function PortalAccountLoading() {
       <Skeleton aria-hidden="true" className="portal-account__skeleton-eyebrow" />
       <Skeleton aria-hidden="true" className="portal-account__skeleton-title" />
       <Skeleton aria-hidden="true" className="portal-account__skeleton-summary" />
-      <div className="portal-account__frame">
+      <CompassFrame className="portal-account__frame">
         <AccountEnrichmentSkeleton label="Account" />
-      </div>
+      </CompassFrame>
     </section>
   );
 }
@@ -395,7 +396,7 @@ export function PortalAccountInformation() {
         <p>Review the information currently connected to your COMPASS account.</p>
       </header>
 
-      <div className="portal-account__frame">
+      <CompassFrame className="portal-account__frame">
         {hasUnavailableEnrichment ? (
           <div className="portal-account__status" role="status" aria-live="polite">
             <p>Some account information is unavailable right now.</p>
@@ -442,7 +443,7 @@ export function PortalAccountInformation() {
             />
           ) : null}
         </div>
-      </div>
+      </CompassFrame>
     </section>
   );
 }

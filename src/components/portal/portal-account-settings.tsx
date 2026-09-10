@@ -22,6 +22,7 @@ import {
   type ReactNode,
 } from "react";
 
+import { CompassFrame } from "@/components/compass/compass-frame";
 import { useAuthSession } from "@/components/auth/auth-session-provider";
 import { PasswordField } from "@/components/auth/password-field";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
@@ -31,7 +32,7 @@ import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
 import { PortalBreadcrumb } from "@/components/portal/portal-breadcrumb";
-import { PortalSectionNav } from "@/components/portal/portal-section-nav";
+import { PortalViewMenu } from "@/components/portal/portal-view-menu";
 import {
   AccountSettingsApiError,
   changeAccountPassword,
@@ -232,13 +233,13 @@ function SettingsArea({
   title: string;
 }) {
   return (
-    <section aria-labelledby={id} className="portal-settings__area">
+    <CompassFrame as="section" aria-labelledby={id} className="portal-settings__area">
       <header className="portal-settings__area-heading">
         <h2 id={id}>{title}</h2>
         <p>{description}</p>
       </header>
       <div className="portal-settings__area-body">{children}</div>
-    </section>
+    </CompassFrame>
   );
 }
 
@@ -394,16 +395,16 @@ export function PortalAccountSettingsLoading() {
         <Skeleton aria-hidden="true" className="portal-settings__skeleton-summary" />
       </header>
       <div aria-hidden="true" className="portal-settings__loading-layout">
-        <div className="portal-section-nav portal-settings__loading-navigation">
+        <div className="portal-view-menu portal-settings__loading-navigation">
           {Array.from({ length: 4 }, (_, index) => (
             <Skeleton className="portal-settings__skeleton-tab" key={index} />
           ))}
         </div>
-        <div className="portal-settings__loading-area">
+        <CompassFrame className="portal-settings__loading-area">
           <Skeleton className="portal-settings__skeleton-line portal-settings__skeleton-line--short" />
           <Skeleton className="portal-settings__skeleton-line" />
           <Skeleton className="portal-settings__skeleton-line portal-settings__skeleton-line--long" />
-        </div>
+        </CompassFrame>
       </div>
     </section>
   );
@@ -1029,10 +1030,11 @@ export function PortalAccountSettings() {
       </header>
 
       <div className="portal-settings__workspace">
-        <PortalSectionNav
+        <PortalViewMenu
           activeValue={activeArea}
           ariaLabel="Account settings sections"
           items={SETTINGS_AREA_NAV_ITEMS}
+          label="Section"
         />
         <div className="portal-settings__panel">
         {activeArea === "security" ? (
@@ -1669,7 +1671,7 @@ export function PortalAccountSettings() {
         }}
         open={confirmAction !== null}
       >
-        <AlertDialogContent className="portal-settings__dialog">
+        <AlertDialogContent className="compass-surface portal-settings__dialog">
           <AlertDialogHeader>
             <AlertDialogTitle>{confirmationTitle}</AlertDialogTitle>
             <AlertDialogDescription>{confirmationDescription}</AlertDialogDescription>

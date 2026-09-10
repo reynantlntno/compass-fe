@@ -188,9 +188,6 @@
 .public-mobile-nav__panel {
   width: min(19rem, calc(100vw - 1.5rem));
   padding: 0.55rem;
-  border: 2px solid var(--compass-brand-maroon);
-  border-radius: var(--compass-radius-lg);
-  background-color: var(--compass-surface);
   box-shadow: var(--compass-shadow-md);
   color: var(--foreground);
 }

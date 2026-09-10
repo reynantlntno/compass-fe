@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ArrowRight, RefreshCw } from "lucide-react";
 import { useEffect, useState, type ComponentPropsWithoutRef } from "react";
 
+import { CompassFrame } from "@/components/compass/compass-frame";
 import { Skeleton } from "@/components/ui/skeleton";
 import { PortalBreadcrumb } from "@/components/portal/portal-breadcrumb";
 import { Button } from "@/components/ui/button";
@@ -143,17 +144,18 @@ export function PortalSystemHealthSkeleton({ detail = false }: { detail?: boolea
             />
           </div>
           <div className="portal-health__detail-cards">
-            <section
+            <CompassFrame
               aria-hidden="true"
               className="portal-health__detail-card portal-health__summary-card"
+              tone="subtle"
             >
               <div className="portal-health__skeleton-facts">
                 {Array.from({ length: 4 }, (_, index) => (
                   <Skeleton className="portal-health__skeleton-line" key={index} />
                 ))}
               </div>
-            </section>
-            <section
+            </CompassFrame>
+            <CompassFrame
               aria-hidden="true"
               className="portal-health__detail-card portal-health__checks-card"
             >
@@ -169,7 +171,7 @@ export function PortalSystemHealthSkeleton({ detail = false }: { detail?: boolea
                   </div>
                 ))}
               </div>
-            </section>
+            </CompassFrame>
           </div>
         </>
       ) : (
@@ -202,7 +204,7 @@ function HealthUnavailable({ detail, onRetry }: { detail: boolean; onRetry: () =
     >
       {detail ? <PortalBreadcrumb current="System health" /> : null}
       {detail ? (
-        <div className="portal-health__frame portal-health__frame--state">
+        <CompassFrame className="portal-health__frame portal-health__frame--state">
           <h1 id="portal-health-unavailable-heading">
             System health is unavailable right now.
           </h1>
@@ -211,7 +213,7 @@ function HealthUnavailable({ detail, onRetry }: { detail: boolean; onRetry: () =
             <RefreshCw aria-hidden="true" />
             Try again
           </Button>
-        </div>
+        </CompassFrame>
       ) : (
         <>
           <h2 id="portal-home-health-heading">
@@ -232,10 +234,10 @@ function HealthForbidden() {
   return (
     <section aria-labelledby="portal-health-forbidden-heading" className="portal-health portal-health--detail">
       <PortalBreadcrumb current="System health" />
-      <div className="portal-health__frame portal-health__frame--state">
+      <CompassFrame className="portal-health__frame portal-health__frame--state">
         <h1 id="portal-health-forbidden-heading">This page isn’t available for this account.</h1>
         <p>Return to your workspace to continue.</p>
-      </div>
+      </CompassFrame>
     </section>
   );
 }
@@ -326,14 +328,17 @@ export function PortalSystemHealthPage() {
       </div>
 
       <div className="portal-health__detail-cards">
-        <section
+        <CompassFrame
+          as="section"
           aria-label="Current health summary"
           className="portal-health__detail-card portal-health__summary-card"
+          tone="subtle"
         >
           <HealthFacts health={state.health} />
-        </section>
+        </CompassFrame>
 
-        <section
+        <CompassFrame
+          as="section"
           aria-labelledby="portal-health-checks-heading"
           className="portal-health__detail-card portal-health__checks-card"
         >
@@ -346,7 +351,7 @@ export function PortalSystemHealthPage() {
               <HealthComponentRow component={component} key={component.component} />
             ))}
           </ul>
-        </section>
+        </CompassFrame>
       </div>
     </section>
   );

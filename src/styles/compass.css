@@ -1,0 +1,40 @@
+/* Keep the shared foundation unlayered so it can intentionally override the
+   default Base UI utility classes on overlay primitives. */
+.compass-surface {
+  border: 2px solid var(--compass-brand-maroon);
+  border-radius: var(--compass-radius-xl);
+  background-color: var(--compass-surface);
+  box-shadow: var(--compass-shadow-sm);
+  color: var(--foreground);
+}
+
+.compass-surface[data-tone="muted"] {
+  background-color: var(--compass-surface-muted);
+}
+
+.compass-surface[data-tone="raised"] {
+  background-color: var(--compass-surface-raised);
+}
+
+.compass-surface[data-tone="sage"] {
+  background-color: var(--compass-note-sage);
+}
+
+.compass-surface[data-tone="subtle"] {
+  background-color: var(--compass-surface-subtle);
+}
+
+.compass-frame {
+  min-width: 0;
+  overflow: hidden;
+}
+
+@media (forced-colors: active) {
+  .compass-surface,
+  .compass-frame {
+    border-color: CanvasText;
+    background-color: Canvas;
+    box-shadow: none;
+    color: CanvasText;
+  }
+}

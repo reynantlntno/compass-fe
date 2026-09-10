@@ -1,5 +1,9 @@
 import { createElement, type HTMLAttributes, type ReactNode } from "react";
 
+import {
+  CompassSurface,
+  type CompassSurfaceTone,
+} from "@/components/compass/compass-surface";
 import { cn } from "@/lib/utils";
 
 type AuthCardElement = "div" | "footer" | "header" | "section";
@@ -17,10 +21,14 @@ export function AuthCard({
   className?: string;
   variant: AuthCardVariant;
 } & Omit<HTMLAttributes<HTMLElement>, "children" | "className">) {
+  const tone: CompassSurfaceTone = variant === "notice" ? "muted" : "surface";
+
   return createElement(
-    as,
+    CompassSurface,
     {
+      as,
       ...props,
+      tone,
       className: cn("auth-card", `auth-card--${variant}`, className),
     },
     children,

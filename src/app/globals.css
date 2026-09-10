@@ -3,6 +3,7 @@
 @import "shadcn/tailwind.css";
 @import "../styles/tokens.css";
 @import "../styles/base.css";
+@import "../styles/compass.css";
 @import "../styles/public.css";
 @import "../styles/accessibility.css";
 @import "../styles/reliability.css";

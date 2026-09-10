@@ -65,10 +65,6 @@
 
   .auth-card {
     overflow: hidden;
-    border: 2px solid var(--compass-brand-maroon);
-    border-radius: var(--compass-radius-xl);
-    background-color: var(--compass-surface);
-    box-shadow: var(--compass-shadow-md);
   }
 
   .auth-card--identity {
@@ -87,7 +83,6 @@
 
   .auth-card--notice {
     padding: 0.9rem clamp(1.25rem, 5vw, 2.25rem) 1.1rem;
-    background-color: var(--compass-surface-muted);
     color: var(--muted-foreground);
     font-size: 0.7rem;
     line-height: 1.45;

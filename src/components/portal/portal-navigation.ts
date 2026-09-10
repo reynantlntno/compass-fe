@@ -1,8 +1,22 @@
 import type { LucideIcon } from "lucide-react";
-import { Activity, Bell, House } from "lucide-react";
+import {
+  Activity,
+  Bell,
+  DatabaseBackup,
+  House,
+  Mail,
+  ScrollText,
+  Settings2,
+} from "lucide-react";
 
 export const PORTAL_CAPABILITIES = {
+  backupsOperate: "backups.operate",
+  backupsView: "backups.view",
+  auditView: "audit.view",
+  notificationsDeliveryOperate: "notifications.delivery.operate",
+  restoresOperate: "restores.operate",
   systemHealthView: "system.health.view",
+  systemOperationsManage: "system.operations.manage",
 } as const;
 
 export type PortalNavigationLink = {
@@ -49,11 +63,43 @@ export const PORTAL_NAVIGATION: readonly PortalNavigationItem[] = [
   },
   {
     kind: "link",
+    id: "notification-delivery",
+    href: "/portal/notification-delivery",
+    label: "Notification delivery",
+    icon: Mail,
+    requiredCapability: PORTAL_CAPABILITIES.notificationsDeliveryOperate,
+  },
+  {
+    kind: "link",
     id: "system-health",
     href: "/portal/system-health",
     label: "System health",
     icon: Activity,
     requiredCapability: PORTAL_CAPABILITIES.systemHealthView,
+  },
+  {
+    kind: "link",
+    id: "system-operations",
+    href: "/portal/system-operations",
+    label: "System operations",
+    icon: Settings2,
+    requiredCapability: PORTAL_CAPABILITIES.systemOperationsManage,
+  },
+  {
+    kind: "link",
+    id: "backups",
+    href: "/portal/backups",
+    label: "Backups & restore",
+    icon: DatabaseBackup,
+    requiredCapability: PORTAL_CAPABILITIES.backupsView,
+  },
+  {
+    kind: "link",
+    id: "audit",
+    href: "/portal/audit",
+    label: "Audit trail",
+    icon: ScrollText,
+    requiredCapability: PORTAL_CAPABILITIES.auditView,
   },
 ];
 

@@ -116,9 +116,6 @@ html[data-compass-motion="reduced"] *::after {
     width: min(22rem, calc(100vw - 1.5rem));
     max-height: min(40rem, calc(100dvh - 2rem));
     overflow-y: auto;
-    border: 2px solid var(--compass-brand-maroon);
-    border-radius: 0.75rem;
-    background-color: var(--compass-surface);
     color: var(--foreground);
     box-shadow: var(--compass-shadow-md);
   }

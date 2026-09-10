@@ -1,8 +1,12 @@
 import { cn } from "@/lib/utils"
 
-function Skeleton({ className, ...props }: React.ComponentProps<"div">) {
+type SkeletonProps = React.ComponentProps<"div"> & {
+  as?: "div" | "span"
+}
+
+function Skeleton({ as: Element = "div", className, ...props }: SkeletonProps) {
   return (
-    <div
+    <Element
       data-slot="skeleton"
       className={cn("animate-pulse rounded-md bg-muted", className)}
       {...props}

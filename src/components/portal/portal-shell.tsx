@@ -16,6 +16,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useState, type ReactNode } from "react";
 
 import { useAuthSession } from "@/components/auth/auth-session-provider";
+import { CompassFrame } from "@/components/compass/compass-frame";
 import { usePortalAccess } from "@/components/portal/portal-access-provider";
 import { usePortalNotifications } from "@/components/portal/portal-notifications-provider";
 import {
@@ -251,7 +252,7 @@ function PortalNavigationMenuView({
       />
       <DropdownMenuContent
         align="start"
-        className="portal-dock__menu"
+        className="compass-surface portal-dock__menu"
         side="top"
         sideOffset={16}
       >
@@ -302,7 +303,7 @@ function PortalDropdownNavigationItem({
         <Icon aria-hidden="true" className="portal-dock__nav-icon" />
         <span>{item.label}</span>
       </DropdownMenuSubTrigger>
-      <DropdownMenuSubContent className="portal-dock__menu portal-dock__submenu">
+      <DropdownMenuSubContent className="compass-surface portal-dock__menu portal-dock__submenu">
         {item.items.map((child) => (
           <PortalDropdownLinkItem
             item={child}
@@ -343,7 +344,7 @@ function PortalMoreMenu({
       />
       <DropdownMenuContent
         align="end"
-        className="portal-dock__menu"
+        className="compass-surface portal-dock__menu"
         side="top"
         sideOffset={24}
       >
@@ -420,7 +421,7 @@ function AccountMenu({
         />
         <DropdownMenuContent
           align="end"
-          className="portal-account__menu"
+          className="compass-surface portal-account__menu"
           side="top"
           sideOffset={20}
         >
@@ -457,7 +458,7 @@ function AccountMenu({
       </DropdownMenu>
 
       <AlertDialog onOpenChange={setConfirmOpen} open={confirmOpen}>
-        <AlertDialogContent className="portal-signout-dialog">
+        <AlertDialogContent className="compass-surface portal-signout-dialog">
           <AlertDialogHeader className="portal-signout-dialog__header">
             <AlertDialogTitle>Sign out of COMPASS?</AlertDialogTitle>
             <AlertDialogDescription>
@@ -535,7 +536,7 @@ export function PortalShell({
         aria-label={`${branding.productName} portal navigation`}
         className={`portal-dock${dockCollapsed ? " is-collapsed" : ""}`}
       >
-        <div className="portal-dock__inner" id="portal-dock-content">
+        <CompassFrame className="portal-dock__inner" id="portal-dock-content">
           <PortalBrand
             collapsed={dockCollapsed}
             onExpand={() => setDockCollapsed(false)}
@@ -580,7 +581,7 @@ export function PortalShell({
               user={user}
             />
           </nav>
-        </div>
+        </CompassFrame>
       </header>
 
       <main className="portal-shell__main" id="portal-main">

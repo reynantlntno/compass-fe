@@ -102,7 +102,7 @@ export function AccessibilityOptions() {
         </PopoverTrigger>
         <PopoverContent
           align="end"
-          className="compass-accessibility__panel"
+          className="compass-surface compass-accessibility__panel"
           side="top"
           sideOffset={12}
         >

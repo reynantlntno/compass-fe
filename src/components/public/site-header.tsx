@@ -148,7 +148,7 @@ export function SiteHeader({ branding }: { branding: BrandingConfig }) {
               />
               <DropdownMenuContent
                 align="end"
-                className="public-mobile-nav__panel"
+                className="compass-surface public-mobile-nav__panel"
                 side="bottom"
                 sideOffset={10}
               >

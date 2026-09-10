@@ -5,6 +5,7 @@ import { ArrowRight } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { useAuthSession } from "@/components/auth/auth-session-provider";
+import { CompassFrame } from "@/components/compass/compass-frame";
 import { PortalDateTime } from "@/components/portal/portal-date-time";
 import {
   cleanPortalValue,
@@ -71,37 +72,48 @@ export function PortalHome() {
             {displayName}.
           </h1>
         </div>
+        <p className="portal-home__guidance">
+          Use the dock below to move between available areas.
+        </p>
       </header>
-      <p className="portal-home__guidance">
-        Use the dock below to move between available areas.
-      </p>
 
       <div className="portal-home__widget-grid">
-        <PortalHomeWidget
-          aria-label="Local date and time"
-          className="portal-home__time-widget"
+        <CompassFrame
+          aria-label="Default widgets"
+          as="section"
+          className="portal-home__default-widgets"
+          tone="subtle"
         >
-          <PortalDateTime compact />
-        </PortalHomeWidget>
+          <div className="portal-home__default-widget-grid">
+            <PortalHomeWidget
+              aria-label="Local date and time"
+              className="portal-home__time-widget"
+              tone="surface"
+            >
+              <PortalDateTime compact />
+            </PortalHomeWidget>
 
-        <PortalHomeWidget
-          aria-labelledby="portal-account-widget-heading"
-          className="portal-home__account-widget"
-        >
-          <div className="portal-home__account-identity">
-            <div aria-hidden="true" className="portal-home__account-avatar">
-              {getPortalInitials(user)}
-            </div>
-            <div className="portal-home__account-copy">
-              <h2 id="portal-account-widget-heading">{displayName}</h2>
-              <p>{roleLabel}</p>
-            </div>
+            <PortalHomeWidget
+              aria-labelledby="portal-account-widget-heading"
+              className="portal-home__account-widget"
+              tone="surface"
+            >
+              <div className="portal-home__account-identity">
+                <div aria-hidden="true" className="portal-home__account-avatar">
+                  {getPortalInitials(user)}
+                </div>
+                <div className="portal-home__account-copy">
+                  <h2 id="portal-account-widget-heading">{displayName}</h2>
+                  <p>{roleLabel}</p>
+                </div>
+              </div>
+              <Link className="portal-home__account-link" href="/portal/account">
+                <span>View account</span>
+                <ArrowRight aria-hidden="true" />
+              </Link>
+            </PortalHomeWidget>
           </div>
-          <Link className="portal-home__account-link" href="/portal/account">
-            <span>View account</span>
-            <ArrowRight aria-hidden="true" />
-          </Link>
-        </PortalHomeWidget>
+        </CompassFrame>
 
         <PortalSystemHealthSummary />
       </div>

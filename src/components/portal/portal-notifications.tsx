@@ -11,9 +11,12 @@ import {
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 
+import { PortalCollectionFrame } from "@/components/portal/portal-collection-frame";
+import { PortalListRow } from "@/components/portal/portal-list-row";
+import { PortalPageHeader } from "@/components/portal/portal-page-header";
+import { PortalViewMenu } from "@/components/portal/portal-view-menu";
 import { usePortalNotifications } from "@/components/portal/portal-notifications-provider";
-import { PortalBreadcrumb } from "@/components/portal/portal-breadcrumb";
-import { PortalSectionNav } from "@/components/portal/portal-section-nav";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -116,6 +119,12 @@ function filterHref(filter: PortalNotificationFilter, page = 1) {
   return query ? `/portal/notifications?${query}` : "/portal/notifications";
 }
 
+const NOTIFICATION_VIEW_ITEMS = FILTERS.map((entry) => ({
+  href: filterHref(entry.value),
+  label: entry.label,
+  value: entry.value,
+}));
+
 function notificationPriorityLabel(priority: NotificationSchema["priority"]) {
   switch (priority) {
     case "urgent":
@@ -141,27 +150,39 @@ function formatNotificationDate(value: string | null | undefined) {
 
 function NotificationsLoading() {
   return (
-      <section
+    <section
       aria-busy="true"
       aria-label="Loading notifications"
       className="portal-notifications portal-notifications--loading"
       role="status"
     >
       <span className="sr-only">Loading notifications…</span>
-      <PortalBreadcrumb current="Notifications" />
-      <header className="portal-notifications__header">
-        <Skeleton aria-hidden="true" className="portal-notifications__skeleton-heading" />
-        <Skeleton aria-hidden="true" className="portal-notifications__skeleton-summary" />
-      </header>
-      <div
-        aria-hidden="true"
-        className="portal-section-nav portal-notifications__filters--loading"
-      >
-        <Skeleton />
-        <Skeleton />
-        <Skeleton />
-      </div>
-      <div className="portal-notifications__inbox">
+      <PortalPageHeader
+        className="portal-notifications__header"
+        current="Notifications"
+        description={
+          <Skeleton
+            as="span"
+            aria-hidden="true"
+            className="portal-notifications__skeleton-summary"
+          />
+        }
+        headingId="portal-notifications-heading"
+        title={
+          <Skeleton
+            as="span"
+            aria-hidden="true"
+            className="portal-notifications__skeleton-heading"
+          />
+        }
+      />
+      <PortalViewMenu
+        activeValue="all"
+        ariaLabel="Notification views"
+        className="portal-notifications__view-menu--loading"
+        items={NOTIFICATION_VIEW_ITEMS}
+      />
+      <PortalCollectionFrame className="portal-notifications__inbox">
         <div aria-hidden="true" className="portal-notifications__skeleton-list">
           {Array.from({ length: 4 }, (_, index) => (
             <div className="portal-notifications__skeleton-row" key={index}>
@@ -170,7 +191,7 @@ function NotificationsLoading() {
             </div>
           ))}
         </div>
-      </div>
+      </PortalCollectionFrame>
     </section>
   );
 }
@@ -185,12 +206,14 @@ function NotificationsUnavailable({ onRetry }: { onRetry: () => void }) {
       aria-labelledby="portal-notifications-heading"
       className="portal-notifications"
     >
-      <PortalBreadcrumb current="Notifications" />
-      <header className="portal-notifications__header">
-        <h1 id="portal-notifications-heading">Notifications</h1>
-        <p>Updates sent to your COMPASS account.</p>
-      </header>
-      <div className="portal-notifications__inbox">
+      <PortalPageHeader
+        className="portal-notifications__header"
+        current="Notifications"
+        description="Updates sent to your COMPASS account."
+        headingId="portal-notifications-heading"
+        title="Notifications"
+      />
+      <PortalCollectionFrame className="portal-notifications__inbox">
         <div
           aria-labelledby="portal-notifications-unavailable-heading"
           className="portal-notifications__state"
@@ -205,7 +228,7 @@ function NotificationsUnavailable({ onRetry }: { onRetry: () => void }) {
             Try again
           </Button>
         </div>
-      </div>
+      </PortalCollectionFrame>
     </section>
   );
 }
@@ -255,7 +278,7 @@ function NotificationRow({
   const isSelectable = notification.status !== "archived";
 
   return (
-    <li
+    <PortalListRow
       className={`portal-notification${notification.status === "unread" ? " is-unread" : ""}`}
       data-status={notification.status}
     >
@@ -286,10 +309,14 @@ function NotificationRow({
             {priorityLabel || notification.status === "archived" ? (
               <span className="portal-notification__meta">
                 {priorityLabel ? (
-                  <span className="portal-notification__priority">{priorityLabel}</span>
+                  <Badge className="portal-notification__priority" variant="outline">
+                    {priorityLabel}
+                  </Badge>
                 ) : null}
                 {notification.status === "archived" ? (
-                  <span className="portal-notification__archived">Archived</span>
+                  <Badge className="portal-notification__archived" variant="ghost">
+                    Archived
+                  </Badge>
                 ) : null}
               </span>
             ) : null}
@@ -352,7 +379,7 @@ function NotificationRow({
           ) : null}
         </div>
       ) : null}
-    </li>
+    </PortalListRow>
   );
 }
 
@@ -768,33 +795,31 @@ export function PortalNotificationsPage() {
 
   return (
     <section aria-labelledby="portal-notifications-heading" className="portal-notifications">
-      <PortalBreadcrumb current="Notifications" />
-      <header className="portal-notifications__header">
-        <div className="portal-notifications__title-row">
-          <h1 id="portal-notifications-heading">Notifications</h1>
-          {unreadCountLabel ? (
+      <PortalPageHeader
+        className="portal-notifications__header"
+        current="Notifications"
+        description="Updates sent to your COMPASS account."
+        headingId="portal-notifications-heading"
+        meta={
+          unreadCountLabel ? (
             <span
               aria-label={`${unreadCountLabel} unread notifications`}
               className="portal-notifications__unread-summary"
             >
               {unreadCountLabel} unread
             </span>
-          ) : null}
-        </div>
-        <p>Updates sent to your COMPASS account.</p>
-      </header>
-
-      <PortalSectionNav
-        activeValue={filter}
-        ariaLabel="Notification views"
-        items={FILTERS.map((entry) => ({
-          href: filterHref(entry.value),
-          label: entry.label,
-          value: entry.value,
-        }))}
+          ) : null
+        }
+        title="Notifications"
       />
 
-      <div className="portal-notifications__inbox">
+      <PortalViewMenu
+        activeValue={filter}
+        ariaLabel="Notification views"
+        items={NOTIFICATION_VIEW_ITEMS}
+      />
+
+      <PortalCollectionFrame className="portal-notifications__inbox">
         {notifications.length === 0 ? (
           <NotificationsEmpty filter={filter} />
         ) : (
@@ -902,7 +927,7 @@ export function PortalNotificationsPage() {
             ) : null}
           </>
         )}
-      </div>
+      </PortalCollectionFrame>
 
       {expandedNotification ? <span className="sr-only">Notification expanded.</span> : null}
     </section>
