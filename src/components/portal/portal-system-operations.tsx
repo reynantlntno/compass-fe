@@ -1,12 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import {
   CalendarClock,
   CheckCircle2,
-  ChevronLeft,
-  ChevronRight,
   Clock3,
   Code2,
   Database,
@@ -27,16 +24,34 @@ import {
 
 import { CompassFrame } from "@/components/compass/compass-frame";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import { Textarea } from "@/components/ui/textarea";
-import { PortalBreadcrumb } from "@/components/portal/portal-breadcrumb";
 import { usePortalAccess } from "@/components/portal/portal-access-provider";
+import { PortalCollectionFrame } from "@/components/portal/portal-collection-frame";
 import { PORTAL_CAPABILITIES } from "@/components/portal/portal-navigation";
-import { PortalViewMenu } from "@/components/portal/portal-view-menu";
+import { PortalListRow } from "@/components/portal/portal-list-row";
+import { PortalPageHeader } from "@/components/portal/portal-page-header";
+import { PortalWorkspaceNav } from "@/components/portal/portal-workspace-nav";
 import {
   activateSystemMaintenance,
   cancelSystemMaintenance,
@@ -305,25 +320,27 @@ function OperationsPagination({
   if (pages <= 1) return null;
 
   return (
-    <nav aria-label={`${label} pages`} className="portal-operations__pagination">
-      {page > 1 ? (
-        <Link className="portal-operations__pagination-link" href={sectionHref(section, page - 1)}>
-          <ChevronLeft aria-hidden="true" />
-          Previous
-        </Link>
-      ) : (
-        <span className="portal-operations__pagination-placeholder" />
-      )}
-      <span aria-live="polite">Page {page} of {pages}</span>
-      {page < pages ? (
-        <Link className="portal-operations__pagination-link" href={sectionHref(section, page + 1)}>
-          Next
-          <ChevronRight aria-hidden="true" />
-        </Link>
-      ) : (
-        <span className="portal-operations__pagination-placeholder" />
-      )}
-    </nav>
+    <Pagination aria-label={`${label} pages`} className="portal-operations__pagination">
+      <PaginationContent>
+        <PaginationItem>
+          {page > 1 ? (
+            <PaginationPrevious href={sectionHref(section, page - 1)} />
+          ) : (
+            <span aria-hidden="true" className="portal-operations__pagination-placeholder" />
+          )}
+        </PaginationItem>
+        <PaginationItem className="portal-operations__pagination-current">
+          <span aria-live="polite">Page {page} of {pages}</span>
+        </PaginationItem>
+        <PaginationItem>
+          {page < pages ? (
+            <PaginationNext href={sectionHref(section, page + 1)} />
+          ) : (
+            <span aria-hidden="true" className="portal-operations__pagination-placeholder" />
+          )}
+        </PaginationItem>
+      </PaginationContent>
+    </Pagination>
   );
 }
 
@@ -416,39 +433,69 @@ function ErrorSection({
       {page.kind === "ready" ? (
         page.data.items.length > 0 ? (
           <>
-            <ul className="portal-operations__list">
-              {page.data.items.map((error) => {
-                const createdAt = formatTimestamp(error.created_at);
-                const resolvedAt = formatTimestamp(error.resolved_at);
-                const routeContext = error.route_name ?? error.path_template;
-                return (
-                  <li className="portal-operations__row" key={error.error_id}>
-                    <div className="portal-operations__row-heading">
-                      <span className="portal-operations__status" data-tone={statusTone(error.severity)}>
-                        {severityLabel(error.severity)}
-                      </span>
-                      <span>{error.is_resolved ? "Resolved" : "Open"}</span>
-                    </div>
-                    <h3>{error.safe_message}</h3>
-                    <p className="portal-operations__row-context">{formatLabel(error.category)}</p>
-                    <dl className="portal-operations__fact-grid">
-                      <Fact label="Environment" value={error.environment} />
-                      {error.release_version ? <Fact label="Release" value={error.release_version} /> : null}
-                      {error.build_id ? <Fact label="Build" value={error.build_id} /> : null}
-                      {routeContext ? <Fact label="Route" value={routeContext} /> : null}
-                      {createdAt ? <Fact label="Created" value={<time dateTime={error.created_at}>{createdAt}</time>} /> : null}
-                      {resolvedAt ? <Fact label="Resolved" value={<time dateTime={error.resolved_at ?? undefined}>{resolvedAt}</time>} /> : null}
-                    </dl>
-                    <div className="portal-operations__row-actions">
-                      <Button onClick={() => onAction(error)} size="sm" type="button" variant="outline">
-                        {error.is_resolved ? <RotateCcw aria-hidden="true" /> : <CheckCircle2 aria-hidden="true" />}
-                        {error.is_resolved ? "Reopen" : "Resolve"}
-                      </Button>
-                    </div>
-                  </li>
-                );
-              })}
-            </ul>
+            <div className="portal-operations__table-wrap">
+              <Table className="portal-operations__table portal-operations__table--errors">
+                <caption className="sr-only">Application errors</caption>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Severity</TableHead>
+                    <TableHead>State</TableHead>
+                    <TableHead>Category</TableHead>
+                    <TableHead>Message</TableHead>
+                    <TableHead>Environment</TableHead>
+                    <TableHead>Context</TableHead>
+                    <TableHead>Created</TableHead>
+                    <TableHead>Action</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {page.data.items.map((error) => {
+                    const createdAt = formatTimestamp(error.created_at);
+                    const routeContext = error.route_name ?? error.path_template;
+                    return (
+                      <TableRow key={error.error_id}>
+                        <TableCell className="portal-operations__table-cell" data-label="Severity">
+                          <Badge className="portal-operations__status-badge" data-tone={statusTone(error.severity)} variant="outline">
+                            {severityLabel(error.severity)}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="portal-operations__table-cell" data-label="State">
+                          <Badge className="portal-operations__state-badge" data-tone={error.is_resolved ? "ok" : "warning"} variant="outline">
+                            {error.is_resolved ? "Resolved" : "Open"}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="portal-operations__table-cell" data-label="Category">
+                          {formatLabel(error.category)}
+                        </TableCell>
+                        <TableCell className="portal-operations__table-cell portal-operations__table-cell--message" data-label="Message">
+                          {error.safe_message}
+                        </TableCell>
+                        <TableCell className="portal-operations__table-cell" data-label="Environment">
+                          {error.environment}
+                        </TableCell>
+                        <TableCell className="portal-operations__table-cell" data-label="Context">
+                          <div className="portal-operations__table-context">
+                            {error.release_version ? <span>Release {error.release_version}</span> : null}
+                            {error.build_id ? <span>Build {error.build_id}</span> : null}
+                            {routeContext ? <span>{routeContext}</span> : null}
+                            {!error.release_version && !error.build_id && !routeContext ? <span>—</span> : null}
+                          </div>
+                        </TableCell>
+                        <TableCell className="portal-operations__table-cell" data-label="Created">
+                          {createdAt ? <time dateTime={error.created_at}>{createdAt}</time> : "—"}
+                        </TableCell>
+                        <TableCell className="portal-operations__table-cell portal-operations__table-cell--action" data-label="Action">
+                          <Button onClick={() => onAction(error)} size="sm" type="button" variant="outline">
+                            {error.is_resolved ? <RotateCcw aria-hidden="true" /> : <CheckCircle2 aria-hidden="true" />}
+                            {error.is_resolved ? "Reopen" : "Resolve"}
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </div>
             <OperationsPagination
               label="Application errors"
               page={page.data.page}
@@ -505,12 +552,12 @@ function MaintenanceSection({
                 const canExtend = maintenance.status === "active";
                 const canComplete = maintenance.status === "active";
                 return (
-                  <li className="portal-operations__row" key={maintenance.id}>
+                  <PortalListRow className="portal-operations__row" key={maintenance.id}>
                     <div className="portal-operations__row-heading">
-                      <span className="portal-operations__status" data-tone={statusTone(maintenance.status)}>
+                      <Badge className="portal-operations__status-badge" data-tone={statusTone(maintenance.status)} variant="outline">
                         {maintenanceStatusLabel(maintenance.status)}
-                      </span>
-                      {maintenance.is_expired ? <span>Expired</span> : null}
+                      </Badge>
+                      {maintenance.is_expired ? <Badge className="portal-operations__state-badge" variant="outline">Expired</Badge> : null}
                     </div>
                     <h3>{maintenance.safe_public_message || "Maintenance window"}</h3>
                     <dl className="portal-operations__fact-grid">
@@ -544,7 +591,7 @@ function MaintenanceSection({
                         </Button>
                       ) : null}
                     </div>
-                  </li>
+                  </PortalListRow>
                 );
               })}
             </ul>
@@ -677,36 +724,68 @@ function HistorySection({
       {page.kind === "ready" ? (
         page.data.items.length > 0 ? (
           <>
-            <ul className="portal-operations__list">
-              {page.data.items.map((run) => {
-                const commandLabel = catalog.kind === "ready"
-                  ? catalog.data.items.find((item) => item.key === run.command_key)?.label
-                  : null;
-                const startedAt = formatTimestamp(run.started_at);
-                const finishedAt = formatTimestamp(run.finished_at);
-                return (
-                  <li className="portal-operations__row" key={run.id}>
-                    <div className="portal-operations__row-heading">
-                      <span className="portal-operations__status" data-tone={statusTone(run.outcome)}>
-                        {outcomeLabel(run.outcome)}
-                      </span>
-                      <span>{formatLabel(run.mode)}</span>
-                    </div>
-                    <h3>{commandLabel ?? run.command_key}</h3>
-                    <p className="portal-operations__row-context">{run.command_key}</p>
-                    <dl className="portal-operations__fact-grid">
-                      <Fact label="Environment" value={run.environment} />
-                      <Fact label="Reason" value={formatLabel(run.reason_code)} />
-                      {run.outcome_reason_code ? <Fact label="Outcome detail" value={formatLabel(run.outcome_reason_code)} /> : null}
-                      {run.release_version ? <Fact label="Release" value={run.release_version} /> : null}
-                      {run.build_id ? <Fact label="Build" value={run.build_id} /> : null}
-                      {startedAt ? <Fact label="Started" value={<time dateTime={run.started_at ?? undefined}>{startedAt}</time>} /> : null}
-                      {finishedAt ? <Fact label="Finished" value={<time dateTime={run.finished_at ?? undefined}>{finishedAt}</time>} /> : null}
-                    </dl>
-                  </li>
-                );
-              })}
-            </ul>
+            <div className="portal-operations__table-wrap">
+              <Table className="portal-operations__table portal-operations__table--history">
+                <caption className="sr-only">Operational history</caption>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Command</TableHead>
+                    <TableHead>Outcome</TableHead>
+                    <TableHead>Mode</TableHead>
+                    <TableHead>Environment</TableHead>
+                    <TableHead>Reason</TableHead>
+                    <TableHead>Started</TableHead>
+                    <TableHead>Finished</TableHead>
+                    <TableHead>Context</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {page.data.items.map((run) => {
+                    const commandLabel = catalog.kind === "ready"
+                      ? catalog.data.items.find((item) => item.key === run.command_key)?.label
+                      : null;
+                    const startedAt = formatTimestamp(run.started_at);
+                    const finishedAt = formatTimestamp(run.finished_at);
+                    return (
+                      <TableRow key={run.id}>
+                        <TableCell className="portal-operations__table-cell portal-operations__table-cell--message" data-label="Command">
+                          <strong>{commandLabel ?? run.command_key}</strong>
+                          <span className="portal-operations__table-secondary">{run.command_key}</span>
+                        </TableCell>
+                        <TableCell className="portal-operations__table-cell" data-label="Outcome">
+                          <Badge className="portal-operations__status-badge" data-tone={statusTone(run.outcome)} variant="outline">
+                            {outcomeLabel(run.outcome)}
+                          </Badge>
+                        </TableCell>
+                        <TableCell className="portal-operations__table-cell" data-label="Mode">
+                          {formatLabel(run.mode)}
+                        </TableCell>
+                        <TableCell className="portal-operations__table-cell" data-label="Environment">
+                          {run.environment}
+                        </TableCell>
+                        <TableCell className="portal-operations__table-cell" data-label="Reason">
+                          {formatLabel(run.reason_code)}
+                        </TableCell>
+                        <TableCell className="portal-operations__table-cell" data-label="Started">
+                          {startedAt ? <time dateTime={run.started_at ?? undefined}>{startedAt}</time> : "—"}
+                        </TableCell>
+                        <TableCell className="portal-operations__table-cell" data-label="Finished">
+                          {finishedAt ? <time dateTime={run.finished_at ?? undefined}>{finishedAt}</time> : "—"}
+                        </TableCell>
+                        <TableCell className="portal-operations__table-cell" data-label="Context">
+                          <div className="portal-operations__table-context">
+                            {run.outcome_reason_code ? <span>{formatLabel(run.outcome_reason_code)}</span> : null}
+                            {run.release_version ? <span>Release {run.release_version}</span> : null}
+                            {run.build_id ? <span>Build {run.build_id}</span> : null}
+                            {!run.outcome_reason_code && !run.release_version && !run.build_id ? <span>—</span> : null}
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })}
+                </TableBody>
+              </Table>
+            </div>
             <OperationsPagination
               label="Operation history"
               page={page.data.page}
@@ -725,7 +804,7 @@ function HistorySection({
 
 function OperationsFrameSkeleton() {
   return (
-    <CompassFrame aria-hidden="true" className="portal-operations__frame portal-operations__frame--loading">
+    <CompassFrame aria-hidden="true" as="div" className="portal-operations__frame portal-operations__frame--loading">
       <Skeleton className="portal-operations__skeleton-line portal-operations__skeleton-line--short" />
       <Skeleton className="portal-operations__skeleton-line portal-operations__skeleton-line--heading" />
       <Skeleton className="portal-operations__skeleton-line portal-operations__skeleton-line--long" />
@@ -738,12 +817,15 @@ function OperationsFrameSkeleton() {
   );
 }
 
-function OperationsHeader() {
+function OperationsWorkspaceNavSkeleton() {
   return (
-    <header className="portal-operations__header">
-      <h1 id="portal-operations-heading">System operations</h1>
-      <p>Review application issues, maintenance windows, release context, and operational history.</p>
-    </header>
+    <div aria-hidden="true" className="compass-surface portal-workspace-nav portal-operations__nav-skeleton" data-tone="subtle">
+      <div className="portal-workspace-nav__skeleton-list">
+        {OPERATIONS_NAV_ITEMS.map((item) => (
+          <Skeleton className="portal-operations__skeleton-tab" key={item.value} />
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -751,15 +833,16 @@ export function PortalSystemOperationsLoading() {
   return (
     <section aria-busy="true" aria-labelledby="portal-operations-loading-heading" className="portal-operations portal-operations--loading" role="status">
       <span className="sr-only">Loading system operations…</span>
-      <PortalBreadcrumb current="System operations" />
-      <header className="portal-operations__header">
-        <h1 id="portal-operations-loading-heading">System operations</h1>
-        <p>Review application issues, maintenance windows, release context, and operational history.</p>
-      </header>
-      <div aria-hidden="true" className="portal-view-menu portal-operations__nav-skeleton">
-        {Array.from({ length: 4 }, (_, index) => <Skeleton className="portal-operations__skeleton-tab" key={index} />)}
+      <PortalPageHeader
+        current="System operations"
+        description="Review application issues, maintenance windows, release context, and operational history."
+        headingId="portal-operations-loading-heading"
+        title="System operations"
+      />
+      <div className="portal-operations__workspace">
+        <OperationsWorkspaceNavSkeleton />
+        <OperationsFrameSkeleton />
       </div>
-      <OperationsFrameSkeleton />
     </section>
   );
 }
@@ -773,9 +856,13 @@ function PortalSystemOperationsAccessState({
 }) {
   return (
     <section aria-labelledby="portal-operations-access-heading" className="portal-operations portal-operations--state" role={kind === "unavailable" ? "alert" : undefined}>
-      <PortalBreadcrumb current="System operations" />
-      <OperationsHeader />
-      <CompassFrame className="portal-operations__frame portal-operations__frame--state">
+      <PortalPageHeader
+        current="System operations"
+        description="Review application issues, maintenance windows, release context, and operational history."
+        headingId="portal-operations-heading"
+        title="System operations"
+      />
+      <PortalCollectionFrame as="div" className="portal-operations__frame portal-operations__frame--state">
         <Settings2 aria-hidden="true" className="portal-operations__state-icon" />
         <h2 id="portal-operations-access-heading">
           {kind === "forbidden" ? "This page isn’t available for this account." : "System operations isn’t available right now."}
@@ -789,7 +876,7 @@ function PortalSystemOperationsAccessState({
             Try again
           </Button>
         ) : null}
-      </CompassFrame>
+      </PortalCollectionFrame>
     </section>
   );
 }
@@ -1221,22 +1308,27 @@ function SystemOperationsWorkspace() {
 
   return (
     <section aria-labelledby="portal-operations-heading" className="portal-operations">
-      <PortalBreadcrumb current="System operations" />
-      <OperationsHeader />
-      <PortalViewMenu
-        activeValue={activeSection}
-        ariaLabel="System operations sections"
-        items={navItems}
-        label="Section"
+      <PortalPageHeader
+        current="System operations"
+        description="Review application issues, maintenance windows, release context, and operational history."
+        headingId="portal-operations-heading"
+        title="System operations"
       />
-      <CompassFrame className="portal-operations__frame">
-        {mutationNotice ? (
-          <p aria-live="polite" className="portal-operations__notice" role="status">
-            {mutationNotice}
-          </p>
-        ) : null}
-        {renderActiveSection()}
-      </CompassFrame>
+      <div className="portal-operations__workspace">
+        <PortalWorkspaceNav
+          activeValue={activeSection}
+          ariaLabel="System operations sections"
+          items={navItems}
+        />
+        <PortalCollectionFrame as="div" className="portal-operations__frame">
+          {mutationNotice ? (
+            <p aria-live="polite" className="portal-operations__notice" role="status">
+              {mutationNotice}
+            </p>
+          ) : null}
+          {renderActiveSection()}
+        </PortalCollectionFrame>
+      </div>
 
       <AlertDialog
         onOpenChange={(open) => {
