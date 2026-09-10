@@ -2,15 +2,21 @@
 
 import Link from "next/link";
 import { ArrowRight, RefreshCw } from "lucide-react";
-import { useEffect, useState, type ComponentPropsWithoutRef } from "react";
+import {
+  useEffect,
+  useState,
+  type ComponentPropsWithoutRef,
+  type ReactNode,
+} from "react";
 
-import { CompassFrame } from "@/components/compass/compass-frame";
-import { Skeleton } from "@/components/ui/skeleton";
-import { PortalBreadcrumb } from "@/components/portal/portal-breadcrumb";
-import { Button } from "@/components/ui/button";
+import { PortalCollectionFrame } from "@/components/portal/portal-collection-frame";
+import { PortalPageHeader } from "@/components/portal/portal-page-header";
 import { PortalHomeWidget } from "@/components/portal/portal-home-widget";
 import { usePortalAccess } from "@/components/portal/portal-access-provider";
 import { PORTAL_CAPABILITIES } from "@/components/portal/portal-navigation";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import type {
   HealthComponentSchema,
   HealthProjectionSchema,
@@ -47,12 +53,30 @@ function formatCheckedAt(value: string | null | undefined) {
   }).format(date);
 }
 
-function HealthFacts({ health }: { health: HealthProjectionSchema }) {
+function HealthFacts({
+  health,
+  showStatusBadge = false,
+}: {
+  health: HealthProjectionSchema;
+  showStatusBadge?: boolean;
+}) {
   return (
     <dl className="portal-health__facts">
       <div>
         <dt>Overall status</dt>
-        <dd data-health-status={health.status}>{healthStatusLabel(health.status)}</dd>
+        <dd data-health-status={health.status}>
+          {showStatusBadge ? (
+            <Badge
+              className="portal-health__status-badge"
+              data-health-status={health.status}
+              variant="outline"
+            >
+              {healthStatusLabel(health.status)}
+            </Badge>
+          ) : (
+            healthStatusLabel(health.status)
+          )}
+        </dd>
       </div>
       <div>
         <dt>Components checked</dt>
@@ -80,14 +104,32 @@ function HealthComponentRow({ component }: { component: HealthComponentSchema })
   return (
     <li className="portal-health__component">
       <div className="portal-health__component-heading">
-        <h2>{component.label}</h2>
-        <span data-health-status={component.status}>
+        <h3>{component.label}</h3>
+        <Badge
+          className="portal-health__status-badge"
+          data-health-status={component.status}
+          variant="outline"
+        >
           {healthStatusLabel(component.status)}
-        </span>
+        </Badge>
       </div>
       <p>{component.message}</p>
       {checkedAt ? <time dateTime={component.checked_at ?? undefined}>Checked {checkedAt}</time> : null}
     </li>
+  );
+}
+
+const HEALTH_DETAIL_DESCRIPTION =
+  "A read-only view of the latest checks available to this workspace.";
+
+function HealthDetailHeader({ title = "System health" }: { title?: ReactNode }) {
+  return (
+    <PortalPageHeader
+      current="System health"
+      description={HEALTH_DETAIL_DESCRIPTION}
+      headingId="portal-health-heading"
+      title={title}
+    />
   );
 }
 
@@ -117,6 +159,58 @@ function HealthSurface({
 }
 
 export function PortalSystemHealthSkeleton({ detail = false }: { detail?: boolean }) {
+  if (detail) {
+    return (
+      <section
+        aria-busy="true"
+        aria-labelledby="portal-health-heading"
+        aria-label="Checking system health"
+        className="portal-health portal-health--loading portal-health--detail"
+        role="status"
+      >
+        <HealthDetailHeader />
+        <span className="sr-only">Checking system health…</span>
+        <div className="portal-health__detail-stack">
+          <PortalCollectionFrame
+            aria-hidden="true"
+            className="portal-health__detail-card portal-health__summary-card"
+            tone="subtle"
+          >
+            <div className="portal-health__card-heading">
+              <Skeleton className="portal-health__skeleton-line portal-health__skeleton-line--short" />
+              <Skeleton className="portal-health__skeleton-line portal-health__skeleton-line--subheading" />
+            </div>
+            <div className="portal-health__skeleton-facts">
+              {Array.from({ length: 4 }, (_, index) => (
+                <div className="portal-health__skeleton-fact" key={index}>
+                  <Skeleton className="portal-health__skeleton-line portal-health__skeleton-line--eyebrow" />
+                  <Skeleton className="portal-health__skeleton-line" />
+                </div>
+              ))}
+            </div>
+          </PortalCollectionFrame>
+          <PortalCollectionFrame
+            aria-hidden="true"
+            className="portal-health__detail-card portal-health__checks-card"
+          >
+            <div className="portal-health__card-heading">
+              <Skeleton className="portal-health__skeleton-line portal-health__skeleton-line--short" />
+              <Skeleton className="portal-health__skeleton-line portal-health__skeleton-line--subheading" />
+            </div>
+            <div className="portal-health__skeleton-components">
+              {Array.from({ length: 3 }, (_, index) => (
+                <div className="portal-health__skeleton-component" key={index}>
+                  <Skeleton className="portal-health__skeleton-line portal-health__skeleton-line--short" />
+                  <Skeleton className="portal-health__skeleton-line portal-health__skeleton-line--summary" />
+                </div>
+              ))}
+            </div>
+          </PortalCollectionFrame>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <HealthSurface
       aria-busy="true"
@@ -125,98 +219,34 @@ export function PortalSystemHealthSkeleton({ detail = false }: { detail?: boolea
       detail={detail}
       role="status"
     >
-      {detail ? <PortalBreadcrumb current="System health" /> : null}
       <span className="sr-only">Checking system health…</span>
-      {detail ? (
-        <>
-          <div className="portal-health__detail-heading portal-health__detail-heading--loading">
-            <Skeleton
-              aria-hidden="true"
-              className="portal-health__skeleton-line portal-health__skeleton-line--short"
-            />
-            <Skeleton
-              aria-hidden="true"
-              className="portal-health__skeleton-line portal-health__skeleton-line--heading"
-            />
-            <Skeleton
-              aria-hidden="true"
-              className="portal-health__skeleton-line portal-health__skeleton-line--summary"
-            />
-          </div>
-          <div className="portal-health__detail-cards">
-            <CompassFrame
-              aria-hidden="true"
-              className="portal-health__detail-card portal-health__summary-card"
-              tone="subtle"
-            >
-              <div className="portal-health__skeleton-facts">
-                {Array.from({ length: 4 }, (_, index) => (
-                  <Skeleton className="portal-health__skeleton-line" key={index} />
-                ))}
-              </div>
-            </CompassFrame>
-            <CompassFrame
-              aria-hidden="true"
-              className="portal-health__detail-card portal-health__checks-card"
-            >
-              <div className="portal-health__components-heading">
-                <Skeleton className="portal-health__skeleton-line portal-health__skeleton-line--short" />
-                <Skeleton className="portal-health__skeleton-line portal-health__skeleton-line--heading" />
-              </div>
-              <div className="portal-health__skeleton-components">
-                {Array.from({ length: 3 }, (_, index) => (
-                  <div className="portal-health__skeleton-component" key={index}>
-                    <Skeleton className="portal-health__skeleton-line portal-health__skeleton-line--short" />
-                    <Skeleton className="portal-health__skeleton-line portal-health__skeleton-line--summary" />
-                  </div>
-                ))}
-              </div>
-            </CompassFrame>
-          </div>
-        </>
-      ) : (
-        <>
-          <Skeleton
-            aria-hidden="true"
-            className="portal-health__skeleton-line portal-health__skeleton-line--short"
-          />
-          <Skeleton
-            aria-hidden="true"
-            className="portal-health__skeleton-line portal-health__skeleton-line--heading"
-          />
-          <div aria-hidden="true" className="portal-health__skeleton-facts">
-            <Skeleton className="portal-health__skeleton-line" />
-            <Skeleton className="portal-health__skeleton-line" />
-            <Skeleton className="portal-health__skeleton-line" />
-          </div>
-        </>
-      )}
+      <Skeleton
+        aria-hidden="true"
+        className="portal-health__skeleton-line portal-health__skeleton-line--short"
+      />
+      <Skeleton
+        aria-hidden="true"
+        className="portal-health__skeleton-line portal-health__skeleton-line--heading"
+      />
+      <div aria-hidden="true" className="portal-health__skeleton-facts">
+        <Skeleton className="portal-health__skeleton-line" />
+        <Skeleton className="portal-health__skeleton-line" />
+        <Skeleton className="portal-health__skeleton-line" />
+      </div>
     </HealthSurface>
   );
 }
 
 function HealthUnavailable({ detail, onRetry }: { detail: boolean; onRetry: () => void }) {
-  return (
-    <HealthSurface
-      aria-labelledby={detail ? "portal-health-unavailable-heading" : "portal-home-health-heading"}
-      className={`portal-health portal-health--unavailable${detail ? " portal-health--detail" : " portal-health--summary"}`}
-      detail={detail}
-    >
-      {detail ? <PortalBreadcrumb current="System health" /> : null}
-      {detail ? (
-        <CompassFrame className="portal-health__frame portal-health__frame--state">
-          <h1 id="portal-health-unavailable-heading">
-            System health is unavailable right now.
-          </h1>
-          <p>Try again when the connection is ready.</p>
-          <Button onClick={onRetry} type="button" variant="outline">
-            <RefreshCw aria-hidden="true" />
-            Try again
-          </Button>
-        </CompassFrame>
-      ) : (
-        <>
-          <h2 id="portal-home-health-heading">
+  if (detail) {
+    return (
+      <section
+        aria-labelledby="portal-health-heading"
+        className="portal-health portal-health--detail portal-health--unavailable"
+      >
+        <HealthDetailHeader />
+        <PortalCollectionFrame className="portal-health__detail-card portal-health__frame--state">
+          <h2 id="portal-health-unavailable-heading">
             System health is unavailable right now.
           </h2>
           <p>Try again when the connection is ready.</p>
@@ -224,20 +254,39 @@ function HealthUnavailable({ detail, onRetry }: { detail: boolean; onRetry: () =
             <RefreshCw aria-hidden="true" />
             Try again
           </Button>
-        </>
-      )}
+        </PortalCollectionFrame>
+      </section>
+    );
+  }
+
+  return (
+    <HealthSurface
+      aria-labelledby="portal-home-health-heading"
+      className="portal-health portal-health--unavailable portal-health--summary"
+      detail={false}
+    >
+      <>
+        <h2 id="portal-home-health-heading">
+          System health is unavailable right now.
+        </h2>
+        <p>Try again when the connection is ready.</p>
+        <Button onClick={onRetry} type="button" variant="outline">
+          <RefreshCw aria-hidden="true" />
+          Try again
+        </Button>
+      </>
     </HealthSurface>
   );
 }
 
 function HealthForbidden() {
   return (
-    <section aria-labelledby="portal-health-forbidden-heading" className="portal-health portal-health--detail">
-      <PortalBreadcrumb current="System health" />
-      <CompassFrame className="portal-health__frame portal-health__frame--state">
-        <h1 id="portal-health-forbidden-heading">This page isn’t available for this account.</h1>
+    <section aria-labelledby="portal-health-heading" className="portal-health portal-health--detail">
+      <HealthDetailHeader />
+      <PortalCollectionFrame className="portal-health__detail-card portal-health__frame--state">
+        <h2 id="portal-health-forbidden-heading">This page isn’t available for this account.</h2>
         <p>Return to your workspace to continue.</p>
-      </CompassFrame>
+      </PortalCollectionFrame>
     </section>
   );
 }
@@ -321,28 +370,28 @@ export function PortalSystemHealthPage() {
 
   return (
     <section aria-labelledby="portal-health-heading" className="portal-health portal-health--detail">
-      <PortalBreadcrumb current="System health" />
-      <div className="portal-health__detail-heading">
-        <h1 id="portal-health-heading">System health</h1>
-        <p>A read-only view of the latest checks available to this workspace.</p>
-      </div>
+      <HealthDetailHeader />
 
-      <div className="portal-health__detail-cards">
-        <CompassFrame
+      <div className="portal-health__detail-stack">
+        <PortalCollectionFrame
           as="section"
-          aria-label="Current health summary"
+          aria-labelledby="portal-health-summary-heading"
           className="portal-health__detail-card portal-health__summary-card"
           tone="subtle"
         >
-          <HealthFacts health={state.health} />
-        </CompassFrame>
+          <div className="portal-health__card-heading">
+            <p className="portal-eyebrow">Summary</p>
+            <h2 id="portal-health-summary-heading">Current health summary</h2>
+          </div>
+          <HealthFacts health={state.health} showStatusBadge />
+        </PortalCollectionFrame>
 
-        <CompassFrame
+        <PortalCollectionFrame
           as="section"
           aria-labelledby="portal-health-checks-heading"
           className="portal-health__detail-card portal-health__checks-card"
         >
-          <div className="portal-health__components-heading">
+          <div className="portal-health__card-heading">
             <p className="portal-eyebrow">Checks</p>
             <h2 id="portal-health-checks-heading">Components</h2>
           </div>
@@ -351,7 +400,7 @@ export function PortalSystemHealthPage() {
               <HealthComponentRow component={component} key={component.component} />
             ))}
           </ul>
-        </CompassFrame>
+        </PortalCollectionFrame>
       </div>
     </section>
   );

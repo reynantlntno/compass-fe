@@ -22,8 +22,9 @@ import {
   type ReactNode,
 } from "react";
 
-import { CompassFrame } from "@/components/compass/compass-frame";
 import { useAuthSession } from "@/components/auth/auth-session-provider";
+import { CompassFrame } from "@/components/compass/compass-frame";
+import { CompassSurface } from "@/components/compass/compass-surface";
 import { PasswordField } from "@/components/auth/password-field";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
@@ -31,8 +32,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
-import { PortalBreadcrumb } from "@/components/portal/portal-breadcrumb";
-import { PortalViewMenu } from "@/components/portal/portal-view-menu";
+import { PortalPageHeader } from "@/components/portal/portal-page-header";
+import { PortalWorkspaceNav } from "@/components/portal/portal-workspace-nav";
 import {
   AccountSettingsApiError,
   changeAccountPassword,
@@ -389,17 +390,27 @@ export function PortalAccountSettingsLoading() {
       role="status"
     >
       <span className="sr-only">Loading account settings…</span>
-      <PortalBreadcrumb current="Account settings" />
-      <header className="portal-settings__header">
-        <Skeleton aria-hidden="true" className="portal-settings__skeleton-title" />
-        <Skeleton aria-hidden="true" className="portal-settings__skeleton-summary" />
-      </header>
+      <PortalPageHeader
+        current="Account settings"
+        description="Manage sign-in security, active access, trusted browsers, notifications, and recent security activity."
+        headingId="portal-settings-loading-heading"
+        title="Account settings"
+      />
       <div aria-hidden="true" className="portal-settings__loading-layout">
-        <div className="portal-view-menu portal-settings__loading-navigation">
-          {Array.from({ length: 4 }, (_, index) => (
-            <Skeleton className="portal-settings__skeleton-tab" key={index} />
-          ))}
-        </div>
+        <CompassSurface
+          aria-label="Loading account settings sections"
+          as="nav"
+          className="portal-workspace-nav portal-settings__loading-navigation"
+          tone="subtle"
+        >
+          <ul className="portal-workspace-nav__skeleton-list">
+            {Array.from({ length: 4 }, (_, index) => (
+              <li key={index}>
+                <Skeleton className="portal-settings__skeleton-tab" />
+              </li>
+            ))}
+          </ul>
+        </CompassSurface>
         <CompassFrame className="portal-settings__loading-area">
           <Skeleton className="portal-settings__skeleton-line portal-settings__skeleton-line--short" />
           <Skeleton className="portal-settings__skeleton-line" />
@@ -1020,21 +1031,18 @@ export function PortalAccountSettings() {
 
   return (
     <section aria-labelledby="portal-settings-heading" className="portal-settings">
-      <PortalBreadcrumb current="Account settings" />
-      <header className="portal-settings__header">
-        <h1 id="portal-settings-heading">Account settings</h1>
-        <p>
-          Manage sign-in security, active access, trusted browsers, notifications,
-          and recent security activity.
-        </p>
-      </header>
+      <PortalPageHeader
+        current="Account settings"
+        description="Manage sign-in security, active access, trusted browsers, notifications, and recent security activity."
+        headingId="portal-settings-heading"
+        title="Account settings"
+      />
 
       <div className="portal-settings__workspace">
-        <PortalViewMenu
+        <PortalWorkspaceNav
           activeValue={activeArea}
           ariaLabel="Account settings sections"
           items={SETTINGS_AREA_NAV_ITEMS}
-          label="Section"
         />
         <div className="portal-settings__panel">
         {activeArea === "security" ? (

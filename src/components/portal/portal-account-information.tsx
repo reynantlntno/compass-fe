@@ -4,13 +4,13 @@ import { ArrowLeft, ArrowRight, RefreshCw } from "lucide-react";
 import { useEffect, useState } from "react";
 
 import { useAuthSession } from "@/components/auth/auth-session-provider";
-import { CompassFrame } from "@/components/compass/compass-frame";
-import { PortalBreadcrumb } from "@/components/portal/portal-breadcrumb";
+import { PortalCollectionFrame } from "@/components/portal/portal-collection-frame";
 import {
   cleanPortalValue,
   getPortalAccountName,
   getPortalRoleLabel,
 } from "@/components/portal/portal-identity";
+import { PortalPageHeader } from "@/components/portal/portal-page-header";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
@@ -257,13 +257,25 @@ export function PortalAccountLoading() {
       className="portal-account portal-account--loading"
       role="status"
     >
-      <PortalBreadcrumb current="Account information" />
-      <Skeleton aria-hidden="true" className="portal-account__skeleton-eyebrow" />
-      <Skeleton aria-hidden="true" className="portal-account__skeleton-title" />
-      <Skeleton aria-hidden="true" className="portal-account__skeleton-summary" />
-      <CompassFrame className="portal-account__frame">
-        <AccountEnrichmentSkeleton label="Account" />
-      </CompassFrame>
+      <PortalPageHeader
+        current="Account information"
+        description="Review the information currently connected to your COMPASS account."
+        headingId="portal-account-loading-heading"
+        title="Account information"
+      />
+      <PortalCollectionFrame
+        aria-label="Loading account information"
+        aria-busy="true"
+        as="div"
+        className="portal-account__frame"
+      >
+        <div className="portal-account__sections">
+          <AccountEnrichmentSkeleton label="Identity" />
+          <AccountEnrichmentSkeleton label="Profile" />
+          <AccountEnrichmentSkeleton label="Current appointment" />
+          <AccountEnrichmentSkeleton label="Current coverage" />
+        </div>
+      </PortalCollectionFrame>
     </section>
   );
 }
@@ -390,13 +402,14 @@ export function PortalAccountInformation() {
 
   return (
     <section aria-labelledby="portal-account-heading" className="portal-account">
-      <PortalBreadcrumb current="Account information" />
-      <header className="portal-account__header">
-        <h1 id="portal-account-heading">Account information</h1>
-        <p>Review the information currently connected to your COMPASS account.</p>
-      </header>
+      <PortalPageHeader
+        current="Account information"
+        description="Review the information currently connected to your COMPASS account."
+        headingId="portal-account-heading"
+        title="Account information"
+      />
 
-      <CompassFrame className="portal-account__frame">
+      <PortalCollectionFrame as="div" className="portal-account__frame">
         {hasUnavailableEnrichment ? (
           <div className="portal-account__status" role="status" aria-live="polite">
             <p>Some account information is unavailable right now.</p>
@@ -443,7 +456,7 @@ export function PortalAccountInformation() {
             />
           ) : null}
         </div>
-      </CompassFrame>
+      </PortalCollectionFrame>
     </section>
   );
 }
