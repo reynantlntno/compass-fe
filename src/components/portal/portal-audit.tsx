@@ -1,19 +1,40 @@
 "use client";
 
 import Link from "next/link";
-import { ChevronDown, ChevronLeft, ChevronRight, RefreshCw } from "lucide-react";
-import { useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  ChevronDown,
+  ChevronLeft,
+  ChevronRight,
+  RefreshCw,
+} from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useTransition,
+  type FormEvent,
+} from "react";
 
 import { usePortalAccess } from "@/components/portal/portal-access-provider";
-import { CompassFrame } from "@/components/compass/compass-frame";
-import { CompassSurface } from "@/components/compass/compass-surface";
-import { PortalBreadcrumb } from "@/components/portal/portal-breadcrumb";
+import { PortalCollectionFrame } from "@/components/portal/portal-collection-frame";
+import { PortalFilterPanel } from "@/components/portal/portal-filter-panel";
+import { PortalPageHeader } from "@/components/portal/portal-page-header";
 import { PORTAL_CAPABILITIES } from "@/components/portal/portal-navigation";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 import {
   AuditApiError,
   getPortalAuditEntries,
@@ -255,25 +276,46 @@ function contextEntries(context: AuditSafeContextSchema) {
   });
 }
 
-function AuditHeader() {
-  return (
-    <header className="portal-audit__header">
-      <h1 id="portal-audit-heading">Audit trail</h1>
-      <p>Review technical activity visible to this account.</p>
-    </header>
-  );
+function auditFiltersFromForm(formData: FormData): PortalAuditFilters {
+  return parseFilters({
+    get: (key) => {
+      const value = formData.get(key);
+      return typeof value === "string" ? value : null;
+    },
+  });
 }
 
 function AuditFilters({ filters }: { filters: PortalAuditFilters }) {
-  const currentKey = filtersKey(filters);
+  const router = useRouter();
+  const [isFilterNavigationPending, startFilterNavigation] = useTransition();
+  const [validationMessage, setValidationMessage] = useState<string | null>(null);
+
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const nextFilters = auditFiltersFromForm(new FormData(event.currentTarget));
+
+    if (
+      nextFilters.createdFrom &&
+      nextFilters.createdUntil &&
+      nextFilters.createdFrom > nextFilters.createdUntil
+    ) {
+      setValidationMessage("The To date must not be earlier than the From date.");
+      return;
+    }
+
+    setValidationMessage(null);
+    startFilterNavigation(() => router.push(auditHref(nextFilters)));
+  };
 
   return (
-    <form
+    <PortalFilterPanel
+      accessibleLabel="audit filters"
       action="/portal/audit"
-      className="compass-surface portal-audit__filters"
-      data-tone="subtle"
-      key={currentKey}
-      method="get"
+      ariaBusy={isFilterNavigationPending}
+      className="portal-audit__filters"
+      onSubmit={handleSubmit}
+      resetKey={filtersKey(filters)}
+      summary="Filter technical activity by category, source, or date."
     >
       <div className="portal-audit__filter-grid">
         <div className="portal-audit__filter-field">
@@ -373,28 +415,45 @@ function AuditFilters({ filters }: { filters: PortalAuditFilters }) {
           />
         </div>
       </div>
+      {validationMessage ? (
+        <p className="portal-audit__filter-validation" role="alert">
+          {validationMessage}
+        </p>
+      ) : null}
       <div className="portal-audit__filter-actions">
-        <Button size="sm" type="submit" variant="outline">
+        <Button
+          disabled={isFilterNavigationPending}
+          size="sm"
+          type="submit"
+          variant="default"
+        >
           Apply filters
         </Button>
         <Link className="portal-audit__filter-clear" href="/portal/audit">
           Clear filters
         </Link>
       </div>
-    </form>
+    </PortalFilterPanel>
   );
 }
 
 function AuditDetails({
   detail,
+  detailsId,
   onRetry,
 }: {
   detail: AuditDetailState;
+  detailsId: string;
   onRetry: () => void;
 }) {
   if (detail.kind === "loading" || detail.kind === "idle") {
     return (
-      <div aria-live="polite" className="portal-audit__details" role="status">
+      <div
+        aria-live="polite"
+        className="portal-audit__details"
+        id={detailsId}
+        role="status"
+      >
         Loading details…
       </div>
     );
@@ -402,7 +461,11 @@ function AuditDetails({
 
   if (detail.kind === "unavailable") {
     return (
-      <div className="portal-audit__details portal-audit__details--state" role="alert">
+      <div
+        className="portal-audit__details portal-audit__details--state"
+        id={detailsId}
+        role="alert"
+      >
         <p>{readErrorMessage(detail.error, "audit details")}</p>
         <Button onClick={onRetry} size="sm" type="button" variant="outline">
           <RefreshCw aria-hidden="true" />
@@ -415,7 +478,7 @@ function AuditDetails({
   const entries = contextEntries(detail.entry.safe_context);
 
   return (
-    <div className="portal-audit__details">
+    <div className="portal-audit__details" id={detailsId}>
       <dl className="portal-audit__detail-grid">
         {detail.entry.target_reference ? (
           <div>
@@ -456,41 +519,65 @@ function AuditRow({
 }) {
   const createdAt = formatTimestamp(entry.created_at);
   const detailsId = `portal-audit-details-${index}`;
+  const actionLabel = formatLabel(entry.action_type);
 
   return (
-    <li className="portal-audit__row">
-      <button
-        aria-controls={detailsId}
-        aria-expanded={expanded}
-        className="portal-audit__row-toggle"
-        onClick={onToggle}
-        type="button"
-      >
-        <span className="portal-audit__row-main">
-          <span className="portal-audit__row-meta">
-            <span className="portal-audit__severity" data-tone={severityTone(entry.severity)}>
-              {formatLabel(entry.severity)}
-            </span>
-            <span>{formatLabel(entry.event_category)}</span>
+    <>
+      <TableRow className="portal-audit__table-row">
+        <TableCell data-label="Severity">
+          <Badge
+            className="portal-audit__severity"
+            data-tone={severityTone(entry.severity)}
+            variant="outline"
+          >
+            {formatLabel(entry.severity)}
+          </Badge>
+        </TableCell>
+        <TableCell data-label="Action">
+          <div className="portal-audit__action-cell">
+            <span className="portal-audit__row-action">{actionLabel}</span>
+            <button
+              aria-controls={detailsId}
+              aria-expanded={expanded}
+              aria-label={`${expanded ? "Hide" : "Show"} details for ${actionLabel}`}
+              className="portal-audit__row-indicator"
+              onClick={onToggle}
+              type="button"
+            >
+              <ChevronDown className={expanded ? "is-expanded" : undefined} />
+            </button>
+          </div>
+        </TableCell>
+        <TableCell data-label="Event category">
+          {formatLabel(entry.event_category)}
+        </TableCell>
+        <TableCell data-label="Source">
+          {formatLabel(entry.source_app)}
+        </TableCell>
+        <TableCell data-label="Target model">
+          {formatLabel(entry.target_model)}
+        </TableCell>
+        <TableCell data-label="Actor role">
+          <span className="portal-audit__row-actor">
+            {formatLabel(entry.actor_role)}
           </span>
-          <span className="portal-audit__row-action">{formatLabel(entry.action_type)}</span>
-          <span className="portal-audit__row-context">
-            <span>Source: {formatLabel(entry.source_app)}</span>
-            <span>Target: {formatLabel(entry.target_model)}</span>
-          </span>
-        </span>
-        <span className="portal-audit__row-side">
-          <span className="portal-audit__row-actor">{formatLabel(entry.actor_role)}</span>
-          {createdAt ? <time dateTime={entry.created_at}>{createdAt}</time> : null}
-          <span aria-hidden="true" className="portal-audit__row-indicator">
-            <ChevronDown className={expanded ? "is-expanded" : undefined} />
-          </span>
-        </span>
-      </button>
+        </TableCell>
+        <TableCell data-label="Created">
+          {createdAt ? <time dateTime={entry.created_at}>{createdAt}</time> : "Unavailable"}
+        </TableCell>
+      </TableRow>
       {expanded ? (
-        <AuditDetails detail={detail} onRetry={onRetry} />
+        <TableRow className="portal-audit__details-row">
+          <TableCell className="portal-audit__details-cell" colSpan={7}>
+            <AuditDetails
+              detail={detail}
+              detailsId={detailsId}
+              onRetry={onRetry}
+            />
+          </TableCell>
+        </TableRow>
       ) : null}
-    </li>
+    </>
   );
 }
 
@@ -535,14 +622,29 @@ function AuditPagination({
 
 function AuditListSkeleton() {
   return (
-    <div aria-hidden="true" className="portal-audit__skeleton-list">
-      {Array.from({ length: 5 }, (_, index) => (
-        <div className="portal-audit__skeleton-row" key={index}>
-          <Skeleton />
-          <Skeleton />
-          <Skeleton />
-        </div>
-      ))}
+    <div aria-hidden="true" className="portal-audit__table-wrap">
+      <Table className="portal-audit__table">
+        <TableHeader>
+          <TableRow>
+            {Array.from({ length: 7 }, (_, index) => (
+              <TableHead key={index}>
+                <Skeleton as="span" />
+              </TableHead>
+            ))}
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {Array.from({ length: 5 }, (_, rowIndex) => (
+            <TableRow className="portal-audit__table-row" key={rowIndex}>
+              {Array.from({ length: 7 }, (_, cellIndex) => (
+                <TableCell data-label="" key={cellIndex}>
+                  <Skeleton as="span" />
+                </TableCell>
+              ))}
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
     </div>
   );
 }
@@ -578,9 +680,13 @@ function AuditAccessState({
       aria-labelledby="portal-audit-heading"
       className="portal-audit portal-audit--state"
     >
-      <PortalBreadcrumb current="Audit trail" />
-      <AuditHeader />
-      <CompassFrame className="portal-audit__frame portal-audit__frame--state">
+      <PortalPageHeader
+        current="Audit trail"
+        description="Review technical activity visible to this account."
+        headingId="portal-audit-heading"
+        title="Audit trail"
+      />
+      <PortalCollectionFrame className="portal-audit__frame portal-audit__frame--state">
         <h2>
           {kind === "forbidden"
             ? "This page isn’t available for this account."
@@ -597,50 +703,18 @@ function AuditAccessState({
             Try again
           </Button>
         ) : null}
-      </CompassFrame>
+      </PortalCollectionFrame>
     </section>
   );
 }
 
 function AuditWorkspace() {
   const searchParams = useSearchParams();
-  const rawValues = {
-    actionType: searchParams.get("action_type"),
-    createdFrom: searchParams.get("created_from"),
-    createdUntil: searchParams.get("created_until"),
-    eventCategory: searchParams.get("event_category"),
-    requestId: searchParams.get("request_id"),
-    severity: searchParams.get("severity"),
-    sourceApp: searchParams.get("source_app"),
-    targetModel: searchParams.get("target_model"),
-    traceId: searchParams.get("trace_id"),
-  };
-  const filters = useMemo(() => parseFilters({ get: (key) => {
-    switch (key) {
-      case "action_type": return rawValues.actionType;
-      case "created_from": return rawValues.createdFrom;
-      case "created_until": return rawValues.createdUntil;
-      case "event_category": return rawValues.eventCategory;
-      case "request_id": return rawValues.requestId;
-      case "severity": return rawValues.severity;
-      case "source_app": return rawValues.sourceApp;
-      case "target_model": return rawValues.targetModel;
-      case "trace_id": return rawValues.traceId;
-      default: return null;
-    }
-  } }), [
-    rawValues.actionType,
-    rawValues.createdFrom,
-    rawValues.createdUntil,
-    rawValues.eventCategory,
-    rawValues.requestId,
-    rawValues.severity,
-    rawValues.sourceApp,
-    rawValues.targetModel,
-    rawValues.traceId,
-  ]);
-  const pageNumber = parsePage(searchParams.get("page"));
-  const filterKey = filtersKey(filters);
+  const queryString = searchParams.toString();
+  const filters = useMemo(
+    () => parseFilters(new URLSearchParams(queryString)),
+    [queryString],
+  );
   const [loadState, setLoadState] = useState<AuditLoadState>({ kind: "loading" });
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [detailState, setDetailState] = useState<AuditDetailState>({ kind: "idle" });
@@ -650,6 +724,7 @@ function AuditWorkspace() {
   const mountedRef = useRef(true);
 
   useEffect(() => {
+    mountedRef.current = true;
     return () => {
       mountedRef.current = false;
       listRequestRef.current?.abort();
@@ -661,16 +736,20 @@ function AuditWorkspace() {
     const controller = new AbortController();
     listRequestRef.current?.abort();
     detailRequestRef.current?.abort();
-    void Promise.resolve().then(() => {
-      if (!mountedRef.current || controller.signal.aborted) return;
-      setLoadState({ kind: "loading" });
-      setExpandedId(null);
-      setDetailState({ kind: "idle" });
-    });
+    const requestParams = new URLSearchParams(queryString);
+    const requestFilters = parseFilters(requestParams);
+    const requestPage = parsePage(requestParams.get("page"));
 
-    void getPortalAuditEntries(pageNumber, filters, controller.signal)
+    void Promise.resolve()
+      .then(() => {
+        if (!mountedRef.current || controller.signal.aborted) return null;
+        setLoadState({ kind: "loading" });
+        setExpandedId(null);
+        setDetailState({ kind: "idle" });
+        return getPortalAuditEntries(requestPage, requestFilters, controller.signal);
+      })
       .then((page) => {
-        if (mountedRef.current && !controller.signal.aborted) {
+        if (page && mountedRef.current && !controller.signal.aborted) {
           setLoadState({ kind: "ready", page });
         }
       })
@@ -686,7 +765,7 @@ function AuditWorkspace() {
 
     listRequestRef.current = controller;
     return () => controller.abort();
-  }, [filterKey, filters, pageNumber, reloadKey]);
+  }, [queryString, reloadKey]);
 
   const loadDetail = (entryId: number) => {
     detailRequestRef.current?.abort();
@@ -733,10 +812,17 @@ function AuditWorkspace() {
 
   return (
     <section aria-labelledby="portal-audit-heading" className="portal-audit">
-      <PortalBreadcrumb current="Audit trail" />
-      <AuditHeader />
+      <PortalPageHeader
+        current="Audit trail"
+        description="Review technical activity visible to this account."
+        headingId="portal-audit-heading"
+        title="Audit trail"
+      />
       <AuditFilters filters={filters} />
-      <CompassFrame aria-busy={loadState.kind === "loading"} className="portal-audit__frame">
+      <PortalCollectionFrame
+        aria-busy={loadState.kind === "loading"}
+        className="portal-audit__frame"
+      >
         {loadState.kind === "loading" ? <AuditListSkeleton /> : null}
         {loadState.kind === "unavailable" ? (
           <AuditUnavailable
@@ -745,19 +831,41 @@ function AuditWorkspace() {
           />
         ) : null}
         {page && page.items.length > 0 ? (
-          <ul className="portal-audit__list">
-            {page.items.map((entry, index) => (
-              <AuditRow
-                detail={detailState.kind !== "idle" && detailState.entryId === entry.id ? detailState : { kind: "idle" }}
-                entry={entry}
-                expanded={expandedId === entry.id}
-                index={index}
-                key={entry.id}
-                onRetry={() => handleRetryDetail(entry.id)}
-                onToggle={() => handleToggle(entry)}
-              />
-            ))}
-          </ul>
+          <div className="portal-audit__table-wrap">
+            <Table className="portal-audit__table">
+              <caption className="portal-audit__table-caption">
+                Technical audit activity
+              </caption>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Severity</TableHead>
+                  <TableHead>Action</TableHead>
+                  <TableHead>Event category</TableHead>
+                  <TableHead>Source</TableHead>
+                  <TableHead>Target model</TableHead>
+                  <TableHead>Actor role</TableHead>
+                  <TableHead>Created</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {page.items.map((entry, index) => (
+                  <AuditRow
+                    detail={
+                      detailState.kind !== "idle" && detailState.entryId === entry.id
+                        ? detailState
+                        : { kind: "idle" }
+                    }
+                    entry={entry}
+                    expanded={expandedId === entry.id}
+                    index={index}
+                    key={entry.id}
+                    onRetry={() => handleRetryDetail(entry.id)}
+                    onToggle={() => handleToggle(entry)}
+                  />
+                ))}
+              </TableBody>
+            </Table>
+          </div>
         ) : null}
         {page && page.items.length === 0 ? (
           <div className="portal-audit__empty" role="status">
@@ -773,7 +881,7 @@ function AuditWorkspace() {
             total={page.total}
           />
         ) : null}
-      </CompassFrame>
+      </PortalCollectionFrame>
     </section>
   );
 }
@@ -787,23 +895,47 @@ export function PortalAuditLoading() {
       role="status"
     >
       <span className="sr-only">Loading audit trail…</span>
-      <PortalBreadcrumb current="Audit trail" />
-      <header className="portal-audit__header">
-        <Skeleton aria-hidden="true" className="portal-audit__skeleton-heading" />
-        <Skeleton aria-hidden="true" className="portal-audit__skeleton-summary" />
-      </header>
-      <CompassSurface
-        aria-hidden="true"
+      <PortalPageHeader
+        current="Audit trail"
+        description={
+          <Skeleton
+            as="span"
+            aria-hidden="true"
+            className="portal-audit__skeleton-summary"
+          />
+        }
+        headingId="portal-audit-heading"
+        title={
+          <Skeleton
+            as="span"
+            aria-hidden="true"
+            className="portal-audit__skeleton-heading"
+          />
+        }
+      />
+      <PortalFilterPanel
+        accessibleLabel="audit filters"
         className="portal-audit__filters portal-audit__filters--loading"
-        tone="subtle"
+        action="/portal/audit"
+        ariaBusy
+        resetKey="audit-loading"
+        summary={
+          <Skeleton
+            as="span"
+            aria-hidden="true"
+            className="portal-audit__skeleton-summary"
+          />
+        }
       >
-        <Skeleton />
-        <Skeleton />
-        <Skeleton />
-      </CompassSurface>
-      <CompassFrame className="portal-audit__frame">
+        <div className="portal-audit__filter-grid portal-audit__filters--loading-grid">
+          {Array.from({ length: 9 }, (_, index) => (
+            <Skeleton as="span" key={index} />
+          ))}
+        </div>
+      </PortalFilterPanel>
+      <PortalCollectionFrame className="portal-audit__frame">
         <AuditListSkeleton />
-      </CompassFrame>
+      </PortalCollectionFrame>
     </section>
   );
 }

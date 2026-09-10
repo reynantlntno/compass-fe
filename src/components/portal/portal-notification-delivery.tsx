@@ -17,7 +17,6 @@ import {
   type ReactNode,
 } from "react";
 
-import { CompassSurface } from "@/components/compass/compass-surface";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -30,11 +29,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -47,6 +41,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { usePortalAccess } from "@/components/portal/portal-access-provider";
 import { PortalCollectionFrame } from "@/components/portal/portal-collection-frame";
+import { PortalFilterPanel } from "@/components/portal/portal-filter-panel";
 import { PortalListRow } from "@/components/portal/portal-list-row";
 import { PORTAL_CAPABILITIES } from "@/components/portal/portal-navigation";
 import { PortalPageHeader } from "@/components/portal/portal-page-header";
@@ -329,7 +324,6 @@ function DeliveryFilters({
   templateKey: string | null;
 }) {
   const router = useRouter();
-  const [filtersOpen, setFiltersOpen] = useState(true);
   const [isFilterNavigationPending, startFilterNavigation] = useTransition();
 
   const handleFilterSubmit = (event: FormEvent<HTMLFormElement>) => {
@@ -353,92 +347,59 @@ function DeliveryFilters({
   };
 
   return (
-    <form
+    <PortalFilterPanel
+      accessibleLabel="notification delivery filters"
       action="/portal/notification-delivery"
-      aria-busy={isFilterNavigationPending || undefined}
-      className="compass-surface portal-delivery__filters"
-      data-tone="subtle"
-      key={`${status}:${deliveryState ?? ""}:${templateKey ?? ""}`}
-      method="get"
+      ariaBusy={isFilterNavigationPending}
+      className="portal-delivery__filters"
       onSubmit={handleFilterSubmit}
+      resetKey={`${status}:${deliveryState ?? ""}:${templateKey ?? ""}`}
+      summary="Narrow delivery records by state or template."
     >
       {status !== "all" ? <input name="status" type="hidden" value={status} /> : null}
-      <Collapsible
-        className="portal-delivery__filters-disclosure"
-        defaultOpen
-        onOpenChange={(open) => setFiltersOpen(open)}
-      >
-        <div className="portal-delivery__filters-header">
-          <div className="portal-delivery__filters-heading">
-            <p className="portal-delivery__filters-kicker">Filters</p>
-            <p className="portal-delivery__filters-summary">
-              Narrow delivery records by state or template.
-            </p>
-          </div>
-          <CollapsibleTrigger
-            render={
-              <Button
-                aria-label={filtersOpen ? "Hide delivery filters" : "Show delivery filters"}
-                className="portal-delivery__filters-toggle"
-                size="sm"
-                type="button"
-                variant="outline"
-              >
-                {filtersOpen ? "Hide filters" : "Show filters"}
-                <ChevronDown
-                  aria-hidden="true"
-                  className={filtersOpen ? "portal-delivery__filters-toggle-icon--open" : undefined}
-                />
-              </Button>
-            }
+      <div className="portal-delivery__filters-grid">
+        <div className="portal-delivery__filter-field">
+          <Label htmlFor="portal-delivery-state">Delivery state</Label>
+          <select
+            defaultValue={deliveryState ?? ""}
+            id="portal-delivery-state"
+            name="delivery_state"
+          >
+            {DELIVERY_STATE_OPTIONS.map((option) => (
+              <option key={option.value || "all"} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="portal-delivery__filter-field portal-delivery__filter-field--template">
+          <Label htmlFor="portal-delivery-template">Template key</Label>
+          <Input
+            defaultValue={templateKey ?? ""}
+            id="portal-delivery-template"
+            maxLength={MAX_TEMPLATE_KEY_LENGTH}
+            name="template_key"
+            placeholder="Filter by template key"
           />
         </div>
-        <CollapsibleContent className="portal-delivery__filters-content">
-          <div className="portal-delivery__filters-grid">
-            <div className="portal-delivery__filter-field">
-              <Label htmlFor="portal-delivery-state">Delivery state</Label>
-              <select
-                defaultValue={deliveryState ?? ""}
-                id="portal-delivery-state"
-                name="delivery_state"
-              >
-                {DELIVERY_STATE_OPTIONS.map((option) => (
-                  <option key={option.value || "all"} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="portal-delivery__filter-field portal-delivery__filter-field--template">
-              <Label htmlFor="portal-delivery-template">Template key</Label>
-              <Input
-                defaultValue={templateKey ?? ""}
-                id="portal-delivery-template"
-                maxLength={MAX_TEMPLATE_KEY_LENGTH}
-                name="template_key"
-                placeholder="Filter by template key"
-              />
-            </div>
-            <div className="portal-delivery__filter-actions">
-              <Button
-                disabled={isFilterNavigationPending}
-                size="sm"
-                type="submit"
-                variant="default"
-              >
-                Apply filters
-              </Button>
-              <Link
-                className="portal-delivery__filter-clear"
-                href={deliveryHref(status)}
-              >
-                Clear
-              </Link>
-            </div>
-          </div>
-        </CollapsibleContent>
-      </Collapsible>
-    </form>
+        <div className="portal-delivery__filter-actions">
+          <Button
+            disabled={isFilterNavigationPending}
+            size="sm"
+            type="submit"
+            variant="default"
+          >
+            Apply filters
+          </Button>
+          <Link
+            className="portal-delivery__filter-clear"
+            href={deliveryHref(status)}
+          >
+            Clear
+          </Link>
+        </div>
+      </div>
+    </PortalFilterPanel>
   );
 }
 
@@ -468,11 +429,29 @@ function DeliveryLoadingState() {
         }
       />
       <DeliveryNavSkeleton />
-      <CompassSurface className="portal-delivery__filters portal-delivery__filters--loading" tone="subtle">
-        <Skeleton />
-        <Skeleton />
-        <Skeleton />
-      </CompassSurface>
+      <PortalFilterPanel
+        accessibleLabel="notification delivery filters"
+        action="/portal/notification-delivery"
+        ariaBusy
+        className="portal-delivery__filters portal-delivery__filters--loading"
+        resetKey="delivery-loading"
+        summary={
+          <Skeleton
+            as="span"
+            aria-hidden="true"
+            className="portal-delivery__skeleton-summary"
+          />
+        }
+      >
+        <div
+          aria-hidden="true"
+          className="portal-delivery__filters-grid portal-delivery__filters--loading-grid"
+        >
+          {Array.from({ length: 3 }, (_, index) => (
+            <Skeleton as="span" key={index} />
+          ))}
+        </div>
+      </PortalFilterPanel>
       <PortalCollectionFrame className="portal-delivery__frame">
         <div aria-hidden="true" className="portal-delivery__skeleton-list">
           {Array.from({ length: 4 }, (_, index) => (

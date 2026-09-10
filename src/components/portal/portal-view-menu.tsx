@@ -6,9 +6,7 @@ import { Check, ChevronDown } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
@@ -59,31 +57,28 @@ export function PortalViewMenu({
           aria-label={ariaLabel}
           className="compass-surface portal-view-menu__content"
         >
-          <DropdownMenuGroup>
-            <DropdownMenuLabel>{ariaLabel}</DropdownMenuLabel>
-            {items.map((item) => {
-              const isCurrent = item.value === activeValue;
+          {items.map((item) => {
+            const isCurrent = item.value === activeValue;
 
-              return (
-                <DropdownMenuItem
-                  className={cn(
-                    "portal-view-menu__item",
-                    isCurrent && "is-current",
-                  )}
-                  key={item.value}
-                  render={
-                    <Link
-                      aria-current={isCurrent ? "page" : undefined}
-                      href={item.href}
-                    />
-                  }
-                >
-                  <span>{item.label}</span>
-                  {isCurrent ? <Check aria-hidden="true" /> : null}
-                </DropdownMenuItem>
-              );
-            })}
-          </DropdownMenuGroup>
+            return (
+              <DropdownMenuItem
+                className={cn(
+                  "portal-view-menu__item",
+                  isCurrent && "is-current",
+                )}
+                key={item.value}
+                render={
+                  <Link
+                    aria-current={isCurrent ? "page" : undefined}
+                    href={item.href}
+                  />
+                }
+              >
+                <span>{item.label}</span>
+                {isCurrent ? <Check aria-hidden="true" /> : null}
+              </DropdownMenuItem>
+            );
+          })}
         </DropdownMenuContent>
       </DropdownMenu>
     </div>

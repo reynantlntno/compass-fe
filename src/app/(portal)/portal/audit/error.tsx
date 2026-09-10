@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { RefreshCw } from "lucide-react";
 
-import { PortalBreadcrumb } from "@/components/portal/portal-breadcrumb";
+import { PortalCollectionFrame } from "@/components/portal/portal-collection-frame";
+import { PortalPageHeader } from "@/components/portal/portal-page-header";
 import { Button } from "@/components/ui/button";
 
 export default function Error({ reset }: { reset: () => void }) {
@@ -13,12 +14,13 @@ export default function Error({ reset }: { reset: () => void }) {
       className="portal-audit portal-audit--state"
       role="alert"
     >
-      <PortalBreadcrumb current="Audit trail" />
-      <header className="portal-audit__header">
-        <h1 id="portal-audit-route-error-heading">We couldn’t load the audit trail.</h1>
-        <p>Try again, or return to your workspace.</p>
-      </header>
-      <div className="portal-audit__frame portal-audit__frame--state">
+      <PortalPageHeader
+        current="Audit trail"
+        description="Try again, or return to your workspace."
+        headingId="portal-audit-route-error-heading"
+        title="We couldn’t load the audit trail."
+      />
+      <PortalCollectionFrame className="portal-audit__frame portal-audit__frame--state">
         <div className="portal-audit__state-actions">
           <Button onClick={reset} type="button" variant="outline">
             <RefreshCw aria-hidden="true" />
@@ -28,7 +30,7 @@ export default function Error({ reset }: { reset: () => void }) {
             Return to portal
           </Button>
         </div>
-      </div>
+      </PortalCollectionFrame>
     </section>
   );
 }
