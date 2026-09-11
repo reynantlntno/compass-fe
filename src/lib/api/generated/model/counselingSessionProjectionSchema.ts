@@ -15,6 +15,7 @@ export interface CounselingSessionProjectionSchema {
   actual_started_at?: string | null;
   appointment_id?: number | null;
   assigned_counselor_id?: number | null;
+  assignment_state?: string | null;
   completed_at?: string | null;
   ended_early_flag?: boolean | null;
   finalized_at?: string | null;
@@ -26,5 +27,7 @@ export interface CounselingSessionProjectionSchema {
   session_source?: string | null;
   session_type: string;
   status: string;
+  student_display_name?: string | null;
   student_id?: number | null;
+  student_number?: string | null;
 }

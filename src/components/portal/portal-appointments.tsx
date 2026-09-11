@@ -26,7 +26,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -37,18 +36,11 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Popover,
-  PopoverContent,
-  PopoverDescription,
-  PopoverHeader,
-  PopoverTitle,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import { usePortalAccess } from "@/components/portal/portal-access-provider";
 import { PortalCollectionFrame } from "@/components/portal/portal-collection-frame";
 import { PortalFilterPanel } from "@/components/portal/portal-filter-panel";
 import { PortalPageHeader } from "@/components/portal/portal-page-header";
+import { PortalStatusFilter } from "@/components/portal/portal-status-filter";
 import { PORTAL_CAPABILITIES } from "@/components/portal/portal-navigation";
 import {
   APPOINTMENT_ASSIGNMENTS,
@@ -331,84 +323,6 @@ function AppointmentPageHeader({
   );
 }
 
-function AppointmentStatusFilter({
-  selectedStatuses,
-}: {
-  selectedStatuses: AppointmentStatus[];
-}) {
-  const [selected, setSelected] = useState<AppointmentStatus[]>(selectedStatuses);
-
-  const summary = selected.length === 0
-    ? "All statuses"
-    : selected.length === 1
-      ? labelForStatus(selected[0])
-      : `${selected.length} statuses selected`;
-
-  const toggleStatus = (status: AppointmentStatus, checked: boolean) => {
-    setSelected((current) => {
-      const next = checked
-        ? [...new Set([...current, status])]
-        : current.filter((value) => value !== status);
-
-      return STATUS_OPTIONS
-        .map((option) => option.value)
-        .filter((value) => next.includes(value));
-    });
-  };
-
-  return (
-    <div className="portal-appointments__status-control">
-      <Popover modal="trap-focus">
-        <PopoverTrigger
-          aria-label="Choose appointment statuses"
-          className="portal-appointments__status-trigger"
-          id="portal-appointments-status"
-          type="button"
-        >
-          <span>{summary}</span>
-          <ChevronDown aria-hidden="true" />
-        </PopoverTrigger>
-        <PopoverContent
-          align="start"
-          className="compass-surface portal-appointments__status-popover"
-          sideOffset={6}
-        >
-          <PopoverHeader className="portal-appointments__status-popover-header">
-            <PopoverTitle>Appointment status</PopoverTitle>
-            <PopoverDescription>
-              Choose one or more statuses.
-            </PopoverDescription>
-          </PopoverHeader>
-          <div className="portal-appointments__status-options">
-            {STATUS_OPTIONS.map((option) => (
-              <div className="portal-appointments__status-option" key={option.value}>
-                <Checkbox
-                  aria-label={option.label}
-                  checked={selected.includes(option.value)}
-                  onCheckedChange={(checked) => toggleStatus(option.value, checked === true)}
-                />
-                <span>{option.label}</span>
-              </div>
-            ))}
-          </div>
-          {selected.length > 0 ? (
-            <button
-              className="portal-appointments__status-clear"
-              onClick={() => setSelected([])}
-              type="button"
-            >
-              Clear status selection
-            </button>
-          ) : null}
-        </PopoverContent>
-      </Popover>
-      {selected.map((status) => (
-        <input key={status} name="status" type="hidden" value={status} />
-      ))}
-    </div>
-  );
-}
-
 function AppointmentFilters({ filters }: { filters: ParsedAppointmentFilters }) {
   const router = useRouter();
   const [isPending, startTransition] = useTransition();
@@ -470,7 +384,13 @@ function AppointmentFilters({ filters }: { filters: ParsedAppointmentFilters }) 
         </div>
         <div className="portal-appointments__filter-field">
           <Label htmlFor="portal-appointments-status">Status</Label>
-          <AppointmentStatusFilter selectedStatuses={filters.statuses} />
+          <PortalStatusFilter
+            ariaLabel="Choose appointment statuses"
+            id="portal-appointments-status"
+            options={STATUS_OPTIONS}
+            selectedValues={filters.statuses}
+            title="Appointment status"
+          />
         </div>
         <div className="portal-appointments__filter-field">
           <Label htmlFor="portal-appointments-type">Appointment type</Label>

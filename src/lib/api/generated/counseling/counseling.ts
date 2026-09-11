@@ -19,6 +19,7 @@ import type {
   CounselingCaseProjectionSchema,
   CounselingCasesListParams,
   CounselingMutationResponseSchema,
+  CounselingReasonSchema,
   CounselingRoutineInterviewsListParams,
   CounselingSessionPageSchema,
   CounselingSessionProjectionSchema,
@@ -37,7 +38,6 @@ import type {
   ParticipantAddSchema,
   ParticipantRevokeSchema,
   ProviderWebhookResponseSchema,
-  ReasonSchema,
   RecordingAvailabilitySchema,
   RecordingMutationResponseSchema,
   RecordingRunProjectionSchema,
@@ -4335,7 +4335,7 @@ export const getCounselingSessionCancelUrl = (referenceCode: string,) => {
  * @summary Cancel Session Route
  */
 export const counselingSessionCancel = async (referenceCode: string,
-    reasonSchema: ReasonSchema, options?: Parameters<typeof compassFetch>[1]): Promise<counselingSessionCancelResponse> => {
+    counselingReasonSchema: CounselingReasonSchema, options?: Parameters<typeof compassFetch>[1]): Promise<counselingSessionCancelResponse> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -4348,7 +4348,7 @@ return compassFetch<counselingSessionCancelResponse>(getCounselingSessionCancelU
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(reasonSchema)
+    body: JSON.stringify(counselingReasonSchema)
   }
 );}
 

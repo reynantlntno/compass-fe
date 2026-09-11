@@ -16,4 +16,5 @@ page?: number;
  * @maximum 100
  */
 page_size?: number;
+status?: string | null;
 };

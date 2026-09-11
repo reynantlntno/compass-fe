@@ -16,4 +16,13 @@ page?: number;
  * @maximum 100
  */
 page_size?: number;
+q?: string | null;
+status?: string | null;
+session_type?: string | null;
+session_mode?: string | null;
+session_source?: string | null;
+assignment?: string;
+date_from?: string | null;
+date_to?: string | null;
+order?: string;
 };

@@ -4,6 +4,7 @@ import {
   Bell,
   CalendarDays,
   DatabaseBackup,
+  HeartHandshake,
   House,
   Mail,
   ScrollText,
@@ -16,6 +17,8 @@ export const PORTAL_CAPABILITIES = {
   backupsView: "backups.view",
   notificationsDeliveryOperate: "notifications.delivery.operate",
   appointmentsQueueView: "appointments.queue.view",
+  counselingSessionsQueueView: "counseling.sessions.queue.view",
+  counselingSessionLock: "counseling_sessions.lock",
   appointmentsReview: "appointments.review",
   appointmentsSchedule: "appointments.schedule",
   appointmentsCancel: "appointments.cancel",
@@ -101,6 +104,15 @@ export const PORTAL_NAVIGATION: readonly PortalNavigationItem[] = [
   },
   {
     kind: "link",
+    id: "counseling",
+    href: "/portal/counseling?section=sessions",
+    label: "Counseling",
+    icon: HeartHandshake,
+    keywords: ["sessions", "routine interview", "e-counseling"],
+    requiredCapability: PORTAL_CAPABILITIES.counselingSessionsQueueView,
+  },
+  {
+    kind: "link",
     id: "notification-delivery",
     href: "/portal/notification-delivery",
     label: "Notification delivery",
@@ -142,6 +154,15 @@ export const PORTAL_NAVIGATION: readonly PortalNavigationItem[] = [
 ];
 
 const PORTAL_SEARCH_ADDITIONS: readonly PortalSearchItem[] = [
+  {
+    group: "section",
+    href: "/portal/counseling?section=sessions",
+    id: "counseling-sessions",
+    keywords: ["counselor", "session", "e-counseling", "routine interview"],
+    label: "Sessions",
+    parentLabel: "Counseling",
+    requiredCapability: PORTAL_CAPABILITIES.counselingSessionsQueueView,
+  },
   {
     group: "destination",
     href: "/portal/account",

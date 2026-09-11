@@ -154,6 +154,7 @@ export * from './counselingCasePageSchema';
 export * from './counselingCaseProjectionSchema';
 export * from './counselingCasesListParams';
 export * from './counselingMutationResponseSchema';
+export * from './counselingReasonSchema';
 export * from './counselingRoutineInterviewsListParams';
 export * from './counselingSessionPageSchema';
 export * from './counselingSessionProjectionSchema';

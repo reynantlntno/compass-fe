@@ -6364,6 +6364,19 @@
         "title": "CounselingMutationResponseSchema",
         "type": "object"
       },
+      "CounselingReasonSchema": {
+        "properties": {
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "reason"
+        ],
+        "title": "CounselingReasonSchema",
+        "type": "object"
+      },
       "CounselingSessionPageSchema": {
         "properties": {
           "items": {
@@ -6454,6 +6467,17 @@
               }
             ],
             "title": "Assigned Counselor Id"
+          },
+          "assignment_state": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assignment State"
           },
           "completed_at": {
             "anyOf": [
@@ -6553,6 +6577,17 @@
             "title": "Status",
             "type": "string"
           },
+          "student_display_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Student Display Name"
+          },
           "student_id": {
             "anyOf": [
               {
@@ -6563,6 +6598,17 @@
               }
             ],
             "title": "Student Id"
+          },
+          "student_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Student Number"
           }
         },
         "required": [
@@ -53029,6 +53075,23 @@
               "title": "Page Size",
               "type": "integer"
             }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 400,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
           }
         ],
         "responses": {
@@ -53841,6 +53904,142 @@
               "title": "Page Size",
               "type": "integer"
             }
+          },
+          {
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 120,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Q"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 400,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "in": "query",
+            "name": "session_type",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Session Type"
+            }
+          },
+          {
+            "in": "query",
+            "name": "session_mode",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Session Mode"
+            }
+          },
+          {
+            "in": "query",
+            "name": "session_source",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Session Source"
+            }
+          },
+          {
+            "in": "query",
+            "name": "assignment",
+            "required": false,
+            "schema": {
+              "default": "all",
+              "title": "Assignment",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "date_from",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Date From"
+            }
+          },
+          {
+            "in": "query",
+            "name": "date_to",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Date To"
+            }
+          },
+          {
+            "in": "query",
+            "name": "order",
+            "required": false,
+            "schema": {
+              "default": "recent",
+              "title": "Order",
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -54453,7 +54652,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ReasonSchema"
+                "$ref": "#/components/schemas/CounselingReasonSchema"
               }
             }
           },
