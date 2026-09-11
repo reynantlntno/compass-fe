@@ -1093,16 +1093,16 @@
             "title": "Appointment Type",
             "type": "string"
           },
-          "assigned_counselor_id": {
+          "assignment_state": {
             "anyOf": [
               {
-                "type": "integer"
+                "type": "string"
               },
               {
                 "type": "null"
               }
             ],
-            "title": "Assigned Counselor Id"
+            "title": "Assignment State"
           },
           "cancellation_reason": {
             "anyOf": [
@@ -1162,17 +1162,6 @@
             ],
             "title": "Internal Notes"
           },
-          "preferred_counselor_id": {
-            "anyOf": [
-              {
-                "type": "integer"
-              },
-              {
-                "type": "null"
-              }
-            ],
-            "title": "Preferred Counselor Id"
-          },
           "reason": {
             "anyOf": [
               {
@@ -1212,20 +1201,31 @@
             ],
             "title": "Requested Start Time"
           },
-          "reviewed_by_id": {
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "student_display_name": {
             "anyOf": [
               {
-                "type": "integer"
+                "type": "string"
               },
               {
                 "type": "null"
               }
             ],
-            "title": "Reviewed By Id"
+            "title": "Student Display Name"
           },
-          "status": {
-            "title": "Status",
-            "type": "string"
+          "student_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Student Number"
           }
         },
         "required": [
@@ -1235,6 +1235,19 @@
           "status"
         ],
         "title": "AppointmentProjectionSchema",
+        "type": "object"
+      },
+      "AppointmentReasonSchema": {
+        "properties": {
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          }
+        },
+        "required": [
+          "reason"
+        ],
+        "title": "AppointmentReasonSchema",
         "type": "object"
       },
       "AppointmentRequestSchema": {
@@ -24160,6 +24173,126 @@
               "title": "Page Size",
               "type": "integer"
             }
+          },
+          {
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 120,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Q"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 400,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "in": "query",
+            "name": "appointment_type",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Appointment Type"
+            }
+          },
+          {
+            "in": "query",
+            "name": "appointment_mode",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Appointment Mode"
+            }
+          },
+          {
+            "in": "query",
+            "name": "assignment",
+            "required": false,
+            "schema": {
+              "default": "all",
+              "title": "Assignment",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "date_from",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Date From"
+            }
+          },
+          {
+            "in": "query",
+            "name": "date_to",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Date To"
+            }
+          },
+          {
+            "in": "query",
+            "name": "order",
+            "required": false,
+            "schema": {
+              "default": "recent",
+              "title": "Order",
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -26214,7 +26347,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ReasonSchema"
+                "$ref": "#/components/schemas/AppointmentReasonSchema"
               }
             }
           },
@@ -26541,7 +26674,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/ReasonSchema"
+                "$ref": "#/components/schemas/AppointmentReasonSchema"
               }
             }
           },

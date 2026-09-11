@@ -16,17 +16,17 @@
 export interface AppointmentProjectionSchema {
   appointment_mode: string;
   appointment_type: string;
-  assigned_counselor_id?: number | null;
+  assignment_state?: string | null;
   cancellation_reason?: string | null;
   confirmed_date?: string | null;
   confirmed_end_time?: string | null;
   confirmed_start_time?: string | null;
   internal_notes?: string | null;
-  preferred_counselor_id?: number | null;
   reason?: string | null;
   reference_code: string;
   requested_date?: string | null;
   requested_start_time?: string | null;
-  reviewed_by_id?: number | null;
   status: string;
+  student_display_name?: string | null;
+  student_number?: string | null;
 }

@@ -28,6 +28,7 @@ export * from './applicationErrorProjectionSchema';
 export * from './appointmentMutationResponseSchema';
 export * from './appointmentPageResultSchema';
 export * from './appointmentProjectionSchema';
+export * from './appointmentReasonSchema';
 export * from './appointmentRequestSchema';
 export * from './appointmentsAvailableSlotsParams';
 export * from './appointmentsListParams';

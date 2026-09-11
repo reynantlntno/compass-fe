@@ -9886,4 +9886,748 @@
       color: CanvasText !important;
     }
   }
+
+  /* Counselor appointment queue */
+  .portal-appointments {
+    display: grid;
+    min-width: 0;
+    flex: 1;
+    align-content: start;
+    gap: 0;
+  }
+
+  .portal-appointments__filters {
+    min-width: 0;
+  }
+
+  .portal-appointments__filters-grid {
+    display: grid;
+    grid-template-columns: minmax(15rem, 1.5fr) repeat(3, minmax(9rem, 1fr));
+    gap: 0.85rem;
+    min-width: 0;
+  }
+
+  .portal-appointments__filter-field {
+    display: grid;
+    min-width: 0;
+    align-content: start;
+    gap: 0.35rem;
+  }
+
+  .portal-appointments__filter-field--search {
+    grid-column: span 2;
+  }
+
+  .portal-appointments__filter-field label,
+  .portal-appointments__dialog-field label,
+  .portal-appointments__dialog-schedule label {
+    color: var(--compass-brand-maroon-strong);
+    font-size: 0.68rem;
+    font-weight: var(--compass-weight-bold);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .portal-appointments__filter-field input,
+  .portal-appointments__filter-field select,
+  .portal-appointments__dialog-field select,
+  .portal-appointments__dialog-field textarea,
+  .portal-appointments__dialog-schedule input {
+    min-width: 0;
+    border: 1px solid var(--compass-border);
+    border-radius: 0.65rem;
+    background: var(--compass-surface);
+    color: var(--foreground);
+    font: inherit;
+  }
+
+  .portal-appointments__status-control {
+    min-width: 0;
+  }
+
+  .portal-appointments__status-trigger {
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    min-height: 2.35rem;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem;
+    border: 1px solid var(--compass-border);
+    border-radius: 0.65rem;
+    padding: 0.45rem 0.65rem;
+    background: var(--compass-surface);
+    color: var(--foreground);
+    font: inherit;
+    font-size: 0.82rem;
+    text-align: left;
+  }
+
+  .portal-appointments__status-trigger:hover,
+  .portal-appointments__status-trigger[data-popup-open] {
+    border-color: var(--compass-brand-maroon);
+  }
+
+  .portal-appointments__status-trigger:focus-visible {
+    border-color: var(--compass-brand-maroon);
+    outline: 2px solid var(--compass-brand-gold);
+    outline-offset: 2px;
+  }
+
+  .portal-appointments__status-trigger > span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .portal-appointments__status-trigger > svg {
+    width: 0.95rem;
+    height: 0.95rem;
+    flex: 0 0 auto;
+    color: var(--compass-brand-maroon);
+  }
+
+  .portal-appointments__status-popover {
+    width: min(22rem, calc(100vw - 2rem));
+    max-width: calc(100vw - 2rem);
+    gap: 0.7rem;
+    padding: 0.8rem;
+    box-shadow: var(--compass-shadow-md, var(--compass-shadow-sm));
+  }
+
+  .portal-appointments__status-popover-header {
+    gap: 0.15rem;
+  }
+
+  .portal-appointments__status-popover-header [data-slot="popover-title"] {
+    color: var(--compass-brand-maroon-strong);
+    font-size: 0.82rem;
+    font-weight: var(--compass-weight-bold);
+  }
+
+  .portal-appointments__status-popover-header [data-slot="popover-description"] {
+    color: var(--muted-foreground);
+    font-size: 0.74rem;
+    line-height: 1.4;
+  }
+
+  .portal-appointments__status-options {
+    display: grid;
+    max-height: min(18rem, 45vh);
+    gap: 0.1rem;
+    overflow-y: auto;
+  }
+
+  .portal-appointments__status-option {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 0.55rem;
+    border-radius: var(--compass-radius-sm);
+    padding: 0.42rem 0.35rem;
+    color: var(--foreground);
+    font-size: 0.78rem;
+    line-height: 1.35;
+  }
+
+  .portal-appointments__status-option:hover {
+    background-color: var(--compass-surface-subtle);
+  }
+
+  .portal-appointments__status-option > span {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .portal-appointments__status-option [data-slot="checkbox"] {
+    flex: 0 0 auto;
+    border-color: var(--compass-border-strong);
+  }
+
+  .portal-appointments__status-clear {
+    width: fit-content;
+    border: 0;
+    border-radius: var(--compass-radius-sm);
+    padding: 0.25rem 0.35rem;
+    background: transparent;
+    color: var(--compass-brand-maroon);
+    font: inherit;
+    font-size: 0.74rem;
+    font-weight: var(--compass-weight-bold);
+    text-decoration: underline;
+    text-underline-offset: 0.18rem;
+  }
+
+  .portal-appointments__status-clear:focus-visible {
+    outline: 2px solid var(--compass-brand-gold);
+    outline-offset: 2px;
+  }
+
+  .portal-appointments__filter-field input,
+  .portal-appointments__filter-field select,
+  .portal-appointments__dialog-field select,
+  .portal-appointments__dialog-schedule input {
+    min-height: 2.35rem;
+    padding: 0.45rem 0.65rem;
+  }
+
+  .portal-appointments__filter-field input:focus-visible,
+  .portal-appointments__filter-field select:focus-visible,
+  .portal-appointments__dialog-field select:focus-visible,
+  .portal-appointments__dialog-field textarea:focus-visible,
+  .portal-appointments__dialog-schedule input:focus-visible {
+    border-color: var(--compass-brand-maroon);
+    outline: 2px solid var(--compass-brand-gold);
+    outline-offset: 2px;
+  }
+
+  .portal-appointments__filter-error,
+  .portal-appointments__dialog-error {
+    margin: 0.75rem 0 0;
+    color: var(--compass-brand-maroon-strong);
+    font-size: 0.82rem;
+    font-weight: var(--compass-weight-bold);
+  }
+
+  .portal-appointments__filter-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    margin-top: 0.95rem;
+  }
+
+  .portal-appointments__filter-actions [data-slot="button"] {
+    border-color: var(--compass-brand-maroon);
+    background: var(--compass-brand-maroon);
+    color: var(--compass-cream);
+  }
+
+  .portal-appointments__filter-actions [data-slot="button"]:hover {
+    background: var(--compass-brand-maroon-strong);
+  }
+
+  .portal-appointments__filter-clear {
+    color: var(--compass-brand-maroon-strong);
+    font-size: 0.82rem;
+    font-weight: var(--compass-weight-bold);
+    text-decoration: underline;
+    text-underline-offset: 0.2em;
+  }
+
+  .portal-appointments__filter-clear:focus-visible,
+  .portal-appointments__state-actions [data-slot="button"]:focus-visible,
+  .portal-appointments__table button:focus-visible {
+    outline: 2px solid var(--compass-brand-gold);
+    outline-offset: 3px;
+  }
+
+  .portal-appointments__frame {
+    min-width: 0;
+    margin-top: 0.8rem;
+    padding: 1.15rem;
+  }
+
+  .portal-appointments__frame-heading {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.85rem;
+  }
+
+  .portal-appointments__kicker {
+    margin: 0 0 0.25rem;
+    color: var(--compass-brand-maroon-strong);
+    font-size: 0.68rem;
+    font-weight: var(--compass-weight-bold);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .portal-appointments__frame-heading h2,
+  .portal-appointments__frame--state h2 {
+    margin: 0;
+    color: var(--compass-brand-maroon-strong);
+    font-size: clamp(1.15rem, 2vw, 1.55rem);
+    font-weight: var(--compass-weight-bold);
+    letter-spacing: -0.03em;
+  }
+
+  .portal-appointments__result-count {
+    margin: 0;
+    color: var(--muted-foreground);
+    font-size: 0.82rem;
+  }
+
+  .portal-appointments__table-wrap {
+    min-width: 0;
+    overflow-x: auto;
+  }
+
+  .portal-appointments__table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    font-size: 0.82rem;
+  }
+
+  .portal-appointments__table th {
+    padding: 0.65rem 0.5rem;
+    border-bottom: 1px solid var(--compass-border);
+    color: var(--compass-brand-maroon-strong);
+    font-size: 0.65rem;
+    font-weight: var(--compass-weight-bold);
+    letter-spacing: 0.08em;
+    text-align: left;
+    text-transform: uppercase;
+    white-space: normal;
+  }
+
+  .portal-appointments__table td {
+    min-width: 0;
+    padding: 0.85rem 0.5rem;
+    border-bottom: 1px solid var(--compass-border);
+    color: var(--foreground);
+    vertical-align: top;
+    overflow-wrap: anywhere;
+  }
+
+  .portal-appointments__table tbody tr:not(.portal-appointments__detail-row):last-child td {
+    border-bottom: 0;
+  }
+
+  .portal-appointments__table tbody tr:not(.portal-appointments__detail-row):hover {
+    background: color-mix(in srgb, var(--compass-surface) 78%, var(--compass-brand-gold));
+  }
+
+  .portal-appointments__student-name,
+  .portal-appointments__student-number {
+    display: block;
+    overflow-wrap: anywhere;
+  }
+
+  .portal-appointments__student-name,
+  .portal-appointments__reference {
+    color: var(--compass-brand-maroon-strong);
+    font-weight: var(--compass-weight-bold);
+  }
+
+  .portal-appointments__student-number {
+    margin-top: 0.2rem;
+    color: var(--muted-foreground);
+    font-size: 0.75rem;
+  }
+
+  .portal-appointments__details-actions,
+  .portal-appointments__row-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.35rem;
+  }
+
+  .portal-appointments__details-actions > [data-slot="button"]:first-child {
+    flex: 0 0 auto;
+  }
+
+  .portal-appointments__details-actions svg {
+    width: 0.9rem;
+    height: 0.9rem;
+  }
+
+  .portal-appointments__row-actions {
+    align-items: stretch;
+  }
+
+  .portal-appointments__row-actions [data-slot="button"] {
+    height: 1.8rem;
+    padding-inline: 0.5rem;
+    font-size: 0.7rem;
+  }
+
+  .portal-appointments__detail-row td {
+    padding: 0;
+    border-bottom: 1px solid var(--compass-border);
+  }
+
+  .portal-appointments__detail-content {
+    margin: 0.1rem 0 0.2rem;
+    padding: 0.85rem 0.8rem 0.9rem 1rem;
+    border-left: 0.25rem solid var(--compass-brand-gold);
+  }
+
+  .portal-appointments__detail-content dl {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.75rem 1rem;
+    margin: 0;
+  }
+
+  .portal-appointments__detail-content dt {
+    color: var(--compass-brand-maroon-strong);
+    font-size: 0.64rem;
+    font-weight: var(--compass-weight-bold);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .portal-appointments__detail-content dd {
+    margin: 0.2rem 0 0;
+    color: var(--foreground);
+    line-height: 1.45;
+    overflow-wrap: anywhere;
+    white-space: pre-wrap;
+  }
+
+  .portal-appointments__detail-state {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.9rem 1rem;
+    border-left: 0.25rem solid var(--compass-brand-gold);
+    color: var(--muted-foreground);
+  }
+
+  .portal-appointments__detail-state > [data-slot="skeleton"] {
+    width: min(15rem, 100%);
+    height: 0.8rem;
+  }
+
+  .portal-appointments__detail-state p {
+    margin: 0;
+  }
+
+  .portal-appointments__mutation {
+    margin: 0 0 0.8rem;
+    padding: 0.55rem 0.7rem;
+    border-left: 0.25rem solid var(--compass-brand-gold);
+    background: color-mix(in srgb, var(--compass-surface) 86%, var(--compass-brand-gold));
+    color: var(--foreground);
+    font-size: 0.82rem;
+  }
+
+  .portal-appointments__mutation--error {
+    border-left-color: var(--compass-brand-maroon);
+  }
+
+  .portal-appointments__empty,
+  .portal-appointments__frame--state {
+    display: grid;
+    justify-items: start;
+    gap: 0.7rem;
+    padding: clamp(2rem, 5vw, 3.5rem) 1.25rem;
+    text-align: left;
+  }
+
+  .portal-appointments__empty h2,
+  .portal-appointments__frame--state h2 {
+    margin: 0;
+    color: var(--compass-brand-maroon-strong);
+    font-family: var(--compass-font-heading);
+    font-size: clamp(1.35rem, 3.5vw, 1.9rem);
+    letter-spacing: -0.035em;
+    line-height: 1.05;
+    overflow-wrap: anywhere;
+    text-wrap: pretty;
+  }
+
+  .portal-appointments__empty p,
+  .portal-appointments__frame--state p {
+    max-width: 40rem;
+    margin: 0;
+    color: var(--muted-foreground);
+    font-size: 0.88rem;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+  }
+
+  .portal-appointments__frame--state {
+    align-content: start;
+  }
+
+  .portal-appointments__frame--state [data-slot="button"],
+  .portal-appointments__state-actions [data-slot="button"] {
+    margin-top: 1rem;
+  }
+
+  .portal-appointments__state-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 0.65rem;
+  }
+
+  .portal-appointments__pagination {
+    margin-top: 1rem;
+  }
+
+  .portal-appointments__pagination-content,
+  .portal-appointments__pagination [data-slot="pagination-content"] {
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .portal-appointments__pagination-current {
+    color: var(--muted-foreground);
+    font-size: 0.78rem;
+  }
+
+  .portal-appointments__pagination-spacer {
+    display: block;
+    width: 5.5rem;
+  }
+
+  .portal-appointments__skeleton-heading {
+    display: inline-block;
+    width: min(15rem, 55vw);
+    height: 2.5rem;
+  }
+
+  .portal-appointments__skeleton-summary {
+    display: inline-block;
+    width: min(28rem, 70vw);
+    height: 1rem;
+    vertical-align: middle;
+  }
+
+  .portal-appointments__filters-grid--loading > [data-slot="skeleton"] {
+    height: 2.35rem;
+  }
+
+  .portal-appointments__skeleton-table {
+    display: grid;
+    gap: 0.8rem;
+  }
+
+  .portal-appointments__skeleton-table-row {
+    display: grid;
+    grid-template-columns: repeat(8, minmax(0, 1fr));
+    gap: 0.65rem;
+    padding-block: 0.75rem;
+    border-bottom: 1px solid var(--compass-border);
+  }
+
+  .portal-appointments__skeleton-table-row > [data-slot="skeleton"] {
+    height: 0.8rem;
+  }
+
+  .portal-appointments__dialog {
+    border: 1px solid var(--compass-brand-maroon);
+    border-radius: var(--compass-radius-xl);
+    background: var(--compass-surface);
+    color: var(--foreground);
+  }
+
+  .portal-appointments__dialog-field {
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .portal-appointments__dialog-field textarea {
+    min-height: 5rem;
+    padding: 0.6rem 0.7rem;
+    resize: vertical;
+  }
+
+  .portal-appointments__dialog-schedule {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.65rem;
+  }
+
+  .portal-appointments__dialog-schedule > div {
+    display: grid;
+    gap: 0.35rem;
+    min-width: 0;
+  }
+
+  @media (max-width: 58rem) {
+    .portal-appointments__filters-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .portal-appointments__filter-field--search {
+      grid-column: 1 / -1;
+    }
+
+    .portal-appointments__detail-content dl {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 48rem) {
+    .portal-appointments__frame {
+      padding: 0.9rem;
+    }
+
+    .portal-appointments__frame-heading {
+      align-items: start;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .portal-appointments__table-wrap {
+      overflow: visible;
+    }
+
+    .portal-appointments__table,
+    .portal-appointments__table thead,
+    .portal-appointments__table tbody,
+    .portal-appointments__table tr,
+    .portal-appointments__table th,
+    .portal-appointments__table td {
+      display: block;
+      width: 100%;
+    }
+
+    .portal-appointments__table thead {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    .portal-appointments__table tbody tr:not(.portal-appointments__detail-row) {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 0 0.75rem;
+      padding-block: 0.65rem;
+      border-bottom: 1px solid var(--compass-border);
+    }
+
+    .portal-appointments__table tbody tr:not(.portal-appointments__detail-row) td {
+      display: grid;
+      grid-template-columns: minmax(6.7rem, 0.42fr) minmax(0, 1fr);
+      gap: 0.65rem;
+      padding: 0.45rem 0;
+      border: 0;
+    }
+
+    .portal-appointments__table tbody tr:not(.portal-appointments__detail-row) td::before {
+      content: attr(data-label);
+      color: var(--compass-brand-maroon-strong);
+      font-size: 0.62rem;
+      font-weight: var(--compass-weight-bold);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+
+    .portal-appointments__table tbody tr:not(.portal-appointments__detail-row) td:last-child {
+      grid-column: 1 / -1;
+    }
+
+    .portal-appointments__table tbody tr.portal-appointments__detail-row {
+      display: block;
+      padding: 0;
+    }
+
+    .portal-appointments__table tbody tr.portal-appointments__detail-row td {
+      display: block;
+      padding: 0;
+    }
+
+    .portal-appointments__table tbody tr.portal-appointments__detail-row td::before {
+      content: none;
+    }
+
+    .portal-appointments__filters-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .portal-appointments__status-popover {
+      width: min(100%, calc(100vw - 2rem));
+    }
+
+    .portal-appointments__filter-field--search {
+      grid-column: auto;
+    }
+
+    .portal-appointments__filter-actions {
+      justify-content: stretch;
+    }
+
+    .portal-appointments__filter-actions [data-slot="button"] {
+      flex: 1;
+    }
+
+    .portal-appointments__dialog-schedule {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 38rem) {
+    .portal-appointments__table tbody tr:not(.portal-appointments__detail-row) td {
+      grid-template-columns: 1fr;
+      gap: 0.15rem;
+    }
+
+    .portal-appointments__table tbody tr:not(.portal-appointments__detail-row) td::before {
+      margin-bottom: 0.08rem;
+    }
+
+    .portal-appointments__details-actions,
+    .portal-appointments__row-actions {
+      align-items: stretch;
+    }
+
+    .portal-appointments__row-actions [data-slot="button"] {
+      flex: 1 1 auto;
+    }
+
+    .portal-appointments__detail-content dl {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .portal-appointments *,
+    .portal-appointments *::before,
+    .portal-appointments *::after {
+      scroll-behavior: auto !important;
+      transition-duration: 0.01ms !important;
+      animation-duration: 0.01ms !important;
+    }
+  }
+
+  @media (forced-colors: active) {
+    .portal-appointments__filters,
+    .portal-appointments__frame,
+    .portal-appointments__dialog,
+    .portal-appointments__status-popover {
+      border-color: CanvasText;
+      background: Canvas;
+      box-shadow: none;
+      color: CanvasText;
+    }
+
+    .portal-appointments__filter-field label,
+    .portal-appointments__filter-error,
+    .portal-appointments__kicker,
+    .portal-appointments__frame-heading h2,
+    .portal-appointments__frame--state h2,
+    .portal-appointments__table th,
+    .portal-appointments__table tbody tr:not(.portal-appointments__detail-row) td::before,
+    .portal-appointments__detail-content dt,
+    .portal-appointments__dialog-field label {
+      color: CanvasText;
+    }
+
+    .portal-appointments__filter-actions [data-slot="button"],
+    .portal-appointments__detail-content,
+    .portal-appointments__detail-state,
+    .portal-appointments__mutation,
+    .portal-appointments__status-trigger,
+    .portal-appointments__status-clear {
+      border-color: CanvasText;
+      background: Canvas;
+      color: CanvasText;
+    }
+  }
 }

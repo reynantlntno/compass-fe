@@ -10,6 +10,7 @@ import type {
   AppointmentMutationResponseSchema,
   AppointmentPageResultSchema,
   AppointmentProjectionSchema,
+  AppointmentReasonSchema,
   AppointmentRequestSchema,
   AppointmentsAvailableSlotsParams,
   AppointmentsListParams,
@@ -19,7 +20,6 @@ import type {
   CompletionSchema,
   DecisionSchema,
   OfficeClosurePageResultSchema,
-  ReasonSchema,
   ReviewDecisionSchema,
   ScheduleChangeResponseSchema,
   ScheduleChangeSchema,
@@ -1385,7 +1385,7 @@ export const getAppointmentsCancelUrl = (referenceCode: string,) => {
  * @summary Cancel
  */
 export const appointmentsCancel = async (referenceCode: string,
-    reasonSchema: ReasonSchema, options?: Parameters<typeof compassFetch>[1]): Promise<appointmentsCancelResponse> => {
+    appointmentReasonSchema: AppointmentReasonSchema, options?: Parameters<typeof compassFetch>[1]): Promise<appointmentsCancelResponse> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -1398,7 +1398,7 @@ return compassFetch<appointmentsCancelResponse>(getAppointmentsCancelUrl(referen
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(reasonSchema)
+    body: JSON.stringify(appointmentReasonSchema)
   }
 );}
 
@@ -1583,7 +1583,7 @@ export const getAppointmentsLateCancellationRequestUrl = (referenceCode: string,
  * @summary Request Late Cancellation Route
  */
 export const appointmentsLateCancellationRequest = async (referenceCode: string,
-    reasonSchema: ReasonSchema, options?: Parameters<typeof compassFetch>[1]): Promise<appointmentsLateCancellationRequestResponse> => {
+    appointmentReasonSchema: AppointmentReasonSchema, options?: Parameters<typeof compassFetch>[1]): Promise<appointmentsLateCancellationRequestResponse> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -1596,7 +1596,7 @@ return compassFetch<appointmentsLateCancellationRequestResponse>(getAppointments
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(reasonSchema)
+    body: JSON.stringify(appointmentReasonSchema)
   }
 );}
 

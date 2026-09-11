@@ -15,6 +15,7 @@ import {
 } from "@/components/portal/portal-identity";
 import { PortalHomeWidget } from "@/components/portal/portal-home-widget";
 import { PortalHomeOperationsOverview } from "@/components/portal/portal-home-operations-overview";
+import { PortalHomeAppointmentsOverview } from "@/components/portal/portal-home-appointments-overview";
 import { PortalSystemHealthSummary } from "@/components/portal/portal-system-health";
 import type { SelfProfileSchema } from "@/lib/api/generated/model";
 import { getCurrentPortalProfile } from "@/lib/api/portal";
@@ -119,6 +120,7 @@ export function PortalHome() {
         <div aria-label="Portal overview" className="portal-home__overview-grid">
           <PortalSystemHealthSummary />
           <PortalHomeOperationsOverview />
+          <PortalHomeAppointmentsOverview />
         </div>
       </div>
     </section>

@@ -2,6 +2,7 @@ import type { LucideIcon } from "lucide-react";
 import {
   Activity,
   Bell,
+  CalendarDays,
   DatabaseBackup,
   House,
   Mail,
@@ -14,6 +15,11 @@ export const PORTAL_CAPABILITIES = {
   backupsOperate: "backups.operate",
   backupsView: "backups.view",
   notificationsDeliveryOperate: "notifications.delivery.operate",
+  appointmentsQueueView: "appointments.queue.view",
+  appointmentsReview: "appointments.review",
+  appointmentsSchedule: "appointments.schedule",
+  appointmentsCancel: "appointments.cancel",
+  appointmentsOutcomeManage: "appointments.outcome.manage",
   restoresOperate: "restores.operate",
   systemErrorsView: "system.errors.view",
   systemHealthView: "system.health.view",
@@ -34,6 +40,7 @@ export type PortalNavigationLink = {
   href: string;
   label: string;
   icon: LucideIcon;
+  keywords?: readonly string[];
   requiredCapability?: string;
   requiresAuditAccess?: boolean;
 };
@@ -82,6 +89,15 @@ export const PORTAL_NAVIGATION: readonly PortalNavigationItem[] = [
     href: "/portal/notifications",
     label: "Notifications",
     icon: Bell,
+  },
+  {
+    kind: "link",
+    id: "appointments",
+    href: "/portal/appointments",
+    label: "Appointments",
+    icon: CalendarDays,
+    keywords: ["schedule", "queue", "sessions", "counseling"],
+    requiredCapability: PORTAL_CAPABILITIES.appointmentsQueueView,
   },
   {
     kind: "link",
@@ -366,6 +382,7 @@ function navigationSearchItems(item: PortalNavigationItem): PortalSearchItem[] {
         group: "destination",
         href: item.href,
         id: item.id,
+        keywords: item.keywords,
         label: item.label,
         requiredCapability: item.requiredCapability,
         requiresAuditAccess: item.requiresAuditAccess,

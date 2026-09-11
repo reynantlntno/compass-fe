@@ -16,4 +16,12 @@ page?: number;
  * @maximum 100
  */
 page_size?: number;
+q?: string | null;
+status?: string | null;
+appointment_type?: string | null;
+appointment_mode?: string | null;
+assignment?: string;
+date_from?: string | null;
+date_to?: string | null;
+order?: string;
 };
