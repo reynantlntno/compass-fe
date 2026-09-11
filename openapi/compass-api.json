@@ -4153,6 +4153,19 @@
         "title": "CaseCreateSchema",
         "type": "object"
       },
+      "CaseReasonSchema": {
+        "properties": {
+          "reason_code": {
+            "title": "Reason Code",
+            "type": "string"
+          }
+        },
+        "required": [
+          "reason_code"
+        ],
+        "title": "CaseReasonSchema",
+        "type": "object"
+      },
       "ClosureSchema": {
         "properties": {
           "closure_reason_code": {
@@ -6071,37 +6084,6 @@
         "title": "ContentWorkspaceTargetSchema",
         "type": "object"
       },
-      "CounselingCasePageSchema": {
-        "properties": {
-          "items": {
-            "items": {
-              "$ref": "#/components/schemas/CounselingCaseProjectionSchema"
-            },
-            "title": "Items",
-            "type": "array"
-          },
-          "page": {
-            "title": "Page",
-            "type": "integer"
-          },
-          "page_size": {
-            "title": "Page Size",
-            "type": "integer"
-          },
-          "total": {
-            "title": "Total",
-            "type": "integer"
-          }
-        },
-        "required": [
-          "page",
-          "page_size",
-          "total",
-          "items"
-        ],
-        "title": "CounselingCasePageSchema",
-        "type": "object"
-      },
       "CounselingCaseProjectionSchema": {
         "description": "Output-only superset of staff and student case metadata.",
         "properties": {
@@ -6223,6 +6205,171 @@
           "status"
         ],
         "title": "CounselingCaseProjectionSchema",
+        "type": "object"
+      },
+      "CounselingCaseQueuePageSchema": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/CounselingCaseQueueProjectionSchema"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "page": {
+            "title": "Page",
+            "type": "integer"
+          },
+          "page_size": {
+            "title": "Page Size",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "page",
+          "page_size",
+          "total",
+          "items"
+        ],
+        "title": "CounselingCaseQueuePageSchema",
+        "type": "object"
+      },
+      "CounselingCaseQueueProjectionSchema": {
+        "description": "Safe staff queue projection without database or actor identifiers.",
+        "properties": {
+          "assignment_state": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assignment State"
+          },
+          "closed_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Closed At"
+          },
+          "concern_category": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Concern Category"
+          },
+          "created_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created At"
+          },
+          "priority": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Priority"
+          },
+          "reference_code": {
+            "title": "Reference Code",
+            "type": "string"
+          },
+          "reopened_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reopened At"
+          },
+          "resolved_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Resolved At"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "student_display_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Student Display Name"
+          },
+          "student_number": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Student Number"
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated At"
+          }
+        },
+        "required": [
+          "reference_code",
+          "status"
+        ],
+        "title": "CounselingCaseQueueProjectionSchema",
         "type": "object"
       },
       "CounselingMutationResponseSchema": {
@@ -48856,6 +49003,96 @@
               "title": "Page Size",
               "type": "integer"
             }
+          },
+          {
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 120,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Q"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 400,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          },
+          {
+            "in": "query",
+            "name": "concern_category",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 40,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Concern Category"
+            }
+          },
+          {
+            "in": "query",
+            "name": "priority",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 20,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Priority"
+            }
+          },
+          {
+            "in": "query",
+            "name": "assignment",
+            "required": false,
+            "schema": {
+              "default": "all",
+              "maxLength": 20,
+              "title": "Assignment",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "order",
+            "required": false,
+            "schema": {
+              "default": "recent",
+              "maxLength": 20,
+              "title": "Order",
+              "type": "string"
+            }
           }
         ],
         "responses": {
@@ -48863,7 +49100,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/CounselingCasePageSchema"
+                  "$ref": "#/components/schemas/CounselingCaseQueuePageSchema"
                 }
               }
             },
@@ -49464,6 +49701,23 @@
             "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/CaseReasonSchema"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          },
+          "required": false
+        },
         "responses": {
           "200": {
             "content": {
@@ -50392,6 +50646,23 @@
             "$ref": "#/components/parameters/IdempotencyKeyHeader"
           }
         ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "anyOf": [
+                  {
+                    "$ref": "#/components/schemas/CaseReasonSchema"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
+              }
+            }
+          },
+          "required": false
+        },
         "responses": {
           "200": {
             "content": {

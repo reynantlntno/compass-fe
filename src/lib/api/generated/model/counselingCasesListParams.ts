@@ -16,4 +16,16 @@ page?: number;
  * @maximum 100
  */
 page_size?: number;
+q?: string | null;
+status?: string | null;
+concern_category?: string | null;
+priority?: string | null;
+/**
+ * @maxLength 20
+ */
+assignment?: string;
+/**
+ * @maxLength 20
+ */
+order?: string;
 };

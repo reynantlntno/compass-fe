@@ -5,10 +5,10 @@
  * The canonical backend API for COMPASS clients.
  * OpenAPI spec version: 1.0.0
  */
-import type { CounselingCaseProjectionSchema } from './counselingCaseProjectionSchema';
+import type { CounselingCaseQueueProjectionSchema } from './counselingCaseQueueProjectionSchema';
 
-export interface CounselingCasePageSchema {
-  items: CounselingCaseProjectionSchema[];
+export interface CounselingCaseQueuePageSchema {
+  items: CounselingCaseQueueProjectionSchema[];
   page: number;
   page_size: number;
   total: number;

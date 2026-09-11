@@ -11,12 +11,13 @@ import type {
   AssignmentSchema,
   CancelSchema,
   CaseCreateSchema,
+  CaseReasonSchema,
   ClosureSchema,
   CollaboratorSchema,
   ConsentDecisionSchema,
   ConsentRequestSchema,
-  CounselingCasePageSchema,
   CounselingCaseProjectionSchema,
+  CounselingCaseQueuePageSchema,
   CounselingCasesListParams,
   CounselingMutationResponseSchema,
   CounselingReasonSchema,
@@ -157,7 +158,7 @@ export const counselingSessionOpenFromAppointment = async (referenceCode: string
 
 
 export type counselingCasesListResponse200 = {
-  data: CounselingCasePageSchema
+  data: CounselingCaseQueuePageSchema
   status: 200
 }
 
@@ -624,14 +625,21 @@ export const getCounselingCaseCloseUrl = (referenceCode: string,) => {
 /**
  * @summary Route
  */
-export const counselingCaseClose = async (referenceCode: string, options?: Parameters<typeof compassFetch>[1]): Promise<counselingCaseCloseResponse> => {
+export const counselingCaseClose = async (referenceCode: string,
+    caseReasonSchemaNull?: CaseReasonSchema | null, options?: Parameters<typeof compassFetch>[1]): Promise<counselingCaseCloseResponse> => {
 
-  return compassFetch<counselingCaseCloseResponse>(getCounselingCaseCloseUrl(referenceCode),
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return compassFetch<counselingCaseCloseResponse>(getCounselingCaseCloseUrl(referenceCode),
   {
     ...options,
-    method: 'POST'
-
-
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(caseReasonSchemaNull)
   }
 );}
 
@@ -1197,14 +1205,21 @@ export const getCounselingCaseReopenUrl = (referenceCode: string,) => {
 /**
  * @summary Route
  */
-export const counselingCaseReopen = async (referenceCode: string, options?: Parameters<typeof compassFetch>[1]): Promise<counselingCaseReopenResponse> => {
+export const counselingCaseReopen = async (referenceCode: string,
+    caseReasonSchemaNull?: CaseReasonSchema | null, options?: Parameters<typeof compassFetch>[1]): Promise<counselingCaseReopenResponse> => {
 
-  return compassFetch<counselingCaseReopenResponse>(getCounselingCaseReopenUrl(referenceCode),
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return compassFetch<counselingCaseReopenResponse>(getCounselingCaseReopenUrl(referenceCode),
   {
     ...options,
-    method: 'POST'
-
-
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(caseReasonSchemaNull)
   }
 );}
 
