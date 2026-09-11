@@ -2256,6 +2256,58 @@
         "title": "AuthSessionReceiptSchema",
         "type": "object"
       },
+      "AuthorityMeProjectionSchema": {
+        "properties": {
+          "account_id": {
+            "title": "Account Id",
+            "type": "integer"
+          },
+          "audit_planes": {
+            "items": {
+              "enum": [
+                "technical",
+                "business",
+                "privacy"
+              ],
+              "type": "string"
+            },
+            "title": "Audit Planes",
+            "type": "array"
+          },
+          "effective_capabilities": {
+            "items": {
+              "$ref": "#/components/schemas/EffectiveCapabilityProjectionSchema"
+            },
+            "title": "Effective Capabilities",
+            "type": "array"
+          },
+          "grants": {
+            "items": {
+              "$ref": "#/components/schemas/GrantProjectionSchema"
+            },
+            "title": "Grants",
+            "type": "array"
+          },
+          "is_head_guidance": {
+            "title": "Is Head Guidance",
+            "type": "boolean"
+          },
+          "role": {
+            "title": "Role",
+            "type": "string"
+          }
+        },
+        "required": [
+          "account_id",
+          "role",
+          "is_head_guidance",
+          "effective_capabilities",
+          "grants",
+          "audit_planes"
+        ],
+        "title": "AuthorityMeProjectionSchema",
+        "type": "object"
+      },
       "AvailableSlotPageResultSchema": {
         "properties": {
           "items": {
@@ -33982,7 +34034,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/EffectiveAuthorityProjectionSchema"
+                  "$ref": "#/components/schemas/AuthorityMeProjectionSchema"
                 }
               }
             },

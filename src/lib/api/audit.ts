@@ -9,7 +9,10 @@ import type {
   AuditEntryProjectionSchema,
   AuditPageSchema,
   AuditSafeContextSchema,
+  AuthorityMeProjectionSchemaAuditPlanesItem,
 } from "@/lib/api/generated/model";
+
+export type PortalAuditPlane = AuthorityMeProjectionSchemaAuditPlanesItem;
 
 export type AuditApiErrorKind =
   | "permission"
@@ -224,6 +227,7 @@ function normalizedFilters(filters: PortalAuditFilters) {
 }
 
 export function getPortalAuditEntries(
+  plane: PortalAuditPlane,
   page = 1,
   filters: PortalAuditFilters = {},
   signal?: AbortSignal,
@@ -235,7 +239,7 @@ export function getPortalAuditEntries(
       {
         page: normalizePage(page),
         page_size: PAGE_SIZE,
-        plane: "technical",
+        plane,
         ...(normalized.action_type ? { action_type: normalized.action_type } : {}),
         ...(normalized.created_from ? { created_from: normalized.created_from } : {}),
         ...(normalized.created_until ? { created_until: normalized.created_until } : {}),
@@ -254,12 +258,13 @@ export function getPortalAuditEntries(
 
 export function getPortalAuditEntryDetail(
   entryId: number,
+  plane: PortalAuditPlane,
   signal?: AbortSignal,
 ) {
   return getReadResponse(
     auditEntryDetail(
       entryId,
-      { plane: "technical" },
+      { plane },
       cookieSessionReadOptions(signal),
     ),
     (value) => (isAuditEntry(value) ? value : null),

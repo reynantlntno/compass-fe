@@ -3,13 +3,20 @@ import { profilesMe } from "@/lib/api/generated/profiles/profiles";
 import { systemHealth } from "@/lib/api/generated/system/system";
 import { cookieSessionReadOptions } from "@/lib/api/auth";
 import type {
-  EffectiveAuthorityProjectionSchema,
+  AuthorityMeProjectionSchema,
+  AuthorityMeProjectionSchemaAuditPlanesItem,
   HealthComponentSchema,
   HealthProjectionSchema,
   SelfProfileSchema,
 } from "@/lib/api/generated/model";
 
 const MAX_AUTHORITY_CAPABILITY_LENGTH = 160;
+const AUDIT_PLANE_ORDER: readonly AuthorityMeProjectionSchemaAuditPlanesItem[] = [
+  "technical",
+  "business",
+  "privacy",
+];
+const AUDIT_PLANES = new Set(AUDIT_PLANE_ORDER);
 
 function isAbortError(error: unknown) {
   return error instanceof Error && error.name === "AbortError";
@@ -21,15 +28,23 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 function isEffectiveAuthorityProjection(
   value: unknown,
-): value is EffectiveAuthorityProjectionSchema {
+): value is AuthorityMeProjectionSchema {
   if (!isRecord(value)) return false;
 
   const capabilities = value.effective_capabilities;
+  const auditPlanes = value.audit_planes;
   return (
     typeof value.account_id === "number" &&
     Number.isSafeInteger(value.account_id) &&
     value.account_id > 0 &&
     Array.isArray(capabilities) &&
+    Array.isArray(auditPlanes) &&
+    auditPlanes.length <= AUDIT_PLANE_ORDER.length &&
+    auditPlanes.every(
+      (plane): plane is AuthorityMeProjectionSchemaAuditPlanesItem =>
+        typeof plane === "string" &&
+        AUDIT_PLANES.has(plane as AuthorityMeProjectionSchemaAuditPlanesItem),
+    ) &&
     capabilities.every((entry) => {
       if (!isRecord(entry)) return false;
       return (
@@ -41,10 +56,15 @@ function isEffectiveAuthorityProjection(
   );
 }
 
-export async function getCurrentPortalCapabilities(
+export type CurrentPortalAccess = {
+  auditPlanes: AuthorityMeProjectionSchemaAuditPlanesItem[];
+  capabilities: string[];
+};
+
+export async function getCurrentPortalAccess(
   userId: number,
   signal?: AbortSignal,
-): Promise<string[] | null> {
+): Promise<CurrentPortalAccess | null> {
   try {
     const response = await authorityMe(cookieSessionReadOptions(signal));
 
@@ -56,17 +76,30 @@ export async function getCurrentPortalCapabilities(
       return null;
     }
 
-    return [
-      ...new Set(
-        response.data.effective_capabilities.map(({ capability }) =>
-          capability.trim(),
-        ),
+    return {
+      auditPlanes: AUDIT_PLANE_ORDER.filter((plane) =>
+        response.data.audit_planes.includes(plane),
       ),
-    ];
+      capabilities: [
+        ...new Set(
+          response.data.effective_capabilities.map(({ capability }) =>
+            capability.trim(),
+          ),
+        ),
+      ],
+    };
   } catch (error) {
     if (isAbortError(error)) throw error;
     return null;
   }
+}
+
+export async function getCurrentPortalCapabilities(
+  userId: number,
+  signal?: AbortSignal,
+): Promise<string[] | null> {
+  const access = await getCurrentPortalAccess(userId, signal);
+  return access?.capabilities ?? null;
 }
 
 function isSelfProfile(value: unknown): value is SelfProfileSchema {

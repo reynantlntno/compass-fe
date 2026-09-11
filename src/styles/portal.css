@@ -6837,6 +6837,31 @@
     width: 12%;
   }
 
+  .portal-audit__table--business thead th:nth-child(1),
+  .portal-audit__table--privacy thead th:nth-child(1) {
+    width: 14%;
+  }
+
+  .portal-audit__table--business thead th:nth-child(2),
+  .portal-audit__table--privacy thead th:nth-child(2) {
+    width: 34%;
+  }
+
+  .portal-audit__table--business thead th:nth-child(3),
+  .portal-audit__table--privacy thead th:nth-child(3) {
+    width: 22%;
+  }
+
+  .portal-audit__table--business thead th:nth-child(4),
+  .portal-audit__table--privacy thead th:nth-child(4) {
+    width: 15%;
+  }
+
+  .portal-audit__table--business thead th:nth-child(5),
+  .portal-audit__table--privacy thead th:nth-child(5) {
+    width: 15%;
+  }
+
   .portal-audit__table tbody > tr.portal-audit__table-row {
     border-bottom: 1px solid var(--compass-border);
     transition: background-color var(--compass-motion-fast) ease;

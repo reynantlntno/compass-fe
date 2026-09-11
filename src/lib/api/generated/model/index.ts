@@ -63,6 +63,8 @@ export * from './authorityCapabilitiesParams';
 export * from './authorityGranteesParams';
 export * from './authorityGrantRevokeParams';
 export * from './authorityMeCoverageParams';
+export * from './authorityMeProjectionSchema';
+export * from './authorityMeProjectionSchemaAuditPlanesItem';
 export * from './authorityScopeOptionsParams';
 export * from './authSessionReceiptSchema';
 export * from './availableSlotPageResultSchema';

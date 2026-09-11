@@ -12,6 +12,7 @@ import type {
   AuthorityGrantRevokeParams,
   AuthorityGranteesParams,
   AuthorityMeCoverageParams,
+  AuthorityMeProjectionSchema,
   AuthorityScopeOptionsParams,
   BulkGrantResultSchema,
   BulkGrantSchema,
@@ -716,7 +717,7 @@ export const authorityGrantRevoke = async (grantId: number,
 
 
 export type authorityMeResponse200 = {
-  data: EffectiveAuthorityProjectionSchema
+  data: AuthorityMeProjectionSchema
   status: 200
 }
 

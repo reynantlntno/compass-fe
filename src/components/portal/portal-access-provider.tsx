@@ -12,17 +12,20 @@ import {
 } from "react";
 
 import { useAuthSession } from "@/components/auth/auth-session-provider";
-import { getCurrentPortalCapabilities } from "@/lib/api/portal";
+import { getCurrentPortalAccess } from "@/lib/api/portal";
+import type { PortalAuditPlane } from "@/components/portal/portal-navigation";
 
 export type PortalAccessStatus = "loading" | "ready" | "unavailable";
 
 type PortalAccessState = {
+  auditPlanes: readonly PortalAuditPlane[];
   status: PortalAccessStatus;
   userId: number | null;
   capabilities: readonly string[];
 };
 
 type PortalAccessContextValue = {
+  auditPlanes: readonly PortalAuditPlane[];
   status: PortalAccessStatus;
   capabilities: readonly string[];
   hasCapability: (capability: string) => boolean;
@@ -39,6 +42,7 @@ export function PortalAccessProvider({ children }: { children: ReactNode }) {
   const { user } = useAuthSession();
   const userId = user?.id ?? null;
   const [state, setState] = useState<PortalAccessState>(() => ({
+    auditPlanes: [],
     status: "loading",
     userId,
     capabilities: [],
@@ -60,7 +64,12 @@ export function PortalAccessProvider({ children }: { children: ReactNode }) {
     await Promise.resolve();
 
     if (userId === null) {
-      applyState({ status: "unavailable", userId: null, capabilities: [] });
+      applyState({
+        auditPlanes: [],
+        status: "unavailable",
+        userId: null,
+        capabilities: [],
+      });
       return;
     }
 
@@ -69,11 +78,16 @@ export function PortalAccessProvider({ children }: { children: ReactNode }) {
     const currentState = stateRef.current;
 
     if (currentState.userId !== userId) {
-      applyState({ status: "loading", userId, capabilities: [] });
+      applyState({
+        auditPlanes: [],
+        status: "loading",
+        userId,
+        capabilities: [],
+      });
     }
 
     try {
-      const capabilities = await getCurrentPortalCapabilities(
+      const access = await getCurrentPortalAccess(
         userId,
         controller.signal,
       );
@@ -81,14 +95,29 @@ export function PortalAccessProvider({ children }: { children: ReactNode }) {
       if (controller.signal.aborted) return;
 
       applyState(
-        capabilities
-          ? { status: "ready", userId, capabilities }
-          : { status: "unavailable", userId, capabilities: [] },
+        access
+          ? {
+              auditPlanes: access.auditPlanes,
+              status: "ready",
+              userId,
+              capabilities: access.capabilities,
+            }
+          : {
+              auditPlanes: [],
+              status: "unavailable",
+              userId,
+              capabilities: [],
+            },
       );
     } catch (error) {
       if (isAbortError(error)) return;
       if (!controller.signal.aborted) {
-        applyState({ status: "unavailable", userId, capabilities: [] });
+        applyState({
+          auditPlanes: [],
+          status: "unavailable",
+          userId,
+          capabilities: [],
+        });
       }
     } finally {
       if (requestRef.current === controller) requestRef.current = null;
@@ -134,6 +163,7 @@ export function PortalAccessProvider({ children }: { children: ReactNode }) {
 
   const contextValue = useMemo<PortalAccessContextValue>(
     () => ({
+      auditPlanes: state.auditPlanes,
       status: state.status,
       capabilities: state.capabilities,
       hasCapability,

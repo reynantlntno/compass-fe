@@ -21,7 +21,11 @@ import { usePortalAccess } from "@/components/portal/portal-access-provider";
 import { PortalCollectionFrame } from "@/components/portal/portal-collection-frame";
 import { PortalFilterPanel } from "@/components/portal/portal-filter-panel";
 import { PortalPageHeader } from "@/components/portal/portal-page-header";
-import { PORTAL_CAPABILITIES } from "@/components/portal/portal-navigation";
+import {
+  PORTAL_AUDIT_PLANE_ORDER,
+  type PortalAuditPlane,
+} from "@/components/portal/portal-navigation";
+import { PortalViewMenu } from "@/components/portal/portal-view-menu";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -59,13 +63,126 @@ type AuditDetailState =
   | { kind: "ready"; entry: AuditEntryProjectionSchema; entryId: number }
   | { kind: "unavailable"; entryId: number; error: AuditApiErrorKind };
 
-const EVENT_CATEGORY_OPTIONS = [
-  { label: "All event categories", value: "" },
-  { label: "Security", value: "SECURITY" },
-  { label: "System", value: "SYSTEM" },
-  { label: "Authorization", value: "AUTHORIZATION" },
-  { label: "Token batch", value: "TOKEN_BATCH" },
-] as const;
+type AuditEventCategoryOption = { label: string; value: string };
+
+const EVENT_CATEGORY_OPTIONS: Record<
+  PortalAuditPlane,
+  readonly AuditEventCategoryOption[]
+> = {
+  technical: [
+    { label: "All event categories", value: "" },
+    { label: "Security", value: "SECURITY" },
+    { label: "System", value: "SYSTEM" },
+    { label: "Authorization", value: "AUTHORIZATION" },
+    { label: "Token batch", value: "TOKEN_BATCH" },
+  ],
+  business: [
+    { label: "All event categories", value: "" },
+    { label: "Workflow", value: "WORKFLOW" },
+    { label: "Content", value: "CONTENT" },
+    { label: "Form", value: "FORM" },
+    { label: "Form collection", value: "FORM_COLLECTION" },
+    { label: "Governance", value: "GOVERNANCE" },
+    { label: "Authorization", value: "AUTHORIZATION" },
+  ],
+  privacy: [
+    { label: "All event categories", value: "" },
+    { label: "Privacy", value: "PRIVACY" },
+    { label: "Privacy governance", value: "PRIVACY_GOVERNANCE" },
+    { label: "Data access", value: "DATA_ACCESS" },
+    { label: "Governance", value: "GOVERNANCE" },
+  ],
+};
+
+const PLANE_LABELS: Record<PortalAuditPlane, string> = {
+  technical: "Technical",
+  business: "Business",
+  privacy: "Privacy",
+};
+
+type AuditTableColumn =
+  | "severity"
+  | "action"
+  | "eventCategory"
+  | "sourceApp"
+  | "targetModel"
+  | "actorRole"
+  | "created";
+
+type AuditTechnicalFilter =
+  | "sourceApp"
+  | "targetModel"
+  | "requestId"
+  | "traceId";
+
+type AuditPlanePresentation = {
+  actionColumnLabel: string;
+  columns: readonly AuditTableColumn[];
+  description: string;
+  filterSummary: string;
+  visibleFilterFields: readonly AuditTechnicalFilter[];
+};
+
+const AUDIT_PLANE_PRESENTATION: Record<
+  PortalAuditPlane,
+  AuditPlanePresentation
+> = {
+  technical: {
+    actionColumnLabel: "Action",
+    columns: [
+      "severity",
+      "action",
+      "eventCategory",
+      "sourceApp",
+      "targetModel",
+      "actorRole",
+      "created",
+    ],
+    description: "Review technical activity visible to this account.",
+    filterSummary: "Filter technical activity by category, source, or date.",
+    visibleFilterFields: ["sourceApp", "targetModel", "requestId", "traceId"],
+  },
+  business: {
+    actionColumnLabel: "Activity",
+    columns: ["severity", "action", "eventCategory", "actorRole", "created"],
+    description: "Review business activity visible to this account.",
+    filterSummary:
+      "Filter business activity by category, severity, action, or date.",
+    visibleFilterFields: [],
+  },
+  privacy: {
+    actionColumnLabel: "Activity",
+    columns: ["severity", "action", "eventCategory", "actorRole", "created"],
+    description: "Review privacy activity visible to this account.",
+    filterSummary:
+      "Filter privacy activity by category, severity, action, or date.",
+    visibleFilterFields: [],
+  },
+};
+
+const AUDIT_TABLE_COLUMN_LABELS: Record<AuditTableColumn, string> = {
+  action: "Action",
+  actorRole: "Actor role",
+  created: "Created",
+  eventCategory: "Event category",
+  severity: "Severity",
+  sourceApp: "Source",
+  targetModel: "Target model",
+};
+
+function auditColumnLabel(plane: PortalAuditPlane, column: AuditTableColumn) {
+  if (column === "action") {
+    return AUDIT_PLANE_PRESENTATION[plane].actionColumnLabel;
+  }
+  return AUDIT_TABLE_COLUMN_LABELS[column];
+}
+
+function hasAuditFilter(
+  plane: PortalAuditPlane,
+  field: AuditTechnicalFilter,
+) {
+  return AUDIT_PLANE_PRESENTATION[plane].visibleFilterFields.includes(field);
+}
 
 const SEVERITY_OPTIONS = [
   { label: "All severities", value: "" },
@@ -76,11 +193,23 @@ const SEVERITY_OPTIONS = [
   { label: "Critical", value: "CRITICAL" },
 ] as const;
 
-const EVENT_CATEGORIES = new Set(
-  EVENT_CATEGORY_OPTIONS.filter((option) => option.value).map(
-    (option) => option.value,
+const EVENT_CATEGORIES: Record<PortalAuditPlane, ReadonlySet<string>> = {
+  technical: new Set(
+    EVENT_CATEGORY_OPTIONS.technical
+      .filter((option) => option.value)
+      .map((option) => option.value),
   ),
-);
+  business: new Set(
+    EVENT_CATEGORY_OPTIONS.business
+      .filter((option) => option.value)
+      .map((option) => option.value),
+  ),
+  privacy: new Set(
+    EVENT_CATEGORY_OPTIONS.privacy
+      .filter((option) => option.value)
+      .map((option) => option.value),
+  ),
+};
 const SEVERITIES = new Set(
   SEVERITY_OPTIONS.filter((option) => option.value).map(
     (option) => option.value,
@@ -159,22 +288,47 @@ function parsePage(value: string | null) {
   return page;
 }
 
+function orderedAuditPlanes(authorizedPlanes: readonly PortalAuditPlane[]) {
+  return PORTAL_AUDIT_PLANE_ORDER.filter((plane) =>
+    authorizedPlanes.includes(plane),
+  );
+}
+
+function normalizeAuditPlane(
+  value: string | null,
+  authorizedPlanes: readonly PortalAuditPlane[],
+) {
+  const orderedPlanes = orderedAuditPlanes(authorizedPlanes);
+  if (value && orderedPlanes.includes(value as PortalAuditPlane)) {
+    return value as PortalAuditPlane;
+  }
+  return orderedPlanes[0] ?? null;
+}
+
 function parseFilters(searchParams: {
   get: (key: string) => string | null;
-}): PortalAuditFilters {
+}, plane: PortalAuditPlane): PortalAuditFilters {
   return {
     actionType: normalizeSafeFilter(searchParams.get("action_type")),
     createdFrom: normalizeDateFilter(searchParams.get("created_from")),
     createdUntil: normalizeDateFilter(searchParams.get("created_until")),
     eventCategory: parseEnumFilter(
       searchParams.get("event_category"),
-      EVENT_CATEGORIES,
+      EVENT_CATEGORIES[plane],
     ),
-    requestId: normalizeSafeFilter(searchParams.get("request_id")),
+    requestId: hasAuditFilter(plane, "requestId")
+      ? normalizeSafeFilter(searchParams.get("request_id"))
+      : null,
     severity: parseEnumFilter(searchParams.get("severity"), SEVERITIES),
-    sourceApp: normalizeSafeFilter(searchParams.get("source_app")),
-    targetModel: normalizeSafeFilter(searchParams.get("target_model")),
-    traceId: normalizeSafeFilter(searchParams.get("trace_id")),
+    sourceApp: hasAuditFilter(plane, "sourceApp")
+      ? normalizeSafeFilter(searchParams.get("source_app"))
+      : null,
+    targetModel: hasAuditFilter(plane, "targetModel")
+      ? normalizeSafeFilter(searchParams.get("target_model"))
+      : null,
+    traceId: hasAuditFilter(plane, "traceId")
+      ? normalizeSafeFilter(searchParams.get("trace_id"))
+      : null,
   };
 }
 
@@ -198,19 +352,35 @@ function filtersKey(filters: PortalAuditFilters) {
     .join("|");
 }
 
-function auditHref(filters: PortalAuditFilters, page = 1) {
+function auditHref(
+  plane: PortalAuditPlane,
+  filters: PortalAuditFilters,
+  page = 1,
+) {
   const params = new URLSearchParams();
-  const values: ReadonlyArray<[string, string | null | undefined]> = [
+  params.set("plane", plane);
+  const values: Array<[string, string | null | undefined]> = [
     ["event_category", filters.eventCategory],
     ["severity", filters.severity],
     ["action_type", filters.actionType],
-    ["source_app", filters.sourceApp],
-    ["target_model", filters.targetModel],
     ["created_from", filters.createdFrom],
     ["created_until", filters.createdUntil],
-    ["request_id", filters.requestId],
-    ["trace_id", filters.traceId],
   ];
+
+  const technicalValues: ReadonlyArray<[
+    AuditTechnicalFilter,
+    string,
+    string | null | undefined,
+  ]> = [
+    ["sourceApp", "source_app", filters.sourceApp],
+    ["targetModel", "target_model", filters.targetModel],
+    ["requestId", "request_id", filters.requestId],
+    ["traceId", "trace_id", filters.traceId],
+  ];
+
+  for (const [field, key, value] of technicalValues) {
+    if (hasAuditFilter(plane, field)) values.push([key, value]);
+  }
 
   for (const [key, value] of values) {
     if (value) params.set(key, value);
@@ -276,23 +446,30 @@ function contextEntries(context: AuditSafeContextSchema) {
   });
 }
 
-function auditFiltersFromForm(formData: FormData): PortalAuditFilters {
-  return parseFilters({
-    get: (key) => {
-      const value = formData.get(key);
-      return typeof value === "string" ? value : null;
-    },
-  });
-}
-
-function AuditFilters({ filters }: { filters: PortalAuditFilters }) {
+function AuditFilters({
+  filters,
+  plane,
+}: {
+  filters: PortalAuditFilters;
+  plane: PortalAuditPlane;
+}) {
   const router = useRouter();
   const [isFilterNavigationPending, startFilterNavigation] = useTransition();
   const [validationMessage, setValidationMessage] = useState<string | null>(null);
+  const presentation = AUDIT_PLANE_PRESENTATION[plane];
 
   const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    const nextFilters = auditFiltersFromForm(new FormData(event.currentTarget));
+    const formData = new FormData(event.currentTarget);
+    const nextFilters = parseFilters(
+      {
+        get: (key) => {
+          const value = formData.get(key);
+          return typeof value === "string" ? value : null;
+        },
+      },
+      plane,
+    );
 
     if (
       nextFilters.createdFrom &&
@@ -304,7 +481,7 @@ function AuditFilters({ filters }: { filters: PortalAuditFilters }) {
     }
 
     setValidationMessage(null);
-    startFilterNavigation(() => router.push(auditHref(nextFilters)));
+    startFilterNavigation(() => router.push(auditHref(plane, nextFilters)));
   };
 
   return (
@@ -314,8 +491,8 @@ function AuditFilters({ filters }: { filters: PortalAuditFilters }) {
       ariaBusy={isFilterNavigationPending}
       className="portal-audit__filters"
       onSubmit={handleSubmit}
-      resetKey={filtersKey(filters)}
-      summary="Filter technical activity by category, source, or date."
+      resetKey={`${plane}|${filtersKey(filters)}`}
+      summary={presentation.filterSummary}
     >
       <div className="portal-audit__filter-grid">
         <div className="portal-audit__filter-field">
@@ -325,7 +502,7 @@ function AuditFilters({ filters }: { filters: PortalAuditFilters }) {
             id="portal-audit-event-category"
             name="event_category"
           >
-            {EVENT_CATEGORY_OPTIONS.map((option) => (
+            {EVENT_CATEGORY_OPTIONS[plane].map((option) => (
               <option key={option.value || "all"} value={option.value}>
                 {option.label}
               </option>
@@ -356,26 +533,30 @@ function AuditFilters({ filters }: { filters: PortalAuditFilters }) {
             placeholder="e.g. SYSTEM_HEALTH_CHECK"
           />
         </div>
-        <div className="portal-audit__filter-field">
-          <Label htmlFor="portal-audit-source">Source app</Label>
-          <Input
-            defaultValue={filterValue(filters, "sourceApp")}
-            id="portal-audit-source"
-            maxLength={MAX_FILTER_LENGTH}
-            name="source_app"
-            placeholder="e.g. apps.system"
-          />
-        </div>
-        <div className="portal-audit__filter-field">
-          <Label htmlFor="portal-audit-target">Target model</Label>
-          <Input
-            defaultValue={filterValue(filters, "targetModel")}
-            id="portal-audit-target"
-            maxLength={MAX_FILTER_LENGTH}
-            name="target_model"
-            placeholder="e.g. system.Health"
-          />
-        </div>
+        {hasAuditFilter(plane, "sourceApp") ? (
+          <div className="portal-audit__filter-field">
+            <Label htmlFor="portal-audit-source">Source app</Label>
+            <Input
+              defaultValue={filterValue(filters, "sourceApp")}
+              id="portal-audit-source"
+              maxLength={MAX_FILTER_LENGTH}
+              name="source_app"
+              placeholder="e.g. apps.system"
+            />
+          </div>
+        ) : null}
+        {hasAuditFilter(plane, "targetModel") ? (
+          <div className="portal-audit__filter-field">
+            <Label htmlFor="portal-audit-target">Target model</Label>
+            <Input
+              defaultValue={filterValue(filters, "targetModel")}
+              id="portal-audit-target"
+              maxLength={MAX_FILTER_LENGTH}
+              name="target_model"
+              placeholder="e.g. system.Health"
+            />
+          </div>
+        ) : null}
         <div className="portal-audit__filter-field">
           <Label htmlFor="portal-audit-created-from">From date</Label>
           <Input
@@ -394,26 +575,30 @@ function AuditFilters({ filters }: { filters: PortalAuditFilters }) {
             type="date"
           />
         </div>
-        <div className="portal-audit__filter-field">
-          <Label htmlFor="portal-audit-request-id">Request correlation</Label>
-          <Input
-            defaultValue={filterValue(filters, "requestId")}
-            id="portal-audit-request-id"
-            maxLength={MAX_FILTER_LENGTH}
-            name="request_id"
-            placeholder="Optional"
-          />
-        </div>
-        <div className="portal-audit__filter-field">
-          <Label htmlFor="portal-audit-trace-id">Trace correlation</Label>
-          <Input
-            defaultValue={filterValue(filters, "traceId")}
-            id="portal-audit-trace-id"
-            maxLength={MAX_FILTER_LENGTH}
-            name="trace_id"
-            placeholder="Optional"
-          />
-        </div>
+        {hasAuditFilter(plane, "requestId") ? (
+          <div className="portal-audit__filter-field">
+            <Label htmlFor="portal-audit-request-id">Request correlation</Label>
+            <Input
+              defaultValue={filterValue(filters, "requestId")}
+              id="portal-audit-request-id"
+              maxLength={MAX_FILTER_LENGTH}
+              name="request_id"
+              placeholder="Optional"
+            />
+          </div>
+        ) : null}
+        {hasAuditFilter(plane, "traceId") ? (
+          <div className="portal-audit__filter-field">
+            <Label htmlFor="portal-audit-trace-id">Trace correlation</Label>
+            <Input
+              defaultValue={filterValue(filters, "traceId")}
+              id="portal-audit-trace-id"
+              maxLength={MAX_FILTER_LENGTH}
+              name="trace_id"
+              placeholder="Optional"
+            />
+          </div>
+        ) : null}
       </div>
       {validationMessage ? (
         <p className="portal-audit__filter-validation" role="alert">
@@ -429,7 +614,10 @@ function AuditFilters({ filters }: { filters: PortalAuditFilters }) {
         >
           Apply filters
         </Button>
-        <Link className="portal-audit__filter-clear" href="/portal/audit">
+        <Link
+          className="portal-audit__filter-clear"
+          href={auditHref(plane, {})}
+        >
           Clear filters
         </Link>
       </div>
@@ -509,6 +697,7 @@ function AuditRow({
   index,
   onRetry,
   onToggle,
+  plane,
 }: {
   detail: AuditDetailState;
   entry: AuditEntryProjectionSchema;
@@ -516,59 +705,95 @@ function AuditRow({
   index: number;
   onRetry: () => void;
   onToggle: () => void;
+  plane: PortalAuditPlane;
 }) {
   const createdAt = formatTimestamp(entry.created_at);
   const detailsId = `portal-audit-details-${index}`;
   const actionLabel = formatLabel(entry.action_type);
+  const presentation = AUDIT_PLANE_PRESENTATION[plane];
 
   return (
     <>
       <TableRow className="portal-audit__table-row">
-        <TableCell data-label="Severity">
-          <Badge
-            className="portal-audit__severity"
-            data-tone={severityTone(entry.severity)}
-            variant="outline"
-          >
-            {formatLabel(entry.severity)}
-          </Badge>
-        </TableCell>
-        <TableCell data-label="Action">
-          <div className="portal-audit__action-cell">
-            <span className="portal-audit__row-action">{actionLabel}</span>
-            <button
-              aria-controls={detailsId}
-              aria-expanded={expanded}
-              aria-label={`${expanded ? "Hide" : "Show"} details for ${actionLabel}`}
-              className="portal-audit__row-indicator"
-              onClick={onToggle}
-              type="button"
-            >
-              <ChevronDown className={expanded ? "is-expanded" : undefined} />
-            </button>
-          </div>
-        </TableCell>
-        <TableCell data-label="Event category">
-          {formatLabel(entry.event_category)}
-        </TableCell>
-        <TableCell data-label="Source">
-          {formatLabel(entry.source_app)}
-        </TableCell>
-        <TableCell data-label="Target model">
-          {formatLabel(entry.target_model)}
-        </TableCell>
-        <TableCell data-label="Actor role">
-          <span className="portal-audit__row-actor">
-            {formatLabel(entry.actor_role)}
-          </span>
-        </TableCell>
-        <TableCell data-label="Created">
-          {createdAt ? <time dateTime={entry.created_at}>{createdAt}</time> : "Unavailable"}
-        </TableCell>
+        {presentation.columns.map((column) => {
+          const label = auditColumnLabel(plane, column);
+
+          switch (column) {
+            case "severity":
+              return (
+                <TableCell data-label={label} key={column}>
+                  <Badge
+                    className="portal-audit__severity"
+                    data-tone={severityTone(entry.severity)}
+                    variant="outline"
+                  >
+                    {formatLabel(entry.severity)}
+                  </Badge>
+                </TableCell>
+              );
+            case "action":
+              return (
+                <TableCell data-label={label} key={column}>
+                  <div className="portal-audit__action-cell">
+                    <span className="portal-audit__row-action">{actionLabel}</span>
+                    <button
+                      aria-controls={detailsId}
+                      aria-expanded={expanded}
+                      aria-label={`${expanded ? "Hide" : "Show"} details for ${actionLabel}`}
+                      className="portal-audit__row-indicator"
+                      onClick={onToggle}
+                      type="button"
+                    >
+                      <ChevronDown className={expanded ? "is-expanded" : undefined} />
+                    </button>
+                  </div>
+                </TableCell>
+              );
+            case "eventCategory":
+              return (
+                <TableCell data-label={label} key={column}>
+                  {formatLabel(entry.event_category)}
+                </TableCell>
+              );
+            case "sourceApp":
+              return (
+                <TableCell data-label={label} key={column}>
+                  {formatLabel(entry.source_app)}
+                </TableCell>
+              );
+            case "targetModel":
+              return (
+                <TableCell data-label={label} key={column}>
+                  {formatLabel(entry.target_model)}
+                </TableCell>
+              );
+            case "actorRole":
+              return (
+                <TableCell data-label={label} key={column}>
+                  <span className="portal-audit__row-actor">
+                    {formatLabel(entry.actor_role)}
+                  </span>
+                </TableCell>
+              );
+            case "created":
+              return (
+                <TableCell data-label={label} key={column}>
+                  {createdAt ? (
+                    <time dateTime={entry.created_at}>{createdAt}</time>
+                  ) : (
+                    "Unavailable"
+                  )}
+                </TableCell>
+              );
+          }
+        })}
       </TableRow>
       {expanded ? (
         <TableRow className="portal-audit__details-row">
-          <TableCell className="portal-audit__details-cell" colSpan={7}>
+          <TableCell
+            className="portal-audit__details-cell"
+            colSpan={presentation.columns.length}
+          >
             <AuditDetails
               detail={detail}
               detailsId={detailsId}
@@ -583,11 +808,13 @@ function AuditRow({
 
 function AuditPagination({
   filters,
+  plane,
   page,
   pageSize,
   total,
 }: {
   filters: PortalAuditFilters;
+  plane: PortalAuditPlane;
   page: number;
   pageSize: number;
   total: number;
@@ -598,7 +825,10 @@ function AuditPagination({
   return (
     <nav aria-label="Audit trail pagination" className="portal-audit__pagination">
       {page > 1 ? (
-        <Link className="portal-audit__pagination-link" href={auditHref(filters, page - 1)}>
+        <Link
+          className="portal-audit__pagination-link"
+          href={auditHref(plane, filters, page - 1)}
+        >
           <ChevronLeft aria-hidden="true" />
           Previous
         </Link>
@@ -609,7 +839,10 @@ function AuditPagination({
         Page {page} of {totalPages}
       </span>
       {page < totalPages ? (
-        <Link className="portal-audit__pagination-link" href={auditHref(filters, page + 1)}>
+        <Link
+          className="portal-audit__pagination-link"
+          href={auditHref(plane, filters, page + 1)}
+        >
           Next
           <ChevronRight aria-hidden="true" />
         </Link>
@@ -620,13 +853,15 @@ function AuditPagination({
   );
 }
 
-function AuditListSkeleton() {
+function AuditListSkeleton({ plane }: { plane: PortalAuditPlane }) {
+  const columnCount = AUDIT_PLANE_PRESENTATION[plane].columns.length;
+
   return (
     <div aria-hidden="true" className="portal-audit__table-wrap">
-      <Table className="portal-audit__table">
+      <Table className={`portal-audit__table portal-audit__table--${plane}`}>
         <TableHeader>
           <TableRow>
-            {Array.from({ length: 7 }, (_, index) => (
+            {Array.from({ length: columnCount }, (_, index) => (
               <TableHead key={index}>
                 <Skeleton as="span" />
               </TableHead>
@@ -636,7 +871,7 @@ function AuditListSkeleton() {
         <TableBody>
           {Array.from({ length: 5 }, (_, rowIndex) => (
             <TableRow className="portal-audit__table-row" key={rowIndex}>
-              {Array.from({ length: 7 }, (_, cellIndex) => (
+              {Array.from({ length: columnCount }, (_, cellIndex) => (
                 <TableCell data-label="" key={cellIndex}>
                   <Skeleton as="span" />
                 </TableCell>
@@ -652,14 +887,18 @@ function AuditListSkeleton() {
 function AuditUnavailable({
   error,
   onRetry,
+  plane,
 }: {
   error: AuditApiErrorKind;
   onRetry: () => void;
+  plane: PortalAuditPlane;
 }) {
+  const activityLabel = `${PLANE_LABELS[plane]} activity`;
+
   return (
     <div className="portal-audit__state" role="status">
-      <h2>Audit activity is unavailable right now.</h2>
-      <p>{readErrorMessage(error, "audit activity")}</p>
+      <h2>{activityLabel} is unavailable right now.</h2>
+      <p>{readErrorMessage(error, activityLabel.toLowerCase())}</p>
       <Button onClick={onRetry} type="button" variant="outline">
         <RefreshCw aria-hidden="true" />
         Try again
@@ -682,7 +921,7 @@ function AuditAccessState({
     >
       <PortalPageHeader
         current="Audit trail"
-        description="Review technical activity visible to this account."
+        description="Review authorized audit activity visible to this account."
         headingId="portal-audit-heading"
         title="Audit trail"
       />
@@ -708,12 +947,26 @@ function AuditAccessState({
   );
 }
 
-function AuditWorkspace() {
+function AuditWorkspace({
+  auditPlanes,
+}: {
+  auditPlanes: readonly PortalAuditPlane[];
+}) {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const queryString = searchParams.toString();
-  const filters = useMemo(
-    () => parseFilters(new URLSearchParams(queryString)),
+  const rawPlane = useMemo(
+    () => new URLSearchParams(queryString).get("plane"),
     [queryString],
+  );
+  const selectedPlane = useMemo(
+    () => normalizeAuditPlane(rawPlane, auditPlanes),
+    [auditPlanes, rawPlane],
+  );
+  const plane = selectedPlane ?? PORTAL_AUDIT_PLANE_ORDER[0];
+  const filters = useMemo(
+    () => parseFilters(new URLSearchParams(queryString), plane),
+    [plane, queryString],
   );
   const [loadState, setLoadState] = useState<AuditLoadState>({ kind: "loading" });
   const [expandedId, setExpandedId] = useState<number | null>(null);
@@ -733,11 +986,30 @@ function AuditWorkspace() {
   }, []);
 
   useEffect(() => {
+    if (!selectedPlane || !queryString) return;
+
+    const params = new URLSearchParams(queryString);
+    const canonicalFilters = parseFilters(params, selectedPlane);
+    const canonicalPage = parsePage(params.get("page"));
+    const canonicalHref = auditHref(
+      selectedPlane,
+      canonicalFilters,
+      canonicalPage,
+    );
+    const currentHref = `/portal/audit?${queryString}`;
+    if (canonicalHref !== currentHref) {
+      router.replace(canonicalHref, { scroll: false });
+    }
+  }, [queryString, router, selectedPlane]);
+
+  useEffect(() => {
     const controller = new AbortController();
     listRequestRef.current?.abort();
     detailRequestRef.current?.abort();
     const requestParams = new URLSearchParams(queryString);
-    const requestFilters = parseFilters(requestParams);
+    const requestPlane =
+      normalizeAuditPlane(requestParams.get("plane"), auditPlanes) ?? plane;
+    const requestFilters = parseFilters(requestParams, requestPlane);
     const requestPage = parsePage(requestParams.get("page"));
 
     void Promise.resolve()
@@ -746,7 +1018,12 @@ function AuditWorkspace() {
         setLoadState({ kind: "loading" });
         setExpandedId(null);
         setDetailState({ kind: "idle" });
-        return getPortalAuditEntries(requestPage, requestFilters, controller.signal);
+        return getPortalAuditEntries(
+          requestPlane,
+          requestPage,
+          requestFilters,
+          controller.signal,
+        );
       })
       .then((page) => {
         if (page && mountedRef.current && !controller.signal.aborted) {
@@ -765,7 +1042,7 @@ function AuditWorkspace() {
 
     listRequestRef.current = controller;
     return () => controller.abort();
-  }, [queryString, reloadKey]);
+  }, [auditPlanes, plane, queryString, reloadKey]);
 
   const loadDetail = (entryId: number) => {
     detailRequestRef.current?.abort();
@@ -773,7 +1050,7 @@ function AuditWorkspace() {
     detailRequestRef.current = controller;
     setDetailState({ kind: "loading", entryId });
 
-    void getPortalAuditEntryDetail(entryId, controller.signal)
+    void getPortalAuditEntryDetail(entryId, plane, controller.signal)
       .then((entry) => {
         if (mountedRef.current && !controller.signal.aborted) {
           setDetailState({ kind: "ready", entryId, entry });
@@ -809,42 +1086,62 @@ function AuditWorkspace() {
   };
 
   const page = loadState.kind === "ready" ? loadState.page : null;
+  const planeLabel = PLANE_LABELS[plane];
+  const presentation = AUDIT_PLANE_PRESENTATION[plane];
+  const planeMenuItems = orderedAuditPlanes(auditPlanes).map((item) => ({
+    href: auditHref(item, { ...filters, eventCategory: null }),
+    label: PLANE_LABELS[item],
+    value: item,
+  }));
 
   return (
     <section aria-labelledby="portal-audit-heading" className="portal-audit">
       <PortalPageHeader
+        actions={
+          planeMenuItems.length > 1 ? (
+            <PortalViewMenu
+              activeValue={plane}
+              ariaLabel="Audit plane"
+              items={planeMenuItems}
+              label="Plane"
+            />
+          ) : undefined
+        }
         current="Audit trail"
-        description="Review technical activity visible to this account."
+        description={presentation.description}
         headingId="portal-audit-heading"
         title="Audit trail"
       />
-      <AuditFilters filters={filters} />
+      <AuditFilters filters={filters} plane={plane} />
       <PortalCollectionFrame
         aria-busy={loadState.kind === "loading"}
         className="portal-audit__frame"
       >
-        {loadState.kind === "loading" ? <AuditListSkeleton /> : null}
+        {loadState.kind === "loading" ? (
+          <AuditListSkeleton plane={plane} />
+        ) : null}
         {loadState.kind === "unavailable" ? (
           <AuditUnavailable
             error={loadState.error}
             onRetry={() => setReloadKey((value) => value + 1)}
+            plane={plane}
           />
         ) : null}
         {page && page.items.length > 0 ? (
           <div className="portal-audit__table-wrap">
-            <Table className="portal-audit__table">
+            <Table
+              className={`portal-audit__table portal-audit__table--${plane}`}
+            >
               <caption className="portal-audit__table-caption">
-                Technical audit activity
+                {planeLabel} audit activity
               </caption>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Severity</TableHead>
-                  <TableHead>Action</TableHead>
-                  <TableHead>Event category</TableHead>
-                  <TableHead>Source</TableHead>
-                  <TableHead>Target model</TableHead>
-                  <TableHead>Actor role</TableHead>
-                  <TableHead>Created</TableHead>
+                  {presentation.columns.map((column) => (
+                    <TableHead key={column}>
+                      {auditColumnLabel(plane, column)}
+                    </TableHead>
+                  ))}
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -861,6 +1158,7 @@ function AuditWorkspace() {
                     key={entry.id}
                     onRetry={() => handleRetryDetail(entry.id)}
                     onToggle={() => handleToggle(entry)}
+                    plane={plane}
                   />
                 ))}
               </TableBody>
@@ -869,13 +1167,14 @@ function AuditWorkspace() {
         ) : null}
         {page && page.items.length === 0 ? (
           <div className="portal-audit__empty" role="status">
-            <h2>No technical audit activity to show.</h2>
+            <h2>No {planeLabel.toLowerCase()} audit activity to show.</h2>
             <p>Try changing the filters or check back after more activity is recorded.</p>
           </div>
         ) : null}
         {page ? (
           <AuditPagination
             filters={filters}
+            plane={plane}
             page={page.page}
             pageSize={page.page_size}
             total={page.total}
@@ -934,22 +1233,22 @@ export function PortalAuditLoading() {
         </div>
       </PortalFilterPanel>
       <PortalCollectionFrame className="portal-audit__frame">
-        <AuditListSkeleton />
+        <AuditListSkeleton plane="technical" />
       </PortalCollectionFrame>
     </section>
   );
 }
 
 export function PortalAuditPage() {
-  const { hasCapability, refreshAccess, status } = usePortalAccess();
+  const { auditPlanes, refreshAccess, status } = usePortalAccess();
 
   if (status === "loading") return <PortalAuditLoading />;
   if (status === "unavailable") {
     return <AuditAccessState kind="unavailable" onRetry={() => void refreshAccess()} />;
   }
-  if (!hasCapability(PORTAL_CAPABILITIES.auditView)) {
+  if (auditPlanes.length === 0) {
     return <AuditAccessState kind="forbidden" />;
   }
 
-  return <AuditWorkspace />;
+  return <AuditWorkspace auditPlanes={auditPlanes} />;
 }

@@ -8,17 +8,25 @@ import {
   ScrollText,
   Settings2,
 } from "lucide-react";
+import type { AuthorityMeProjectionSchemaAuditPlanesItem } from "@/lib/api/generated/model";
 
 export const PORTAL_CAPABILITIES = {
   backupsOperate: "backups.operate",
   backupsView: "backups.view",
-  auditView: "audit.view",
   notificationsDeliveryOperate: "notifications.delivery.operate",
   restoresOperate: "restores.operate",
   systemErrorsView: "system.errors.view",
   systemHealthView: "system.health.view",
   systemOperationsManage: "system.operations.manage",
 } as const;
+
+export type PortalAuditPlane = AuthorityMeProjectionSchemaAuditPlanesItem;
+
+export const PORTAL_AUDIT_PLANE_ORDER: readonly PortalAuditPlane[] = [
+  "technical",
+  "business",
+  "privacy",
+];
 
 export type PortalNavigationLink = {
   kind: "link";
@@ -27,6 +35,7 @@ export type PortalNavigationLink = {
   label: string;
   icon: LucideIcon;
   requiredCapability?: string;
+  requiresAuditAccess?: boolean;
 };
 
 export type PortalNavigationMenu = {
@@ -36,6 +45,7 @@ export type PortalNavigationMenu = {
   icon: LucideIcon;
   items: readonly PortalNavigationLink[];
   requiredCapability?: string;
+  requiresAuditAccess?: boolean;
 };
 
 export type PortalNavigationItem =
@@ -50,6 +60,7 @@ export type PortalSearchItem = {
   label: string;
   parentLabel?: string;
   requiredCapability?: string;
+  requiresAuditAccess?: boolean;
 };
 
 /**
@@ -110,7 +121,7 @@ export const PORTAL_NAVIGATION: readonly PortalNavigationItem[] = [
     href: "/portal/audit",
     label: "Audit trail",
     icon: ScrollText,
-    requiredCapability: PORTAL_CAPABILITIES.auditView,
+    requiresAuditAccess: true,
   },
 ];
 
@@ -316,23 +327,26 @@ const PORTAL_SEARCH_ADDITIONS: readonly PortalSearchItem[] = [
 function hasRequiredCapability(
   item: PortalNavigationItem | PortalNavigationLink,
   capabilities: readonly string[],
+  auditPlanes: readonly PortalAuditPlane[],
 ) {
   return (
-    !item.requiredCapability || capabilities.includes(item.requiredCapability)
+    (!item.requiredCapability || capabilities.includes(item.requiredCapability)) &&
+    (!item.requiresAuditAccess || auditPlanes.length > 0)
   );
 }
 
 export function getVisiblePortalNavigation(
   capabilities: readonly string[],
+  auditPlanes: readonly PortalAuditPlane[] = [],
 ): PortalNavigationItem[] {
   const visibleItems: PortalNavigationItem[] = [];
 
   for (const item of PORTAL_NAVIGATION) {
-    if (!hasRequiredCapability(item, capabilities)) continue;
+    if (!hasRequiredCapability(item, capabilities, auditPlanes)) continue;
 
     if (item.kind === "menu") {
       const visibleChildren = item.items.filter((child) =>
-        hasRequiredCapability(child, capabilities),
+        hasRequiredCapability(child, capabilities, auditPlanes),
       );
       if (visibleChildren.length === 0) continue;
       visibleItems.push({ ...item, items: visibleChildren });
@@ -354,6 +368,7 @@ function navigationSearchItems(item: PortalNavigationItem): PortalSearchItem[] {
         id: item.id,
         label: item.label,
         requiredCapability: item.requiredCapability,
+        requiresAuditAccess: item.requiresAuditAccess,
       },
     ];
   }
@@ -365,11 +380,13 @@ function navigationSearchItems(item: PortalNavigationItem): PortalSearchItem[] {
     label: child.label,
     parentLabel: item.label,
     requiredCapability: child.requiredCapability ?? item.requiredCapability,
+    requiresAuditAccess: child.requiresAuditAccess ?? item.requiresAuditAccess,
   }));
 }
 
 export function getVisiblePortalSearchItems(
   capabilities: readonly string[],
+  auditPlanes: readonly PortalAuditPlane[] = [],
 ): PortalSearchItem[] {
   const items = PORTAL_NAVIGATION.flatMap(navigationSearchItems).concat(
     PORTAL_SEARCH_ADDITIONS,
@@ -377,7 +394,8 @@ export function getVisiblePortalSearchItems(
 
   return items.filter(
     (item) =>
-      !item.requiredCapability || capabilities.includes(item.requiredCapability),
+      (!item.requiredCapability || capabilities.includes(item.requiredCapability)) &&
+      (!item.requiresAuditAccess || auditPlanes.length > 0),
   );
 }
 

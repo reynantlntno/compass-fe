@@ -624,15 +624,20 @@ export function PortalShell({
   onSignOut: () => Promise<void>;
 }) {
   const { user } = useAuthSession();
-  const { status: accessStatus, capabilities } = usePortalAccess();
+  const {
+    auditPlanes,
+    status: accessStatus,
+    capabilities,
+  } = usePortalAccess();
   const [dockCollapsed, setDockCollapsed] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
   const visibleNavigation = useMemo(
     () =>
       getVisiblePortalNavigation(
         accessStatus === "ready" ? capabilities : [],
+        accessStatus === "ready" ? auditPlanes : [],
       ),
-    [accessStatus, capabilities],
+    [accessStatus, auditPlanes, capabilities],
   );
   const mobileDirectNavigation = visibleNavigation.slice(
     0,
@@ -645,8 +650,9 @@ export function PortalShell({
     () =>
       getVisiblePortalSearchItems(
         accessStatus === "ready" ? capabilities : [],
+        accessStatus === "ready" ? auditPlanes : [],
       ),
-    [accessStatus, capabilities],
+    [accessStatus, auditPlanes, capabilities],
   );
 
   useEffect(() => {

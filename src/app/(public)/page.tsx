@@ -11,6 +11,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 import { HomepageCharacter } from "@/components/public/homepage-character";
+import { HomepageAccountAction } from "@/components/public/homepage-account-action";
 import { PaperSheet } from "@/components/public/paper-sheet";
 import { StickyNote } from "@/components/public/sticky-note";
 import { getPublicBranding } from "@/lib/branding";
@@ -190,14 +191,15 @@ export default async function Home() {
               Start with what is available here, or reach the {branding.officeName} directly
               if you are not sure where to begin.
             </p>
-            {actions.length > 0 ? (
-              <div className="homepage-hero__actions">
-                <a className="homepage-primary-action" href="#start-here">
+            <div className="homepage-hero__actions">
+              <HomepageAccountAction />
+              {actions.length > 0 ? (
+                <a className="homepage-secondary-action" href="#start-here">
                   Start here
                   <ArrowDown aria-hidden="true" />
                 </a>
-              </div>
-            ) : null}
+              ) : null}
+            </div>
           </div>
           <div className="homepage-hero__art">
             <Image

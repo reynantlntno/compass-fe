@@ -2254,6 +2254,46 @@
   height: 1rem;
 }
 
+.homepage-secondary-action {
+  display: inline-flex;
+  min-height: 2.9rem;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  border: 1px solid var(--compass-brand-maroon);
+  border-radius: var(--compass-radius-md);
+  padding: 0.75rem 1rem;
+  color: var(--compass-brand-maroon);
+  font-size: 0.88rem;
+  font-weight: var(--compass-weight-bold);
+  text-decoration: none;
+  transition:
+    background-color var(--compass-motion-fast) ease,
+    color var(--compass-motion-fast) ease,
+    border-color var(--compass-motion-fast) ease,
+    transform var(--compass-motion-fast) ease;
+}
+
+.homepage-secondary-action:hover {
+  background-color: color-mix(
+    in srgb,
+    var(--compass-surface-raised) 82%,
+    var(--compass-brand-maroon) 18%
+  );
+  color: var(--compass-brand-maroon-strong);
+}
+
+.homepage-secondary-action svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.homepage-primary-action:focus-visible,
+.homepage-secondary-action:focus-visible {
+  outline: 3px solid var(--compass-brand-gold);
+  outline-offset: 3px;
+}
+
 .homepage-hero__art {
   grid-area: art;
   display: flex;
@@ -2772,6 +2812,10 @@
     width: 100%;
   }
 
+  .homepage-secondary-action {
+    width: 100%;
+  }
+
   .homepage-notes-grid,
   .homepage-resources-grid,
   .homepage-actions-list,
@@ -2792,6 +2836,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .homepage-primary-action,
+  .homepage-secondary-action,
   .homepage-action,
   .homepage-action__icon,
   .homepage-sticky-note,
@@ -2855,6 +2900,7 @@
   }
 
   .homepage-primary-action,
+  .homepage-secondary-action,
   .homepage-action,
   .homepage-content-link,
   .homepage-content-title {
@@ -2863,6 +2909,10 @@
   }
 
   .homepage-primary-action {
+    background-color: Canvas;
+  }
+
+  .homepage-secondary-action {
     background-color: Canvas;
   }
 
