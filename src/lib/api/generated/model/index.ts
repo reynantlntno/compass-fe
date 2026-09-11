@@ -506,6 +506,8 @@ export * from './rollbackSchema';
 export * from './routineDocumentGenerateSchema';
 export * from './routineInterviewPageSchema';
 export * from './routineInterviewProjectionSchema';
+export * from './routineInterviewQueueProjectionSchema';
+export * from './routineInterviewSensitiveDetailSchema';
 export * from './rowCorrectionSchema';
 export * from './scheduleChangeResponseSchema';
 export * from './scheduleChangeSchema';

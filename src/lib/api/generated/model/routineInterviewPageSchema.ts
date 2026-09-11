@@ -5,10 +5,10 @@
  * The canonical backend API for COMPASS clients.
  * OpenAPI spec version: 1.0.0
  */
-import type { RoutineInterviewProjectionSchema } from './routineInterviewProjectionSchema';
+import type { RoutineInterviewQueueProjectionSchema } from './routineInterviewQueueProjectionSchema';
 
 export interface RoutineInterviewPageSchema {
-  items: RoutineInterviewProjectionSchema[];
+  items: RoutineInterviewQueueProjectionSchema[];
   page: number;
   page_size: number;
   total: number;

@@ -3793,6 +3793,14 @@
     gap: 0.75rem;
   }
 
+  .portal-home__operations-card-links {
+    display: flex;
+    min-width: 0;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.35rem 0.7rem;
+  }
+
   .portal-home__operations-card-header h3 {
     min-width: 0;
     margin: 0;
@@ -3808,6 +3816,10 @@
     flex: 0 0 auto;
     margin-top: 0;
     font-size: 0.7rem;
+  }
+
+  .portal-home__operations-card-header .portal-home__section-link--secondary {
+    color: var(--muted-foreground);
   }
 
   .portal-home__operations-facts {
@@ -3925,6 +3937,10 @@
     .portal-home__operations-card-header {
       flex-direction: column;
       gap: 0.5rem;
+    }
+
+    .portal-home__operations-card-links {
+      justify-content: flex-start;
     }
 
     .portal-home__operations-card-header .portal-home__section-link {
@@ -10700,6 +10716,10 @@
     grid-column: span 2;
   }
 
+  .portal-counseling__routine-filters-grid {
+    grid-template-columns: minmax(12rem, 24rem);
+  }
+
   .portal-counseling__filter-field label,
   .portal-counseling__dialog-field label {
     color: var(--compass-brand-maroon-strong);
@@ -10926,6 +10946,34 @@
     white-space: pre-wrap;
   }
 
+  .portal-counseling__routine-sensitive {
+    margin-top: 1rem;
+    padding: 0.85rem 0.8rem 0.1rem 1rem;
+    border-left: 0.25rem solid var(--compass-brand-gold);
+  }
+
+  .portal-counseling__routine-sensitive .portal-counseling__kicker {
+    margin-bottom: 0.7rem;
+  }
+
+  .portal-counseling__routine-sensitive dl {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.75rem 1rem;
+    margin: 0;
+  }
+
+  .portal-counseling__routine-sensitive > p:last-child {
+    margin: 0 0 0.8rem;
+    color: var(--muted-foreground);
+    line-height: 1.45;
+  }
+
+  .portal-counseling__routine-table [data-slot="badge"] {
+    max-width: 100%;
+    white-space: normal;
+  }
+
   .portal-counseling__detail-state {
     display: flex;
     flex-wrap: wrap;
@@ -11098,6 +11146,10 @@
     .portal-counseling__detail-content dl {
       grid-template-columns: repeat(2, minmax(0, 1fr));
     }
+
+    .portal-counseling__routine-sensitive dl {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
   }
 
   @media (max-width: 48rem) {
@@ -11237,6 +11289,10 @@
       grid-template-columns: 1fr;
     }
 
+    .portal-counseling__routine-sensitive dl {
+      grid-template-columns: 1fr;
+    }
+
     .portal-counseling__empty,
     .portal-counseling__frame--state {
       padding-inline: 0.25rem;
@@ -11279,6 +11335,7 @@
     .portal-counseling__filter-actions [data-slot="button"],
     .portal-counseling__detail-content,
     .portal-counseling__detail-state,
+    .portal-counseling__routine-sensitive,
     .portal-counseling__mutation {
       border-color: CanvasText;
       background: Canvas;

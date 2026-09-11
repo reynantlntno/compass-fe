@@ -44,6 +44,7 @@ import { PortalPageHeader } from "@/components/portal/portal-page-header";
 import { PORTAL_CAPABILITIES } from "@/components/portal/portal-navigation";
 import { PortalStatusFilter } from "@/components/portal/portal-status-filter";
 import { PortalWorkspaceNav } from "@/components/portal/portal-workspace-nav";
+import { RoutineInterviewsView } from "@/components/portal/portal-routine-interviews";
 import {
   COUNSELING_SESSION_ASSIGNMENTS,
   COUNSELING_SESSION_MODES,
@@ -72,6 +73,10 @@ import {
   type PortalCounselingSessionPage,
 } from "@/lib/api/counseling";
 import { createIdempotencyKey, type IdempotencyKey } from "@/lib/api/idempotency";
+import {
+  parseRoutineInterviewStatuses,
+  routineInterviewHref,
+} from "@/lib/api/routine-interviews";
 
 type ParsedFilters = CounselingListFilters & { statuses: CounselingSessionStatus[] };
 
@@ -152,6 +157,7 @@ const MAX_QUERY_LENGTH = 120;
 
 const NAV_ITEMS = [
   { href: "/portal/counseling?section=sessions", label: "Sessions", value: "sessions" },
+  { href: "/portal/counseling?section=routine-interviews", label: "Routine interviews", value: "routine-interviews" },
 ] as const;
 
 function isAbortError(error: unknown) {
@@ -353,14 +359,15 @@ function CounselingFilterPanel({ filters }: { filters: ParsedFilters }) {
   );
 }
 
-function CounselingLoadingState() {
+function CounselingLoadingState({ section = "sessions" }: { section?: "sessions" | "routine-interviews" }) {
+  const isRoutine = section === "routine-interviews";
   return (
     <section aria-busy="true" aria-labelledby="portal-counseling-loading-heading" className="portal-counseling portal-counseling--loading" role="status">
-      <span className="sr-only">Loading counseling sessions…</span>
+      <span className="sr-only">Loading {isRoutine ? "routine interviews" : "counseling sessions"}…</span>
       <CounselingHeader title="Counseling" />
       <div className="portal-counseling__workspace">
-        <div aria-hidden="true" className="compass-surface portal-workspace-nav portal-counseling__nav-skeleton" data-tone="subtle"><Skeleton className="portal-counseling__nav-skeleton-line" /></div>
-        <div className="portal-counseling__content-skeleton"><PortalFilterPanel action="/portal/counseling?section=sessions" ariaBusy className="portal-counseling__filters" resetKey="counseling-loading" summary={<Skeleton as="span" aria-hidden="true" className="portal-counseling__skeleton-summary" />}><div aria-hidden="true" className="portal-counseling__filter-skeleton-grid">{Array.from({ length: 9 }, (_, index) => <Skeleton as="span" key={index} />)}</div></PortalFilterPanel><PortalCollectionFrame className="portal-counseling__frame"><div aria-hidden="true" className="portal-counseling__table-skeleton">{Array.from({ length: 5 }, (_, row) => <div className="portal-counseling__table-skeleton-row" key={row}>{Array.from({ length: 8 }, (_, cell) => <Skeleton as="span" key={cell} />)}</div>)}</div></PortalCollectionFrame></div>
+        <div aria-hidden="true" className="compass-surface portal-workspace-nav portal-counseling__nav-skeleton" data-tone="subtle">{Array.from({ length: 2 }, (_, index) => <Skeleton className="portal-counseling__nav-skeleton-line" key={index} />)}</div>
+        <div className="portal-counseling__content-skeleton"><PortalFilterPanel action={isRoutine ? "/portal/counseling?section=routine-interviews" : "/portal/counseling?section=sessions"} ariaBusy className="portal-counseling__filters" resetKey="counseling-loading" summary={<Skeleton as="span" aria-hidden="true" className="portal-counseling__skeleton-summary" />}><div aria-hidden="true" className="portal-counseling__filter-skeleton-grid">{Array.from({ length: isRoutine ? 1 : 9 }, (_, index) => <Skeleton as="span" key={index} />)}</div></PortalFilterPanel><PortalCollectionFrame className="portal-counseling__frame"><div aria-hidden="true" className="portal-counseling__table-skeleton">{Array.from({ length: 5 }, (_, row) => <div className="portal-counseling__table-skeleton-row" key={row}>{Array.from({ length: isRoutine ? 6 : 8 }, (_, cell) => <Skeleton as="span" key={cell} />)}</div>)}</div></PortalCollectionFrame></div>
       </div>
     </section>
   );
@@ -446,9 +453,11 @@ export function PortalCounselingPage() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const rawQuery = searchParams.toString();
+  const section = searchParams.get("section") === "routine-interviews" ? "routine-interviews" : "sessions";
   const filters = useMemo(() => parseFilters(searchParams), [searchParams]);
+  const routineStatuses = useMemo(() => parseRoutineInterviewStatuses(searchParams.get("status")), [searchParams]);
   const pageNumber = parsePage(searchParams.get("page"));
-  const canonicalHref = sessionHref(pageNumber, filters);
+  const canonicalHref = section === "routine-interviews" ? routineInterviewHref(pageNumber, routineStatuses) : sessionHref(pageNumber, filters);
   const canonicalQuery = canonicalHref.split("?")[1] ?? "";
   const [loadState, setLoadState] = useState<LoadState>({ kind: "loading" });
   const [reloadKey, setReloadKey] = useState(0);
@@ -461,14 +470,14 @@ export function PortalCounselingPage() {
   const [mutation, setMutation] = useState<MutationState | null>(null);
   const mutationKeysRef = useRef<Map<string, MutationKeyEntry>>(new Map());
   const canQueue = accessStatus === "ready" && hasCapability(PORTAL_CAPABILITIES.counselingSessionsQueueView);
-  const queryKey = `${rawQuery}:${reloadKey}:${canQueue}`;
+  const queryKey = `${rawQuery}:${reloadKey}:${canQueue}:${section}`;
 
   useEffect(() => {
     if (rawQuery !== canonicalQuery) router.replace(canonicalHref, { scroll: false });
   }, [canonicalHref, canonicalQuery, rawQuery, router]);
 
   useEffect(() => {
-    if (!canQueue) return;
+    if (!canQueue || section !== "sessions") return;
     const controller = new AbortController();
     let active = true;
     void Promise.resolve().then(() => {
@@ -485,7 +494,7 @@ export function PortalCounselingPage() {
       else setLoadState({ kind: "unavailable", error: error instanceof CounselingApiError && (error.kind === "rate_limited" || error.kind === "validation") ? error.kind : "unavailable" });
     });
     return () => { active = false; controller.abort(); };
-  }, [canQueue, filters, pageNumber, queryKey]);
+  }, [canQueue, filters, pageNumber, queryKey, section]);
 
   const getMutationKey = (scope: string, fingerprint: string) => {
     const existing = mutationKeysRef.current.get(scope);
@@ -552,9 +561,10 @@ export function PortalCounselingPage() {
     void getPortalCounselingSessionDetail(session.reference_code).then((detail) => setDetails((current) => ({ ...current, [session.reference_code]: { kind: "ready", session: detail } }))).catch(() => setDetails((current) => ({ ...current, [session.reference_code]: { kind: "error" } })));
   };
 
-  if (accessStatus === "loading") return <CounselingLoadingState />;
+  if (accessStatus === "loading") return <CounselingLoadingState section={section} />;
   if (accessStatus === "unavailable") return <CounselingAccessState kind="unavailable" onRetry={() => void refreshAccess()} />;
   if (!canQueue) return <CounselingAccessState kind="forbidden" />;
+  if (section === "routine-interviews") return <RoutineInterviewsView hasCapability={hasCapability} />;
   if (loadState.kind === "loading") return <CounselingLoadingState />;
   if (loadState.kind === "forbidden") return <CounselingAccessState kind="forbidden" />;
   if (loadState.kind === "unavailable") return <section aria-labelledby="portal-counseling-heading" className="portal-counseling portal-counseling--state"><CounselingHeader /><CounselingFilterPanel filters={filters} /><PortalCollectionFrame className="portal-counseling__frame portal-counseling__frame--state"><h2>{loadMessage(loadState.error)}</h2><p>Try again when the connection is ready.</p><Button onClick={() => setReloadKey((value) => value + 1)} type="button" variant="outline"><RefreshCw aria-hidden="true" />Try again</Button></PortalCollectionFrame></section>;
@@ -563,7 +573,7 @@ export function PortalCounselingPage() {
   return <section aria-labelledby="portal-counseling-heading" className="portal-counseling">
     <CounselingHeader />
     <div className="portal-counseling__workspace">
-      <PortalWorkspaceNav activeValue="sessions" ariaLabel="Counseling sections" items={NAV_ITEMS} />
+      <PortalWorkspaceNav activeValue={section} ariaLabel="Counseling sections" items={NAV_ITEMS} />
       <div className="portal-counseling__active-content">
         <CounselingFilterPanel filters={filters} />
         <PortalCollectionFrame aria-labelledby="portal-counseling-results-heading" className="portal-counseling__frame">

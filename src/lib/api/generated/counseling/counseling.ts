@@ -51,6 +51,7 @@ import type {
   RoutineDocumentGenerateSchema,
   RoutineInterviewPageSchema,
   RoutineInterviewProjectionSchema,
+  RoutineInterviewSensitiveDetailSchema,
   SessionCreateSchema,
   TranscriptMetadataSchema,
   TranscriptionStatusSchema,
@@ -3857,6 +3858,98 @@ export const getCounselingRoutineInterviewsDocumentPreviewUrl = (referenceCode: 
 export const counselingRoutineInterviewsDocumentPreview = async (referenceCode: string, options?: Parameters<typeof compassFetch>[1]): Promise<counselingRoutineInterviewsDocumentPreviewResponse> => {
 
   return compassFetch<counselingRoutineInterviewsDocumentPreviewResponse>(getCounselingRoutineInterviewsDocumentPreviewUrl(referenceCode),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+export type counselingRoutineInterviewSensitiveDetailResponse200 = {
+  data: RoutineInterviewSensitiveDetailSchema
+  status: 200
+}
+
+export type counselingRoutineInterviewSensitiveDetailResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type counselingRoutineInterviewSensitiveDetailResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type counselingRoutineInterviewSensitiveDetailResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type counselingRoutineInterviewSensitiveDetailResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type counselingRoutineInterviewSensitiveDetailResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type counselingRoutineInterviewSensitiveDetailResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type counselingRoutineInterviewSensitiveDetailResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type counselingRoutineInterviewSensitiveDetailResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type counselingRoutineInterviewSensitiveDetailResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type counselingRoutineInterviewSensitiveDetailResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type counselingRoutineInterviewSensitiveDetailResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type counselingRoutineInterviewSensitiveDetailResponseSuccess = (counselingRoutineInterviewSensitiveDetailResponse200) & {
+  headers: Record<string, string>;
+};
+export type counselingRoutineInterviewSensitiveDetailResponseError = (counselingRoutineInterviewSensitiveDetailResponse400 | counselingRoutineInterviewSensitiveDetailResponse401 | counselingRoutineInterviewSensitiveDetailResponse403 | counselingRoutineInterviewSensitiveDetailResponse404 | counselingRoutineInterviewSensitiveDetailResponse405 | counselingRoutineInterviewSensitiveDetailResponse409 | counselingRoutineInterviewSensitiveDetailResponse413 | counselingRoutineInterviewSensitiveDetailResponse422 | counselingRoutineInterviewSensitiveDetailResponse429 | counselingRoutineInterviewSensitiveDetailResponse500 | counselingRoutineInterviewSensitiveDetailResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type counselingRoutineInterviewSensitiveDetailResponse = (counselingRoutineInterviewSensitiveDetailResponseSuccess | counselingRoutineInterviewSensitiveDetailResponseError)
+
+export const getCounselingRoutineInterviewSensitiveDetailUrl = (referenceCode: string,) => {
+
+
+
+
+  return `/api/v1/counseling/routine-interviews/${referenceCode}/sensitive/`
+}
+
+/**
+ * @summary Routine Interview Sensitive Detail
+ */
+export const counselingRoutineInterviewSensitiveDetail = async (referenceCode: string, options?: Parameters<typeof compassFetch>[1]): Promise<counselingRoutineInterviewSensitiveDetailResponse> => {
+
+  return compassFetch<counselingRoutineInterviewSensitiveDetailResponse>(getCounselingRoutineInterviewSensitiveDetailUrl(referenceCode),
   {
     ...options,
     method: 'GET'

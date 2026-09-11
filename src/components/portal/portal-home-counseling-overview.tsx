@@ -183,9 +183,16 @@ export function PortalHomeCounselingOverview() {
     >
       <div className="portal-home__operations-card-header">
         <h3 id="portal-home-counseling-heading">Counseling work</h3>
-        <Link className="portal-home__section-link" href="/portal/counseling?section=sessions">
-          <span>Open sessions</span><ArrowRight aria-hidden="true" />
-        </Link>
+        <div className="portal-home__operations-card-links">
+          <Link className="portal-home__section-link" href="/portal/counseling?section=sessions">
+            <span>Open sessions</span><ArrowRight aria-hidden="true" />
+          </Link>
+          {routine.state.kind === "ready" && routine.state.count > 0 ? (
+            <Link className="portal-home__section-link portal-home__section-link--secondary" href="/portal/counseling?section=routine-interviews&status=INTAKE_SUBMITTED">
+              <span>Review interviews</span><ArrowRight aria-hidden="true" />
+            </Link>
+          ) : null}
+        </div>
       </div>
       <dl className="portal-home__operations-facts">
         <CounselingFact label="Next session">
