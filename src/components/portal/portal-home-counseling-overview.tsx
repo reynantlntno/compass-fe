@@ -160,6 +160,7 @@ function formatSchedule(session: PortalCounselingSessionPage["items"][number] | 
 export function PortalHomeCounselingOverview() {
   const { hasCapability, status: accessStatus } = usePortalAccess();
   const canQueue = accessStatus === "ready" && hasCapability(PORTAL_CAPABILITIES.counselingSessionsQueueView);
+  const canReviewUrgentSupport = accessStatus === "ready" && hasCapability(PORTAL_CAPABILITIES.urgentSupportQueueReview);
   const nextLoader = useMemo(
     () => (signal: AbortSignal) => getPortalCounselingSessions(1, { status: ACTIVE_SESSION_STATUSES, order: "upcoming" }, signal),
     [],
@@ -187,9 +188,23 @@ export function PortalHomeCounselingOverview() {
           <Link className="portal-home__section-link" href="/portal/counseling?section=sessions">
             <span>Open sessions</span><ArrowRight aria-hidden="true" />
           </Link>
+          {nextSource.state.kind === "ready" && nextSource.state.page.items[0] ? (
+            <Link className="portal-home__section-link portal-home__section-link--secondary" href={`/portal/counseling/sessions/${encodeURIComponent(nextSource.state.page.items[0].reference_code)}`}>
+              <span>Open next session</span><ArrowRight aria-hidden="true" />
+            </Link>
+          ) : null}
           {routine.state.kind === "ready" && routine.state.count > 0 ? (
             <Link className="portal-home__section-link portal-home__section-link--secondary" href="/portal/counseling?section=routine-interviews&status=INTAKE_SUBMITTED">
               <span>Review interviews</span><ArrowRight aria-hidden="true" />
+            </Link>
+          ) : (
+            <Link className="portal-home__section-link portal-home__section-link--secondary" href="/portal/counseling?section=routine-interviews">
+              <span>Open routine interviews</span><ArrowRight aria-hidden="true" />
+            </Link>
+          )}
+          {canReviewUrgentSupport ? (
+            <Link className="portal-home__section-link portal-home__section-link--secondary" href="/portal/counseling?section=urgent-support">
+              <span>Review urgent support</span><ArrowRight aria-hidden="true" />
             </Link>
           ) : null}
         </div>

@@ -8,6 +8,7 @@
 
 export interface UrgentTriageSchema {
   assigned_counselor?: number | null;
+  counselor_selection_token?: string | null;
   scheduled_end_at?: string | null;
   scheduled_start_at?: string | null;
   session_mode?: string;

@@ -5,10 +5,10 @@
  * The canonical backend API for COMPASS clients.
  * OpenAPI spec version: 1.0.0
  */
-import type { UrgentSupportQueueProjectionSchema } from './urgentSupportQueueProjectionSchema';
+import type { UrgentSupportCounselorOptionSchema } from './urgentSupportCounselorOptionSchema';
 
-export interface UrgentSupportPageSchema {
-  items: UrgentSupportQueueProjectionSchema[];
+export interface UrgentSupportCounselorOptionPageSchema {
+  items: UrgentSupportCounselorOptionSchema[];
   page: number;
   page_size: number;
   total: number;

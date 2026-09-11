@@ -22,6 +22,10 @@ export const PORTAL_CAPABILITIES = {
   counselingRoutineReopen: "routine_interviews.reopen",
   counselingCasesClose: "counseling_cases.close",
   counselingCasesReopen: "counseling_cases.reopen",
+  urgentSupportQueueReview: "urgent_support.queue.review",
+  urgentSupportAssign: "urgent_support.assign",
+  urgentSupportLifecycleManage: "urgent_support.lifecycle.manage",
+  urgentSupportTemporaryAccessManage: "urgent_support.temporary_access.manage",
   appointmentsReview: "appointments.review",
   appointmentsSchedule: "appointments.schedule",
   appointmentsCancel: "appointments.cancel",
@@ -48,6 +52,7 @@ export type PortalNavigationLink = {
   icon: LucideIcon;
   keywords?: readonly string[];
   requiredCapability?: string;
+  requiredCapabilitiesAny?: readonly string[];
   requiresAuditAccess?: boolean;
 };
 
@@ -58,6 +63,7 @@ export type PortalNavigationMenu = {
   icon: LucideIcon;
   items: readonly PortalNavigationLink[];
   requiredCapability?: string;
+  requiredCapabilitiesAny?: readonly string[];
   requiresAuditAccess?: boolean;
 };
 
@@ -73,6 +79,7 @@ export type PortalSearchItem = {
   label: string;
   parentLabel?: string;
   requiredCapability?: string;
+  requiredCapabilitiesAny?: readonly string[];
   requiresAuditAccess?: boolean;
 };
 
@@ -112,7 +119,10 @@ export const PORTAL_NAVIGATION: readonly PortalNavigationItem[] = [
     label: "Counseling",
     icon: HeartHandshake,
     keywords: ["sessions", "routine interview", "e-counseling"],
-    requiredCapability: PORTAL_CAPABILITIES.counselingSessionsQueueView,
+    requiredCapabilitiesAny: [
+      PORTAL_CAPABILITIES.counselingSessionsQueueView,
+      PORTAL_CAPABILITIES.urgentSupportQueueReview,
+    ],
   },
   {
     kind: "link",
@@ -183,6 +193,15 @@ const PORTAL_SEARCH_ADDITIONS: readonly PortalSearchItem[] = [
     label: "Cases",
     parentLabel: "Counseling",
     requiredCapability: PORTAL_CAPABILITIES.counselingSessionsQueueView,
+  },
+  {
+    group: "section",
+    href: "/portal/counseling?section=urgent-support",
+    id: "counseling-urgent-support",
+    keywords: ["triage", "urgent", "review", "temporary access"],
+    label: "Urgent support",
+    parentLabel: "Counseling",
+    requiredCapability: PORTAL_CAPABILITIES.urgentSupportQueueReview,
   },
   {
     group: "destination",
@@ -383,12 +402,16 @@ const PORTAL_SEARCH_ADDITIONS: readonly PortalSearchItem[] = [
 ];
 
 function hasRequiredCapability(
-  item: PortalNavigationItem | PortalNavigationLink,
+  item: PortalNavigationItem | PortalNavigationLink | PortalSearchItem,
   capabilities: readonly string[],
   auditPlanes: readonly PortalAuditPlane[],
 ) {
+  const hasAnyRequiredCapability =
+    !item.requiredCapabilitiesAny ||
+    item.requiredCapabilitiesAny.some((capability) => capabilities.includes(capability));
   return (
     (!item.requiredCapability || capabilities.includes(item.requiredCapability)) &&
+    hasAnyRequiredCapability &&
     (!item.requiresAuditAccess || auditPlanes.length > 0)
   );
 }
@@ -427,6 +450,7 @@ function navigationSearchItems(item: PortalNavigationItem): PortalSearchItem[] {
         keywords: item.keywords,
         label: item.label,
         requiredCapability: item.requiredCapability,
+        requiredCapabilitiesAny: item.requiredCapabilitiesAny,
         requiresAuditAccess: item.requiresAuditAccess,
       },
     ];
@@ -439,6 +463,7 @@ function navigationSearchItems(item: PortalNavigationItem): PortalSearchItem[] {
     label: child.label,
     parentLabel: item.label,
     requiredCapability: child.requiredCapability ?? item.requiredCapability,
+    requiredCapabilitiesAny: child.requiredCapabilitiesAny ?? item.requiredCapabilitiesAny,
     requiresAuditAccess: child.requiresAuditAccess ?? item.requiresAuditAccess,
   }));
 }
@@ -452,9 +477,7 @@ export function getVisiblePortalSearchItems(
   );
 
   return items.filter(
-    (item) =>
-      (!item.requiredCapability || capabilities.includes(item.requiredCapability)) &&
-      (!item.requiresAuditAccess || auditPlanes.length > 0),
+    (item) => hasRequiredCapability(item, capabilities, auditPlanes),
   );
 }
 

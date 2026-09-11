@@ -6,10 +6,12 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export interface AccessGrantSchema {
-  expires_at?: string | null;
+export interface UrgentSupportAccessGrantProjectionSchema {
+  display_name: string;
+  expires_at: string;
   grant_type: string;
-  grantee_id?: number | null;
-  grantee_selection_token?: string | null;
   purpose_code: string;
+  selection_token: string;
+  starts_at: string;
+  status: string;
 }

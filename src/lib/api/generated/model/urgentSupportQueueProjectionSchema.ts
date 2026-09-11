@@ -5,13 +5,11 @@
  * The canonical backend API for COMPASS clients.
  * OpenAPI spec version: 1.0.0
  */
-import type { UrgentSupportAccessGrantProjectionSchema } from './urgentSupportAccessGrantProjectionSchema';
 
 /**
- * Safe urgent-support detail projection.
+ * Bounded operational queue projection.
  */
-export interface UrgentSupportProjectionSchema {
-  active_access_grants?: UrgentSupportAccessGrantProjectionSchema[] | null;
+export interface UrgentSupportQueueProjectionSchema {
   assignment_state?: string | null;
   closed_at?: string | null;
   counseling_case_reference?: string | null;

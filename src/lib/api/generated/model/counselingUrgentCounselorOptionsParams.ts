@@ -6,7 +6,7 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export type CounselingUrgentListParams = {
+export type CounselingUrgentCounselorOptionsParams = {
 /**
  * @minimum 1
  */
@@ -17,16 +17,4 @@ page?: number;
  */
 page_size?: number;
 q?: string | null;
-status?: string | null;
-urgency_level?: string | null;
-source_type?: string | null;
-/**
- * @maxLength 20
- */
-assignment?: string;
-review_status?: string | null;
-/**
- * @maxLength 20
- */
-order?: string;
 };
