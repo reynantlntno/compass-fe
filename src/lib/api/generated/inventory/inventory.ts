@@ -16,6 +16,9 @@ import type {
   InventoryListParams,
   InventoryMutationResponseSchema,
   InventoryPageResultSchema,
+  InventoryQueueDetailSchema,
+  InventoryQueueListParams,
+  InventoryQueuePageResultSchema,
   InventorySnapshotSchema,
   ReopenSchema,
   SubmitSchema
@@ -216,6 +219,289 @@ return compassFetch<inventoryDraftCreateResponse>(getInventoryDraftCreateUrl(),
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
     body: JSON.stringify(draftCreateSchema)
+  }
+);}
+
+
+export type inventoryQueueListResponse200 = {
+  data: InventoryQueuePageResultSchema
+  status: 200
+}
+
+export type inventoryQueueListResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type inventoryQueueListResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type inventoryQueueListResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type inventoryQueueListResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type inventoryQueueListResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type inventoryQueueListResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type inventoryQueueListResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type inventoryQueueListResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type inventoryQueueListResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type inventoryQueueListResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type inventoryQueueListResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type inventoryQueueListResponseSuccess = (inventoryQueueListResponse200) & {
+  headers: Record<string, string>;
+};
+export type inventoryQueueListResponseError = (inventoryQueueListResponse400 | inventoryQueueListResponse401 | inventoryQueueListResponse403 | inventoryQueueListResponse404 | inventoryQueueListResponse405 | inventoryQueueListResponse409 | inventoryQueueListResponse413 | inventoryQueueListResponse422 | inventoryQueueListResponse429 | inventoryQueueListResponse500 | inventoryQueueListResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type inventoryQueueListResponse = (inventoryQueueListResponseSuccess | inventoryQueueListResponseError)
+
+export const getInventoryQueueListUrl = (params?: InventoryQueueListParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/inventory/queue/?${stringifiedParams}` : `/api/v1/inventory/queue/`
+}
+
+/**
+ * @summary List Inventory Queue
+ */
+export const inventoryQueueList = async (params?: InventoryQueueListParams, options?: Parameters<typeof compassFetch>[1]): Promise<inventoryQueueListResponse> => {
+
+  return compassFetch<inventoryQueueListResponse>(getInventoryQueueListUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+export type inventoryQueueDetailResponse200 = {
+  data: InventoryQueueDetailSchema
+  status: 200
+}
+
+export type inventoryQueueDetailResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type inventoryQueueDetailResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type inventoryQueueDetailResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type inventoryQueueDetailResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type inventoryQueueDetailResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type inventoryQueueDetailResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type inventoryQueueDetailResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type inventoryQueueDetailResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type inventoryQueueDetailResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type inventoryQueueDetailResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type inventoryQueueDetailResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type inventoryQueueDetailResponseSuccess = (inventoryQueueDetailResponse200) & {
+  headers: Record<string, string>;
+};
+export type inventoryQueueDetailResponseError = (inventoryQueueDetailResponse400 | inventoryQueueDetailResponse401 | inventoryQueueDetailResponse403 | inventoryQueueDetailResponse404 | inventoryQueueDetailResponse405 | inventoryQueueDetailResponse409 | inventoryQueueDetailResponse413 | inventoryQueueDetailResponse422 | inventoryQueueDetailResponse429 | inventoryQueueDetailResponse500 | inventoryQueueDetailResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type inventoryQueueDetailResponse = (inventoryQueueDetailResponseSuccess | inventoryQueueDetailResponseError)
+
+export const getInventoryQueueDetailUrl = (snapshotId: number,) => {
+
+
+
+
+  return `/api/v1/inventory/queue/${snapshotId}/`
+}
+
+/**
+ * @summary Inventory Queue Detail
+ */
+export const inventoryQueueDetail = async (snapshotId: number, options?: Parameters<typeof compassFetch>[1]): Promise<inventoryQueueDetailResponse> => {
+
+  return compassFetch<inventoryQueueDetailResponse>(getInventoryQueueDetailUrl(snapshotId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+export type inventoryQueueSensitiveDetailResponse200 = {
+  data: InventoryQueueDetailSchema
+  status: 200
+}
+
+export type inventoryQueueSensitiveDetailResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type inventoryQueueSensitiveDetailResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type inventoryQueueSensitiveDetailResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type inventoryQueueSensitiveDetailResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type inventoryQueueSensitiveDetailResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type inventoryQueueSensitiveDetailResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type inventoryQueueSensitiveDetailResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type inventoryQueueSensitiveDetailResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type inventoryQueueSensitiveDetailResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type inventoryQueueSensitiveDetailResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type inventoryQueueSensitiveDetailResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type inventoryQueueSensitiveDetailResponseSuccess = (inventoryQueueSensitiveDetailResponse200) & {
+  headers: Record<string, string>;
+};
+export type inventoryQueueSensitiveDetailResponseError = (inventoryQueueSensitiveDetailResponse400 | inventoryQueueSensitiveDetailResponse401 | inventoryQueueSensitiveDetailResponse403 | inventoryQueueSensitiveDetailResponse404 | inventoryQueueSensitiveDetailResponse405 | inventoryQueueSensitiveDetailResponse409 | inventoryQueueSensitiveDetailResponse413 | inventoryQueueSensitiveDetailResponse422 | inventoryQueueSensitiveDetailResponse429 | inventoryQueueSensitiveDetailResponse500 | inventoryQueueSensitiveDetailResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type inventoryQueueSensitiveDetailResponse = (inventoryQueueSensitiveDetailResponseSuccess | inventoryQueueSensitiveDetailResponseError)
+
+export const getInventoryQueueSensitiveDetailUrl = (snapshotId: number,) => {
+
+
+
+
+  return `/api/v1/inventory/queue/${snapshotId}/sensitive/`
+}
+
+/**
+ * @summary Inventory Queue Sensitive Detail
+ */
+export const inventoryQueueSensitiveDetail = async (snapshotId: number, options?: Parameters<typeof compassFetch>[1]): Promise<inventoryQueueSensitiveDetailResponse> => {
+
+  return compassFetch<inventoryQueueSensitiveDetailResponse>(getInventoryQueueSensitiveDetailUrl(snapshotId),
+  {
+    ...options,
+    method: 'GET'
+
+
   }
 );}
 

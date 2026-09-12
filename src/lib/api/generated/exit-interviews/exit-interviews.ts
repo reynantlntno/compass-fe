@@ -15,11 +15,14 @@ import type {
   ExitInterviewAssignmentPageSchema,
   ExitInterviewAssignmentSchema,
   ExitInterviewDetailSchema,
+  ExitInterviewQueueDetailSchema,
+  ExitInterviewQueuePageSchema,
   ExitInterviewResponsePageSchema,
   ExitInterviewResponseSchema,
   ExitInterviewStatusSchema,
   ExitInterviewsAssignmentsListParams,
   ExitInterviewsListParams,
+  ExitInterviewsQueueListParams,
   GeneratedDocumentMetadataSchema,
   LifecycleSchema,
   StartSchema
@@ -515,6 +518,289 @@ return compassFetch<exitInterviewsAssignmentReassignResponse>(getExitInterviewsA
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
     body: JSON.stringify(assignmentReassignSchema)
+  }
+);}
+
+
+export type exitInterviewsQueueListResponse200 = {
+  data: ExitInterviewQueuePageSchema
+  status: 200
+}
+
+export type exitInterviewsQueueListResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type exitInterviewsQueueListResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type exitInterviewsQueueListResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type exitInterviewsQueueListResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type exitInterviewsQueueListResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type exitInterviewsQueueListResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type exitInterviewsQueueListResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type exitInterviewsQueueListResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type exitInterviewsQueueListResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type exitInterviewsQueueListResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type exitInterviewsQueueListResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type exitInterviewsQueueListResponseSuccess = (exitInterviewsQueueListResponse200) & {
+  headers: Record<string, string>;
+};
+export type exitInterviewsQueueListResponseError = (exitInterviewsQueueListResponse400 | exitInterviewsQueueListResponse401 | exitInterviewsQueueListResponse403 | exitInterviewsQueueListResponse404 | exitInterviewsQueueListResponse405 | exitInterviewsQueueListResponse409 | exitInterviewsQueueListResponse413 | exitInterviewsQueueListResponse422 | exitInterviewsQueueListResponse429 | exitInterviewsQueueListResponse500 | exitInterviewsQueueListResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type exitInterviewsQueueListResponse = (exitInterviewsQueueListResponseSuccess | exitInterviewsQueueListResponseError)
+
+export const getExitInterviewsQueueListUrl = (params?: ExitInterviewsQueueListParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/exit-interviews/queue/?${stringifiedParams}` : `/api/v1/exit-interviews/queue/`
+}
+
+/**
+ * @summary List Exit Interview Queue
+ */
+export const exitInterviewsQueueList = async (params?: ExitInterviewsQueueListParams, options?: Parameters<typeof compassFetch>[1]): Promise<exitInterviewsQueueListResponse> => {
+
+  return compassFetch<exitInterviewsQueueListResponse>(getExitInterviewsQueueListUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+export type exitInterviewsQueueDetailResponse200 = {
+  data: ExitInterviewQueueDetailSchema
+  status: 200
+}
+
+export type exitInterviewsQueueDetailResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type exitInterviewsQueueDetailResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type exitInterviewsQueueDetailResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type exitInterviewsQueueDetailResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type exitInterviewsQueueDetailResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type exitInterviewsQueueDetailResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type exitInterviewsQueueDetailResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type exitInterviewsQueueDetailResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type exitInterviewsQueueDetailResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type exitInterviewsQueueDetailResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type exitInterviewsQueueDetailResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type exitInterviewsQueueDetailResponseSuccess = (exitInterviewsQueueDetailResponse200) & {
+  headers: Record<string, string>;
+};
+export type exitInterviewsQueueDetailResponseError = (exitInterviewsQueueDetailResponse400 | exitInterviewsQueueDetailResponse401 | exitInterviewsQueueDetailResponse403 | exitInterviewsQueueDetailResponse404 | exitInterviewsQueueDetailResponse405 | exitInterviewsQueueDetailResponse409 | exitInterviewsQueueDetailResponse413 | exitInterviewsQueueDetailResponse422 | exitInterviewsQueueDetailResponse429 | exitInterviewsQueueDetailResponse500 | exitInterviewsQueueDetailResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type exitInterviewsQueueDetailResponse = (exitInterviewsQueueDetailResponseSuccess | exitInterviewsQueueDetailResponseError)
+
+export const getExitInterviewsQueueDetailUrl = (referenceCode: string,) => {
+
+
+
+
+  return `/api/v1/exit-interviews/queue/${referenceCode}/`
+}
+
+/**
+ * @summary Exit Interview Queue Detail
+ */
+export const exitInterviewsQueueDetail = async (referenceCode: string, options?: Parameters<typeof compassFetch>[1]): Promise<exitInterviewsQueueDetailResponse> => {
+
+  return compassFetch<exitInterviewsQueueDetailResponse>(getExitInterviewsQueueDetailUrl(referenceCode),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+export type exitInterviewsQueueSensitiveDetailResponse200 = {
+  data: ExitInterviewQueueDetailSchema
+  status: 200
+}
+
+export type exitInterviewsQueueSensitiveDetailResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type exitInterviewsQueueSensitiveDetailResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type exitInterviewsQueueSensitiveDetailResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type exitInterviewsQueueSensitiveDetailResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type exitInterviewsQueueSensitiveDetailResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type exitInterviewsQueueSensitiveDetailResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type exitInterviewsQueueSensitiveDetailResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type exitInterviewsQueueSensitiveDetailResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type exitInterviewsQueueSensitiveDetailResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type exitInterviewsQueueSensitiveDetailResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type exitInterviewsQueueSensitiveDetailResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type exitInterviewsQueueSensitiveDetailResponseSuccess = (exitInterviewsQueueSensitiveDetailResponse200) & {
+  headers: Record<string, string>;
+};
+export type exitInterviewsQueueSensitiveDetailResponseError = (exitInterviewsQueueSensitiveDetailResponse400 | exitInterviewsQueueSensitiveDetailResponse401 | exitInterviewsQueueSensitiveDetailResponse403 | exitInterviewsQueueSensitiveDetailResponse404 | exitInterviewsQueueSensitiveDetailResponse405 | exitInterviewsQueueSensitiveDetailResponse409 | exitInterviewsQueueSensitiveDetailResponse413 | exitInterviewsQueueSensitiveDetailResponse422 | exitInterviewsQueueSensitiveDetailResponse429 | exitInterviewsQueueSensitiveDetailResponse500 | exitInterviewsQueueSensitiveDetailResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type exitInterviewsQueueSensitiveDetailResponse = (exitInterviewsQueueSensitiveDetailResponseSuccess | exitInterviewsQueueSensitiveDetailResponseError)
+
+export const getExitInterviewsQueueSensitiveDetailUrl = (referenceCode: string,) => {
+
+
+
+
+  return `/api/v1/exit-interviews/queue/${referenceCode}/sensitive/`
+}
+
+/**
+ * @summary Exit Interview Queue Sensitive Detail
+ */
+export const exitInterviewsQueueSensitiveDetail = async (referenceCode: string, options?: Parameters<typeof compassFetch>[1]): Promise<exitInterviewsQueueSensitiveDetailResponse> => {
+
+  return compassFetch<exitInterviewsQueueSensitiveDetailResponse>(getExitInterviewsQueueSensitiveDetailUrl(referenceCode),
+  {
+    ...options,
+    method: 'GET'
+
+
   }
 );}
 

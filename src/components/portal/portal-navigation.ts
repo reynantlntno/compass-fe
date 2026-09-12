@@ -3,6 +3,7 @@ import {
   Activity,
   Bell,
   CalendarDays,
+  ClipboardList,
   DatabaseBackup,
   HeartHandshake,
   House,
@@ -18,6 +19,13 @@ export const PORTAL_CAPABILITIES = {
   notificationsDeliveryOperate: "notifications.delivery.operate",
   appointmentsQueueView: "appointments.queue.view",
   counselingSessionsQueueView: "counseling.sessions.queue.view",
+  inventoryQueueView: "inventory.queue.view",
+  exitInterviewsQueueView: "exit_interviews.queue.view",
+  inventoryReopen: "inventory.reopen",
+  exitInterviewsAcknowledge: "exit_interviews.acknowledge",
+  exitInterviewsReopen: "exit_interviews.reopen",
+  exitInterviewsVoid: "exit_interviews.void",
+  exitInterviewsArchive: "exit_interviews.archive",
   counselingSessionLock: "counseling_sessions.lock",
   counselingRoutineReopen: "routine_interviews.reopen",
   counselingCasesClose: "counseling_cases.close",
@@ -126,6 +134,18 @@ export const PORTAL_NAVIGATION: readonly PortalNavigationItem[] = [
   },
   {
     kind: "link",
+    id: "forms",
+    href: "/portal/forms?section=inventory",
+    label: "Forms & submissions",
+    icon: ClipboardList,
+    keywords: ["inventory", "exit interview", "submissions", "forms"],
+    requiredCapabilitiesAny: [
+      PORTAL_CAPABILITIES.inventoryQueueView,
+      PORTAL_CAPABILITIES.exitInterviewsQueueView,
+    ],
+  },
+  {
+    kind: "link",
     id: "notification-delivery",
     href: "/portal/notification-delivery",
     label: "Notification delivery",
@@ -202,6 +222,24 @@ const PORTAL_SEARCH_ADDITIONS: readonly PortalSearchItem[] = [
     label: "Urgent support",
     parentLabel: "Counseling",
     requiredCapability: PORTAL_CAPABILITIES.urgentSupportQueueReview,
+  },
+  {
+    group: "section",
+    href: "/portal/forms?section=inventory",
+    id: "forms-inventory",
+    keywords: ["individual inventory", "student profile", "submission", "form"],
+    label: "Individual Inventory",
+    parentLabel: "Forms & submissions",
+    requiredCapability: PORTAL_CAPABILITIES.inventoryQueueView,
+  },
+  {
+    group: "section",
+    href: "/portal/forms?section=exit-interviews",
+    id: "forms-exit-interviews",
+    keywords: ["exit interview", "graduate", "submission", "form"],
+    label: "Exit Interviews",
+    parentLabel: "Forms & submissions",
+    requiredCapability: PORTAL_CAPABILITIES.exitInterviewsQueueView,
   },
   {
     group: "destination",
@@ -493,7 +531,8 @@ export function isPortalNavigationItemActive(
     );
   }
 
-  if (item.href === "/portal") return pathname === item.href;
+  const itemPath = item.href.split("?")[0];
+  if (itemPath === "/portal") return pathname === itemPath;
 
-  return pathname === item.href || pathname.startsWith(`${item.href}/`);
+  return pathname === itemPath || pathname.startsWith(`${itemPath}/`);
 }
