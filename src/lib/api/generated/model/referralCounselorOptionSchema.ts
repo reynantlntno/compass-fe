@@ -7,9 +7,9 @@
  */
 
 /**
- * Staff assign target represented by a short-lived opaque selector.
+ * Staff assign target; ``counselor_id`` is adapter-local request state.
  */
 export interface ReferralCounselorOptionSchema {
+  counselor_id: number;
   display_name: string;
-  selection_token: string;
 }

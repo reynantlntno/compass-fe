@@ -7,9 +7,13 @@
  */
 
 /**
- * Bounded staff workflow student option with an opaque selection token.
+ * Bounded intake search row; ``student_id`` is adapter-local request state.
  */
 export interface StaffStudentOptionSchema {
-  label: string;
-  selection_token: string;
+  campus?: string | null;
+  college?: string | null;
+  display_name: string;
+  program?: string | null;
+  student_id: number;
+  student_number?: string | null;
 }

@@ -8,6 +8,7 @@ import {
   appointmentsReviewDecision,
   appointmentsSchedule,
 } from "@/lib/api/generated/appointments/appointments";
+import { counselingSessionOpenFromAppointment } from "@/lib/api/generated/counseling/counseling";
 import type {
   AppointmentPageResultSchema,
   AppointmentProjectionSchema,
@@ -425,6 +426,14 @@ export function scheduleAppointment(
   signal?: AbortSignal,
 ) {
   return runMutation((options) => appointmentsSchedule(safeReference(referenceCode), payload, options), key, signal);
+}
+
+export function openPortalAppointmentSession(referenceCode: string, key: IdempotencyKey, signal?: AbortSignal) {
+  return runMutation(
+    (options) => counselingSessionOpenFromAppointment(safeReference(referenceCode), options),
+    key,
+    signal,
+  );
 }
 
 export type AppointmentDecision = DecisionSchema;

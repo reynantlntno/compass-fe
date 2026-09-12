@@ -1,6 +1,7 @@
 "use client";
 
 import { ChevronDown, ChevronUp, HeartHandshake, RefreshCw } from "lucide-react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Fragment, useEffect, useMemo, useRef, useState, useTransition, type FormEvent } from "react";
 
@@ -34,11 +35,14 @@ import {
   getPortalUrgentCounselorOptions,
   getPortalUrgentSupport,
   getPortalUrgentSupportDetail,
+  getPortalUrgentLinkOptions,
   grantPortalUrgentSupportAccess,
   parseUrgentSupportFilters,
   revokePortalUrgentSupportAccess,
   reviewPortalUrgentSupport,
   triagePortalUrgentSupport,
+  linkPortalUrgentSupportToCase,
+  linkPortalUrgentSupportToSession,
   urgentSupportHref,
   URGENT_SUPPORT_ASSIGNMENTS,
   URGENT_SUPPORT_ORDERS,
@@ -50,6 +54,7 @@ import {
   type PortalUrgentSupport,
   type PortalUrgentSupportDetail,
   type PortalUrgentSupportPage,
+  type PortalUrgentLinkOptions,
   type UrgentSupportAssignment,
   type UrgentSupportOrder,
   type UrgentSupportReviewStatus,
@@ -73,6 +78,10 @@ type OptionState =
   | { kind: "loading" }
   | { kind: "ready"; options: PortalUrgentCounselorOption[] }
   | { kind: "error" };
+type LinkOptionState =
+  | { kind: "loading" | "error" }
+  | { kind: "ready"; options: PortalUrgentLinkOptions };
+type LinkTarget = { request: PortalUrgentSupport; kind: "session" | "case" };
 
 type UrgentAction = "triage" | "review" | "close" | "grant" | "revoke";
 type ActionIntent = { action: UrgentAction; request: PortalUrgentSupport; grantToken?: string };
@@ -207,7 +216,7 @@ function UrgentFilterPanel({ filters }: { filters: ReturnType<typeof parseUrgent
   </PortalFilterPanel>;
 }
 
-function UrgentDetail({ detail, onRetry }: { detail: DetailState | undefined; onRetry: () => void }) {
+function UrgentDetail({ detail, onRetry, canLink, onLink }: { detail: DetailState | undefined; onRetry: () => void; canLink: boolean; onLink: (kind: "session" | "case") => void }) {
   if (!detail || detail.kind === "loading") return <div className="portal-counseling__detail-state" role="status"><Skeleton as="span" /><Skeleton as="span" /></div>;
   if (detail.kind === "error") return <div className="portal-counseling__detail-state" role="status"><p>Urgent-support details are unavailable right now.</p><Button onClick={onRetry} size="sm" type="button" variant="outline"><RefreshCw aria-hidden="true" />Try again</Button></div>;
   const value = detail.detail;
@@ -226,7 +235,7 @@ function UrgentDetail({ detail, onRetry }: { detail: DetailState | undefined; on
     value.originating_session_reference ? ["Originating session", value.originating_session_reference] : null,
     value.documentation_session_reference ? ["Documentation session", value.documentation_session_reference] : null,
   ].filter((fact): fact is [string, string] => Boolean(fact));
-  return <div className="portal-counseling__detail-content"><dl>{facts.map(([label, fact]) => <div key={label}><dt>{label}</dt><dd>{fact}</dd></div>)}</dl>{value.active_access_grants.length ? <div className="portal-counseling__urgent-grant-list"><p className="portal-counseling__kicker">Active temporary access</p><ul>{value.active_access_grants.map((grant) => <li key={`${grant.display_name}:${grant.grant_type}:${grant.expires_at}`}><span>{grant.display_name}</span><span>{labelForValue(grant.grant_type)} · expires {formatTimestamp(grant.expires_at)}</span></li>)}</ul></div> : null}</div>;
+  return <div className="portal-counseling__detail-content"><dl>{facts.map(([label, fact]) => <div key={label}><dt>{label}</dt><dd>{label === "Linked case" ? <Link href={`/portal/counseling?section=cases&q=${encodeURIComponent(fact)}`}>{fact}</Link> : label.endsWith("session") ? <Link href={`/portal/counseling/sessions/${encodeURIComponent(fact)}`}>{fact}</Link> : fact}</dd></div>)}</dl>{value.active_access_grants.length ? <div className="portal-counseling__urgent-grant-list"><p className="portal-counseling__kicker">Active temporary access</p><ul>{value.active_access_grants.map((grant) => <li key={`${grant.display_name}:${grant.grant_type}:${grant.expires_at}`}><span>{grant.display_name}</span><span>{labelForValue(grant.grant_type)} · expires {formatTimestamp(grant.expires_at)}</span></li>)}</ul></div> : null}{canLink ? <div className="portal-counseling__row-actions"><Button onClick={() => onLink("session")} size="xs" type="button" variant="outline">Link session</Button><Button onClick={() => onLink("case")} size="xs" type="button" variant="outline">Link case</Button></div> : null}</div>;
 }
 
 function UrgentActions({ request, hasCapability, onAction }: { request: PortalUrgentSupport; hasCapability: (capability: string) => boolean; onAction: (action: UrgentAction, request: PortalUrgentSupport, grantToken?: string) => void }) {
@@ -235,7 +244,7 @@ function UrgentActions({ request, hasCapability, onAction }: { request: PortalUr
   return <div aria-label={`Actions for ${request.reference_code}`} className="portal-counseling__row-actions">{actions.map((action) => <Button key={action} onClick={() => onAction(action, request)} size="xs" type="button" variant={action === "close" ? "outline" : "ghost"}>{action === "triage" ? "Create triage session" : action === "review" ? "Review" : action === "close" ? "Close" : "Grant access"}</Button>)}</div>;
 }
 
-function UrgentTable({ requests, details, expandedReference, hasCapability, mutation, onAction, onRetryDetail, onToggle }: { requests: PortalUrgentSupport[]; details: Record<string, DetailState>; expandedReference: string | null; hasCapability: (capability: string) => boolean; mutation: MutationState | null; onAction: (action: UrgentAction, request: PortalUrgentSupport, grantToken?: string) => void; onRetryDetail: (request: PortalUrgentSupport) => void; onToggle: (request: PortalUrgentSupport) => void }) {
+function UrgentTable({ requests, details, expandedReference, hasCapability, mutation, onAction, onRetryDetail, onToggle, onLink }: { requests: PortalUrgentSupport[]; details: Record<string, DetailState>; expandedReference: string | null; hasCapability: (capability: string) => boolean; mutation: MutationState | null; onAction: (action: UrgentAction, request: PortalUrgentSupport, grantToken?: string) => void; onRetryDetail: (request: PortalUrgentSupport) => void; onToggle: (request: PortalUrgentSupport) => void; onLink: (request: PortalUrgentSupport, kind: "session" | "case") => void }) {
   return <div className="portal-counseling__table-wrap"><table className="portal-counseling__table"><thead><tr><th scope="col">Student</th><th scope="col">Urgent reference</th><th scope="col">Urgency</th><th scope="col">Status</th><th scope="col">Source</th><th scope="col">Review</th><th scope="col">Latest activity</th><th scope="col">Assignment</th><th scope="col">Details &amp; actions</th></tr></thead><tbody>{requests.map((request) => {
     const expanded = expandedReference === request.reference_code;
     const expandedId = detailId(request.reference_code);
@@ -251,7 +260,7 @@ function UrgentTable({ requests, details, expandedReference, hasCapability, muta
       <td data-label="Latest activity">{formatTimestamp(request.updated_at ?? request.created_at)}</td>
       <td data-label="Assignment">{request.assignment_state ?? "Assignment unavailable"}</td>
       <td data-label="Details & actions"><div className="portal-counseling__details-actions"><Button aria-controls={expandedId} aria-expanded={expanded} aria-label={`${expanded ? "Hide" : "Show"} details for ${request.reference_code}`} onClick={() => onToggle(request)} size="xs" type="button" variant="outline">{expanded ? <ChevronUp aria-hidden="true" /> : <ChevronDown aria-hidden="true" />}<span className="sr-only">{expanded ? "Hide" : "Show"} details</span></Button><UrgentActions hasCapability={hasCapability} onAction={onAction} request={request} /></div></td>
-    </tr>{expanded ? <tr className="portal-counseling__detail-row"><td colSpan={9} id={expandedId}><UrgentDetail detail={expandedDetail} onRetry={() => onRetryDetail(request)} />{expandedDetail?.kind === "ready" && expandedDetail.detail.active_access_grants.length && hasCapability(PORTAL_CAPABILITIES.urgentSupportTemporaryAccessManage) ? <div className="portal-counseling__urgent-grant-actions">{expandedDetail.detail.active_access_grants.map((grant) => <Button key={grant.selection_token} onClick={() => onAction("revoke", request, grant.selection_token)} size="xs" type="button" variant="outline">Revoke access for {grant.display_name}</Button>)}</div> : null}{rowMutation ? <p className={`portal-counseling__mutation portal-counseling__mutation--${rowMutation.state}`} role={rowMutation.state === "error" ? "alert" : "status"}>{rowMutation.message}</p> : null}</td></tr> : null}</Fragment>;
+    </tr>{expanded ? <tr className="portal-counseling__detail-row"><td colSpan={9} id={expandedId}><UrgentDetail canLink={hasCapability(PORTAL_CAPABILITIES.urgentSupportQueueReview)} detail={expandedDetail} onLink={(kind) => onLink(request, kind)} onRetry={() => onRetryDetail(request)} />{expandedDetail?.kind === "ready" && expandedDetail.detail.active_access_grants.length && hasCapability(PORTAL_CAPABILITIES.urgentSupportTemporaryAccessManage) ? <div className="portal-counseling__urgent-grant-actions">{expandedDetail.detail.active_access_grants.map((grant) => <Button key={grant.selection_token} onClick={() => onAction("revoke", request, grant.selection_token)} size="xs" type="button" variant="outline">Revoke access for {grant.display_name}</Button>)}</div> : null}{rowMutation ? <p className={`portal-counseling__mutation portal-counseling__mutation--${rowMutation.state}`} role={rowMutation.state === "error" ? "alert" : "status"}>{rowMutation.message}</p> : null}</td></tr> : null}</Fragment>;
   })}</tbody></table></div>;
 }
 
@@ -284,6 +293,10 @@ export function UrgentSupportView({ hasCapability, navItems }: { hasCapability: 
   const [expandedReference, setExpandedReference] = useState<string | null>(null);
   const [details, setDetails] = useState<Record<string, DetailState>>({});
   const [options, setOptions] = useState<Record<string, OptionState>>({});
+  const [linkOptions, setLinkOptions] = useState<Record<string, LinkOptionState>>({});
+  const [linkTarget, setLinkTarget] = useState<LinkTarget | null>(null);
+  const [selectedLinkReference, setSelectedLinkReference] = useState("");
+  const [linkIntent, setLinkIntent] = useState<"originating" | "documentation">("originating");
   const [actionIntent, setActionIntent] = useState<ActionIntent | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [mutation, setMutation] = useState<MutationState | null>(null);
@@ -334,6 +347,25 @@ export function UrgentSupportView({ hasCapability, navItems }: { hasCapability: 
     setOptions((current) => ({ ...current, [request.reference_code]: { kind: "loading" } }));
     void getPortalUrgentCounselorOptions(request.reference_code).then((next) => setOptions((current) => ({ ...current, [request.reference_code]: { kind: "ready", options: next } }))).catch((error: unknown) => {
       if (!isAbortError(error)) setOptions((current) => ({ ...current, [request.reference_code]: { kind: "error" } }));
+    });
+  };
+
+  const loadLinkOptions = (request: PortalUrgentSupport, kind: "session" | "case") => {
+    const current = linkOptions[request.reference_code];
+    if (current?.kind === "ready") {
+      const candidates = kind === "session" ? current.options.sessions : current.options.cases;
+      setSelectedLinkReference(candidates[0]?.reference_code ?? "");
+      setLinkTarget({ request, kind });
+      return;
+    }
+    setLinkOptions((state) => ({ ...state, [request.reference_code]: { kind: "loading" } }));
+    void getPortalUrgentLinkOptions(request.reference_code).then((next) => {
+      setLinkOptions((state) => ({ ...state, [request.reference_code]: { kind: "ready", options: next } }));
+      const candidates = kind === "session" ? next.sessions : next.cases;
+      setSelectedLinkReference(candidates[0]?.reference_code ?? "");
+      setLinkTarget({ request, kind });
+    }).catch((error: unknown) => {
+      if (!isAbortError(error)) setLinkOptions((state) => ({ ...state, [request.reference_code]: { kind: "error" } }));
     });
   };
 
@@ -389,6 +421,27 @@ export function UrgentSupportView({ hasCapability, navItems }: { hasCapability: 
     }
   };
 
+  const confirmLink = async () => {
+    if (!linkTarget || !selectedLinkReference) return;
+    const { request, kind } = linkTarget;
+    const payload = { kind, selectedLinkReference, intent: kind === "session" ? linkIntent : null };
+    const scope = `urgent-support-link:${kind}:${request.reference_code}`;
+    const key = getMutationKey(scope, JSON.stringify(payload));
+    setMutation({ referenceCode: request.reference_code, state: "pending", message: "Linking related record…" });
+    try {
+      if (kind === "session") await linkPortalUrgentSupportToSession(request.reference_code, selectedLinkReference, linkIntent, key);
+      else await linkPortalUrgentSupportToCase(request.reference_code, selectedLinkReference, key);
+      mutationKeysRef.current.delete(scope);
+      setMutation({ referenceCode: request.reference_code, state: "success", message: "Related record linked." });
+      setLinkTarget(null);
+      setReloadKey((value) => value + 1);
+    } catch (error: unknown) {
+      const apiError = error instanceof CounselingApiError ? error : new CounselingApiError("unavailable");
+      if (apiError.kind !== "unavailable" && apiError.kind !== "rate_limited") mutationKeysRef.current.delete(scope);
+      setMutation({ referenceCode: request.reference_code, state: "error", message: actionMessage(apiError) });
+    }
+  };
+
   const toggleDetails = (request: PortalUrgentSupport) => {
     const reference = request.reference_code;
     if (expandedReference === reference) return setExpandedReference(null);
@@ -411,7 +464,9 @@ export function UrgentSupportView({ hasCapability, navItems }: { hasCapability: 
   if (loadState.kind === "unavailable") return <UrgentState kind="unavailable" error={loadState.error} navItems={navItems} onRetry={() => setReloadKey((value) => value + 1)} />;
   const page = loadState.page;
   const optionState = actionIntent ? options[actionIntent.request.reference_code] : undefined;
-  return <section aria-labelledby="portal-counseling-urgent-heading" className="portal-counseling"><UrgentHeader /><div className="portal-counseling__workspace"><PortalWorkspaceNav activeValue="urgent-support" ariaLabel="Counseling sections" items={navItems} /><div className="portal-counseling__active-content"><UrgentFilterPanel filters={filters} /><PortalCollectionFrame aria-labelledby="portal-counseling-urgent-results-heading" className="portal-counseling__frame"><div className="portal-counseling__frame-heading"><div><p className="portal-counseling__kicker">Urgent support</p><h2 id="portal-counseling-urgent-results-heading">Urgent-support requests</h2></div><p className="portal-counseling__result-count">{page.total} {page.total === 1 ? "request" : "requests"}</p></div>{mutation ? <p className={`portal-counseling__mutation portal-counseling__mutation--${mutation.state}`} role={mutation.state === "error" ? "alert" : "status"}>{mutation.message}</p> : null}{page.items.length ? <UrgentTable details={details} expandedReference={expandedReference} hasCapability={hasCapability} mutation={mutation} onAction={openAction} onRetryDetail={retryDetail} onToggle={toggleDetails} requests={page.items} /> : <div className="portal-counseling__empty" role="status"><h2>No urgent-support requests to show.</h2><p>Try changing the filters or check back after more requests are recorded.</p></div>}<UrgentPagination filters={filters} page={page} /></PortalCollectionFrame></div></div>
+  const linkOptionState = linkTarget ? linkOptions[linkTarget.request.reference_code] : undefined;
+  const linkCandidates = linkOptionState?.kind === "ready" && linkTarget ? (linkTarget.kind === "session" ? linkOptionState.options.sessions : linkOptionState.options.cases) : [];
+  return <section aria-labelledby="portal-counseling-urgent-heading" className="portal-counseling"><UrgentHeader /><div className="portal-counseling__workspace"><PortalWorkspaceNav activeValue="urgent-support" ariaLabel="Counseling sections" items={navItems} /><div className="portal-counseling__active-content"><UrgentFilterPanel filters={filters} /><PortalCollectionFrame aria-labelledby="portal-counseling-urgent-results-heading" className="portal-counseling__frame"><div className="portal-counseling__frame-heading"><div><p className="portal-counseling__kicker">Urgent support</p><h2 id="portal-counseling-urgent-results-heading">Urgent-support requests</h2></div><p className="portal-counseling__result-count">{page.total} {page.total === 1 ? "request" : "requests"}</p></div>{mutation ? <p className={`portal-counseling__mutation portal-counseling__mutation--${mutation.state}`} role={mutation.state === "error" ? "alert" : "status"}>{mutation.message}</p> : null}{page.items.length ? <UrgentTable details={details} expandedReference={expandedReference} hasCapability={hasCapability} mutation={mutation} onAction={openAction} onLink={loadLinkOptions} onRetryDetail={retryDetail} onToggle={toggleDetails} requests={page.items} /> : <div className="portal-counseling__empty" role="status"><h2>No urgent-support requests to show.</h2><p>Try changing the filters or check back after more requests are recorded.</p></div>}<UrgentPagination filters={filters} page={page} /></PortalCollectionFrame></div></div>
     <AlertDialog onOpenChange={(open) => { if (!open && mutation?.state !== "pending") { setActionIntent(null); setActionError(null); } }} open={actionIntent !== null}><AlertDialogContent className="portal-counseling__dialog" size="sm"><AlertDialogHeader><AlertDialogTitle>{actionIntent?.action === "triage" ? "Create triage session" : actionIntent?.action === "review" ? "Review urgent support" : actionIntent?.action === "close" ? "Close urgent support" : actionIntent?.action === "grant" ? "Grant temporary access" : "Revoke temporary access"}</AlertDialogTitle><AlertDialogDescription>{actionIntent ? `${actionIntent.request.reference_code} will be updated using the current urgent-support policy.` : "Review this action before continuing."}</AlertDialogDescription></AlertDialogHeader>
       {actionIntent?.action === "triage" ? <div className="portal-counseling__dialog-fields"><div className="portal-counseling__dialog-field"><Label htmlFor="portal-urgent-mode">Session mode</Label><select id="portal-urgent-mode" onChange={(event) => setSessionMode(event.target.value)} value={sessionMode}>{TRIAGE_MODE_OPTIONS.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></div><div className="portal-counseling__dialog-field"><Label htmlFor="portal-urgent-start">Start (optional)</Label><Input id="portal-urgent-start" onChange={(event) => setScheduledStartAt(event.target.value)} type="datetime-local" value={scheduledStartAt} /></div><div className="portal-counseling__dialog-field"><Label htmlFor="portal-urgent-end">End (optional)</Label><Input id="portal-urgent-end" onChange={(event) => setScheduledEndAt(event.target.value)} type="datetime-local" value={scheduledEndAt} /></div>{optionState?.kind === "ready" && optionState.options.length ? <div className="portal-counseling__dialog-field"><Label htmlFor="portal-urgent-counselor">Counselor (optional)</Label><select id="portal-urgent-counselor" onChange={(event) => setSelectedCounselor(event.target.value)} value={selectedCounselor}><option value="">Assign to me</option>{optionState.options.map((option) => <option key={option.selection_token} value={option.selection_token}>{option.display_name}</option>)}</select></div> : optionState?.kind === "loading" ? <p role="status">Loading counselor options…</p> : optionState?.kind === "error" ? <p className="portal-counseling__dialog-error" role="alert">Counselor options are unavailable. You can still assign this triage session to yourself.</p> : null}</div> : null}
       {actionIntent?.action === "review" ? <div className="portal-counseling__dialog-field"><Label htmlFor="portal-urgent-review-status">Review status</Label><select id="portal-urgent-review-status" onChange={(event) => setReviewStatus(event.target.value as UrgentSupportReviewStatus)} value={reviewStatus}>{REVIEW_OPTIONS.map((option) => <option key={option.value} value={option.value}>{option.label}</option>)}</select></div> : null}
@@ -420,5 +475,14 @@ export function UrgentSupportView({ hasCapability, navItems }: { hasCapability: 
       {actionIntent?.action === "revoke" ? <p>Access for this urgent-support request will be revoked.</p> : null}
       {actionError ? <p className="portal-counseling__dialog-error" role="alert">{actionError}</p> : null}<AlertDialogFooter><AlertDialogCancel disabled={mutation?.state === "pending"}>Keep request</AlertDialogCancel><AlertDialogAction disabled={mutation?.state === "pending" || (actionIntent?.action === "grant" && optionState?.kind !== "ready")} onClick={() => void confirmAction()}>{mutation?.state === "pending" ? "Saving…" : "Continue"}</AlertDialogAction></AlertDialogFooter>
     </AlertDialogContent></AlertDialog>
+    <AlertDialog onOpenChange={(open) => { if (!open && mutation?.state !== "pending") setLinkTarget(null); }} open={linkTarget !== null}>
+      <AlertDialogContent className="portal-counseling__dialog" size="sm"><AlertDialogHeader><AlertDialogTitle>Link {linkTarget?.kind === "session" ? "session" : "case"}</AlertDialogTitle><AlertDialogDescription>Choose an authorized same-student record. The server will check scope and current relationships again.</AlertDialogDescription></AlertDialogHeader>
+        {linkOptionState?.kind === "loading" ? <p role="status">Loading eligible records…</p> : null}
+        {linkOptionState?.kind === "error" ? <p className="portal-counseling__dialog-error" role="alert">Eligible records are unavailable right now.</p> : null}
+        {linkOptionState?.kind === "ready" && linkCandidates.length ? <div className="portal-counseling__dialog-fields"><div className="portal-counseling__dialog-field"><Label htmlFor="portal-urgent-link-record">Record</Label><select id="portal-urgent-link-record" onChange={(event) => setSelectedLinkReference(event.target.value)} value={selectedLinkReference}>{linkCandidates.map((option) => <option key={option.reference_code} value={option.reference_code}>{option.reference_code}{option.status ? ` · ${labelForValue(option.status)}` : ""}</option>)}</select></div>{linkTarget?.kind === "session" ? <div className="portal-counseling__dialog-field"><Label htmlFor="portal-urgent-link-intent">Relationship</Label><select id="portal-urgent-link-intent" onChange={(event) => setLinkIntent(event.target.value as "originating" | "documentation")} value={linkIntent}><option value="originating">Originating session</option><option value="documentation">Documentation session</option></select></div> : null}</div> : null}
+        {linkOptionState?.kind === "ready" && !linkCandidates.length ? <p>No eligible records are available for this request.</p> : null}
+        <AlertDialogFooter><AlertDialogCancel disabled={mutation?.state === "pending"}>Cancel</AlertDialogCancel><AlertDialogAction disabled={mutation?.state === "pending" || linkOptionState?.kind !== "ready" || !selectedLinkReference} onClick={() => void confirmLink()}>{mutation?.state === "pending" ? "Linking…" : "Link record"}</AlertDialogAction></AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   </section>;
 }

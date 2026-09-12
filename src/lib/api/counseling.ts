@@ -387,7 +387,7 @@ export function getPortalCounselingSessionStudents(query = "", signal?: AbortSig
         page_size: 25,
         q: normalizedQuery || undefined,
         workflow: "counseling_session",
-      },
+      } as unknown as Parameters<typeof profilesStaffStudents>[0],
       cookieSessionReadOptions(signal),
     ),
     parseStudentOptions,

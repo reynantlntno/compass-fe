@@ -19,16 +19,20 @@ import type {
   CounselingCaseProjectionSchema,
   CounselingCaseQueuePageSchema,
   CounselingCasesListParams,
+  CounselingLinkOptionPageSchema,
   CounselingMutationResponseSchema,
   CounselingNoteProjectionSchema,
   CounselingReasonSchema,
+  CounselingRelatedRecordsSchema,
   CounselingRoutineInterviewsListParams,
   CounselingSessionPageSchema,
   CounselingSessionProjectionSchema,
+  CounselingSessionUrgentSupportOptionsParams,
   CounselingSessionWorkspaceContextSchema,
   CounselingSessionsListParams,
   CounselingStudentSummarySchema,
   CounselingUrgentCounselorOptionsParams,
+  CounselingUrgentLinkOptionsSchema,
   CounselingUrgentListParams,
   ECounselingJoinContextSchema,
   ECounselingJoinStateSchema,
@@ -59,6 +63,7 @@ import type {
   TranscriptionStatusSchema,
   UrgentCreateSchema,
   UrgentSupportCounselorOptionPageSchema,
+  UrgentSupportLinkSchema,
   UrgentSupportPageSchema,
   UrgentSupportProjectionSchema,
   UrgentSupportReviewSchema,
@@ -5031,6 +5036,98 @@ return compassFetch<counselingNoteSaveResponse>(getCounselingNoteSaveUrl(referen
 );}
 
 
+export type counselingSessionRelatedRecordsResponse200 = {
+  data: CounselingRelatedRecordsSchema
+  status: 200
+}
+
+export type counselingSessionRelatedRecordsResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type counselingSessionRelatedRecordsResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type counselingSessionRelatedRecordsResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type counselingSessionRelatedRecordsResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type counselingSessionRelatedRecordsResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type counselingSessionRelatedRecordsResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type counselingSessionRelatedRecordsResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type counselingSessionRelatedRecordsResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type counselingSessionRelatedRecordsResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type counselingSessionRelatedRecordsResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type counselingSessionRelatedRecordsResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type counselingSessionRelatedRecordsResponseSuccess = (counselingSessionRelatedRecordsResponse200) & {
+  headers: Record<string, string>;
+};
+export type counselingSessionRelatedRecordsResponseError = (counselingSessionRelatedRecordsResponse400 | counselingSessionRelatedRecordsResponse401 | counselingSessionRelatedRecordsResponse403 | counselingSessionRelatedRecordsResponse404 | counselingSessionRelatedRecordsResponse405 | counselingSessionRelatedRecordsResponse409 | counselingSessionRelatedRecordsResponse413 | counselingSessionRelatedRecordsResponse422 | counselingSessionRelatedRecordsResponse429 | counselingSessionRelatedRecordsResponse500 | counselingSessionRelatedRecordsResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type counselingSessionRelatedRecordsResponse = (counselingSessionRelatedRecordsResponseSuccess | counselingSessionRelatedRecordsResponseError)
+
+export const getCounselingSessionRelatedRecordsUrl = (referenceCode: string,) => {
+
+
+
+
+  return `/api/v1/counseling/sessions/${referenceCode}/related-records/`
+}
+
+/**
+ * @summary Session Related Records
+ */
+export const counselingSessionRelatedRecords = async (referenceCode: string, options?: Parameters<typeof compassFetch>[1]): Promise<counselingSessionRelatedRecordsResponse> => {
+
+  return compassFetch<counselingSessionRelatedRecordsResponse>(getCounselingSessionRelatedRecordsUrl(referenceCode),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
 export type counselingRoutineEvaluationSaveResponse200 = {
   data: CounselingMutationResponseSchema
   status: 200
@@ -5901,6 +5998,107 @@ export const counselingSessionSummary = async (referenceCode: string, options?: 
 );}
 
 
+export type counselingSessionUrgentSupportOptionsResponse200 = {
+  data: CounselingLinkOptionPageSchema
+  status: 200
+}
+
+export type counselingSessionUrgentSupportOptionsResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type counselingSessionUrgentSupportOptionsResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type counselingSessionUrgentSupportOptionsResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type counselingSessionUrgentSupportOptionsResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type counselingSessionUrgentSupportOptionsResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type counselingSessionUrgentSupportOptionsResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type counselingSessionUrgentSupportOptionsResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type counselingSessionUrgentSupportOptionsResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type counselingSessionUrgentSupportOptionsResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type counselingSessionUrgentSupportOptionsResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type counselingSessionUrgentSupportOptionsResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type counselingSessionUrgentSupportOptionsResponseSuccess = (counselingSessionUrgentSupportOptionsResponse200) & {
+  headers: Record<string, string>;
+};
+export type counselingSessionUrgentSupportOptionsResponseError = (counselingSessionUrgentSupportOptionsResponse400 | counselingSessionUrgentSupportOptionsResponse401 | counselingSessionUrgentSupportOptionsResponse403 | counselingSessionUrgentSupportOptionsResponse404 | counselingSessionUrgentSupportOptionsResponse405 | counselingSessionUrgentSupportOptionsResponse409 | counselingSessionUrgentSupportOptionsResponse413 | counselingSessionUrgentSupportOptionsResponse422 | counselingSessionUrgentSupportOptionsResponse429 | counselingSessionUrgentSupportOptionsResponse500 | counselingSessionUrgentSupportOptionsResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type counselingSessionUrgentSupportOptionsResponse = (counselingSessionUrgentSupportOptionsResponseSuccess | counselingSessionUrgentSupportOptionsResponseError)
+
+export const getCounselingSessionUrgentSupportOptionsUrl = (referenceCode: string,
+    params?: CounselingSessionUrgentSupportOptionsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/counseling/sessions/${referenceCode}/urgent-support-options/?${stringifiedParams}` : `/api/v1/counseling/sessions/${referenceCode}/urgent-support-options/`
+}
+
+/**
+ * @summary Session Urgent Support Options
+ */
+export const counselingSessionUrgentSupportOptions = async (referenceCode: string,
+    params?: CounselingSessionUrgentSupportOptionsParams, options?: Parameters<typeof compassFetch>[1]): Promise<counselingSessionUrgentSupportOptionsResponse> => {
+
+  return compassFetch<counselingSessionUrgentSupportOptionsResponse>(getCounselingSessionUrgentSupportOptionsUrl(referenceCode,params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
 export type counselingSessionWorkspaceResponse200 = {
   data: CounselingSessionWorkspaceContextSchema
   status: 200
@@ -6675,6 +6873,296 @@ export const counselingUrgentCounselorOptions = async (referenceCode: string,
     method: 'GET'
 
 
+  }
+);}
+
+
+export type counselingUrgentLinkCaseResponse200 = {
+  data: CounselingMutationResponseSchema
+  status: 200
+}
+
+export type counselingUrgentLinkCaseResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type counselingUrgentLinkCaseResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type counselingUrgentLinkCaseResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type counselingUrgentLinkCaseResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type counselingUrgentLinkCaseResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type counselingUrgentLinkCaseResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type counselingUrgentLinkCaseResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type counselingUrgentLinkCaseResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type counselingUrgentLinkCaseResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type counselingUrgentLinkCaseResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type counselingUrgentLinkCaseResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type counselingUrgentLinkCaseResponseSuccess = (counselingUrgentLinkCaseResponse200) & {
+  headers: Record<string, string>;
+};
+export type counselingUrgentLinkCaseResponseError = (counselingUrgentLinkCaseResponse400 | counselingUrgentLinkCaseResponse401 | counselingUrgentLinkCaseResponse403 | counselingUrgentLinkCaseResponse404 | counselingUrgentLinkCaseResponse405 | counselingUrgentLinkCaseResponse409 | counselingUrgentLinkCaseResponse413 | counselingUrgentLinkCaseResponse422 | counselingUrgentLinkCaseResponse429 | counselingUrgentLinkCaseResponse500 | counselingUrgentLinkCaseResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type counselingUrgentLinkCaseResponse = (counselingUrgentLinkCaseResponseSuccess | counselingUrgentLinkCaseResponseError)
+
+export const getCounselingUrgentLinkCaseUrl = (referenceCode: string,) => {
+
+
+
+
+  return `/api/v1/counseling/urgent-support/${referenceCode}/link-case/`
+}
+
+/**
+ * @summary Link Urgent Case Route
+ */
+export const counselingUrgentLinkCase = async (referenceCode: string,
+    urgentSupportLinkSchema: UrgentSupportLinkSchema, options?: Parameters<typeof compassFetch>[1]): Promise<counselingUrgentLinkCaseResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return compassFetch<counselingUrgentLinkCaseResponse>(getCounselingUrgentLinkCaseUrl(referenceCode),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(urgentSupportLinkSchema)
+  }
+);}
+
+
+export type counselingUrgentLinkOptionsResponse200 = {
+  data: CounselingUrgentLinkOptionsSchema
+  status: 200
+}
+
+export type counselingUrgentLinkOptionsResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type counselingUrgentLinkOptionsResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type counselingUrgentLinkOptionsResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type counselingUrgentLinkOptionsResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type counselingUrgentLinkOptionsResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type counselingUrgentLinkOptionsResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type counselingUrgentLinkOptionsResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type counselingUrgentLinkOptionsResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type counselingUrgentLinkOptionsResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type counselingUrgentLinkOptionsResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type counselingUrgentLinkOptionsResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type counselingUrgentLinkOptionsResponseSuccess = (counselingUrgentLinkOptionsResponse200) & {
+  headers: Record<string, string>;
+};
+export type counselingUrgentLinkOptionsResponseError = (counselingUrgentLinkOptionsResponse400 | counselingUrgentLinkOptionsResponse401 | counselingUrgentLinkOptionsResponse403 | counselingUrgentLinkOptionsResponse404 | counselingUrgentLinkOptionsResponse405 | counselingUrgentLinkOptionsResponse409 | counselingUrgentLinkOptionsResponse413 | counselingUrgentLinkOptionsResponse422 | counselingUrgentLinkOptionsResponse429 | counselingUrgentLinkOptionsResponse500 | counselingUrgentLinkOptionsResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type counselingUrgentLinkOptionsResponse = (counselingUrgentLinkOptionsResponseSuccess | counselingUrgentLinkOptionsResponseError)
+
+export const getCounselingUrgentLinkOptionsUrl = (referenceCode: string,) => {
+
+
+
+
+  return `/api/v1/counseling/urgent-support/${referenceCode}/link-options/`
+}
+
+/**
+ * @summary Urgent Link Options
+ */
+export const counselingUrgentLinkOptions = async (referenceCode: string, options?: Parameters<typeof compassFetch>[1]): Promise<counselingUrgentLinkOptionsResponse> => {
+
+  return compassFetch<counselingUrgentLinkOptionsResponse>(getCounselingUrgentLinkOptionsUrl(referenceCode),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+export type counselingUrgentLinkSessionResponse200 = {
+  data: CounselingMutationResponseSchema
+  status: 200
+}
+
+export type counselingUrgentLinkSessionResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type counselingUrgentLinkSessionResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type counselingUrgentLinkSessionResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type counselingUrgentLinkSessionResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type counselingUrgentLinkSessionResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type counselingUrgentLinkSessionResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type counselingUrgentLinkSessionResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type counselingUrgentLinkSessionResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type counselingUrgentLinkSessionResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type counselingUrgentLinkSessionResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type counselingUrgentLinkSessionResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type counselingUrgentLinkSessionResponseSuccess = (counselingUrgentLinkSessionResponse200) & {
+  headers: Record<string, string>;
+};
+export type counselingUrgentLinkSessionResponseError = (counselingUrgentLinkSessionResponse400 | counselingUrgentLinkSessionResponse401 | counselingUrgentLinkSessionResponse403 | counselingUrgentLinkSessionResponse404 | counselingUrgentLinkSessionResponse405 | counselingUrgentLinkSessionResponse409 | counselingUrgentLinkSessionResponse413 | counselingUrgentLinkSessionResponse422 | counselingUrgentLinkSessionResponse429 | counselingUrgentLinkSessionResponse500 | counselingUrgentLinkSessionResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type counselingUrgentLinkSessionResponse = (counselingUrgentLinkSessionResponseSuccess | counselingUrgentLinkSessionResponseError)
+
+export const getCounselingUrgentLinkSessionUrl = (referenceCode: string,) => {
+
+
+
+
+  return `/api/v1/counseling/urgent-support/${referenceCode}/link-session/`
+}
+
+/**
+ * @summary Link Urgent Session Route
+ */
+export const counselingUrgentLinkSession = async (referenceCode: string,
+    urgentSupportLinkSchema: UrgentSupportLinkSchema, options?: Parameters<typeof compassFetch>[1]): Promise<counselingUrgentLinkSessionResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return compassFetch<counselingUrgentLinkSessionResponse>(getCounselingUrgentLinkSessionUrl(referenceCode),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(urgentSupportLinkSchema)
   }
 );}
 

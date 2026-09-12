@@ -5,6 +5,9 @@ import {
   counselingRoutineInterviewDetail,
   counselingRoutineInterviewSensitiveDetail,
   counselingRoutineInterviewsList,
+  counselingRoutineInterviewsDocumentDownload,
+  counselingRoutineInterviewsDocumentGenerate,
+  counselingRoutineInterviewsDocumentPreview,
   counselingRoutineLock,
   counselingRoutineReopen,
 } from "@/lib/api/generated/counseling/counseling";
@@ -15,6 +18,7 @@ import type {
   RoutineInterviewProjectionSchema,
   RoutineInterviewQueueProjectionSchema,
   RoutineInterviewSensitiveDetailSchema,
+  RoutineDocumentGenerateSchema,
 } from "@/lib/api/generated/model";
 import { cookieSessionMutationOptions, cookieSessionReadOptions } from "@/lib/api/auth";
 import { withIdempotencyKey, type IdempotencyKey } from "@/lib/api/idempotency";
@@ -139,6 +143,17 @@ export type PortalRoutineInterviewSensitiveDetail = {
   career_goals: string | null;
   special_concern: string | null;
   recommendations: string | null;
+};
+
+export type PortalGeneratedRoutineDocument = {
+  content_type: string;
+  document_status: string;
+  generated_at: string | null;
+  output_format: string;
+  reference_code: string;
+  released_at: string | null;
+  template_key: string;
+  template_version: string;
 };
 
 type GeneratedResponse = { data: unknown; status: number };
@@ -292,6 +307,20 @@ function parseSensitiveDetail(value: unknown): PortalRoutineInterviewSensitiveDe
   return detail;
 }
 
+function parseGeneratedDocument(value: unknown): PortalGeneratedRoutineDocument | null {
+  if (!isRecord(value) || typeof value.content_type !== "string" || value.content_type.length > 120 || typeof value.document_status !== "string" || value.document_status.length > 80 || !optionalTimestamp(value.generated_at) || typeof value.output_format !== "string" || value.output_format.length > 40 || typeof value.reference_code !== "string" || value.reference_code.length === 0 || value.reference_code.length > MAX_REFERENCE_LENGTH || !optionalTimestamp(value.released_at) || typeof value.template_key !== "string" || value.template_key.length > 120 || typeof value.template_version !== "string" || value.template_version.length > 80) return null;
+  return {
+    content_type: value.content_type,
+    document_status: value.document_status,
+    generated_at: value.generated_at ?? null,
+    output_format: value.output_format,
+    reference_code: value.reference_code,
+    released_at: value.released_at ?? null,
+    template_key: value.template_key,
+    template_version: value.template_version,
+  };
+}
+
 function errorKind(status: number) {
   if (status === 409) return "conflict" as const;
   if (status === 429) return "rate_limited" as const;
@@ -325,6 +354,18 @@ function safeReference(referenceCode: string) {
   return value;
 }
 
+async function readBlobRequest(request: Promise<GeneratedResponse>) {
+  try {
+    const response = await request;
+    if (response.status === 200 && response.data instanceof Blob) return response.data;
+    throw new CounselingApiError(errorKind(response.status));
+  } catch (error) {
+    if (isAbortError(error)) throw error;
+    if (error instanceof CounselingApiError) throw error;
+    throw new CounselingApiError("unavailable");
+  }
+}
+
 export function getPortalRoutineInterviews(page = 1, status?: string | null, signal?: AbortSignal) {
   const statuses = parseRoutineInterviewStatuses(status);
   return readRequest(
@@ -339,6 +380,20 @@ export function getPortalRoutineInterviewDetail(referenceCode: string, signal?: 
 
 export function getPortalRoutineInterviewSensitiveDetail(referenceCode: string, signal?: AbortSignal) {
   return readRequest(counselingRoutineInterviewSensitiveDetail(safeReference(referenceCode), cookieSessionReadOptions(signal)), parseSensitiveDetail);
+}
+
+export function previewPortalRoutineInterviewDocument(referenceCode: string, signal?: AbortSignal) {
+  return readBlobRequest(counselingRoutineInterviewsDocumentPreview(safeReference(referenceCode), cookieSessionReadOptions(signal)));
+}
+
+export function downloadPortalRoutineInterviewDocument(referenceCode: string, signal?: AbortSignal) {
+  return readBlobRequest(counselingRoutineInterviewsDocumentDownload(safeReference(referenceCode), cookieSessionReadOptions(signal)));
+}
+
+export async function generatePortalRoutineInterviewDocument(referenceCode: string, expectedUpdatedAt: string | null, key: IdempotencyKey, signal?: AbortSignal) {
+  const payload: RoutineDocumentGenerateSchema = expectedUpdatedAt ? { expected_updated_at: expectedUpdatedAt } : {};
+  const options = withIdempotencyKey(key, await cookieSessionMutationOptions(signal));
+  return readRequest(counselingRoutineInterviewsDocumentGenerate(safeReference(referenceCode), payload, options), parseGeneratedDocument);
 }
 
 async function runMutation(

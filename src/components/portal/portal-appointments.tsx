@@ -53,6 +53,7 @@ import {
   completePortalAppointment,
   getPortalAppointmentDetail,
   getPortalAppointments,
+  openPortalAppointmentSession,
   markAppointmentNoShow,
   reviewAppointment,
   scheduleAppointment,
@@ -571,6 +572,7 @@ function AppointmentTable({
   mutation,
   onAction,
   onRetryDetail,
+  onOpenSession,
   onToggle,
 }: {
   appointments: PortalAppointment[];
@@ -580,6 +582,7 @@ function AppointmentTable({
   mutation: MutationState | null;
   onAction: (action: AppointmentAction, appointment: PortalAppointment) => void;
   onRetryDetail: (appointment: PortalAppointment) => void;
+  onOpenSession: (appointment: PortalAppointment) => void;
   onToggle: (appointment: PortalAppointment) => void;
 }) {
   return (
@@ -630,6 +633,7 @@ function AppointmentTable({
                         <span className="sr-only">{expanded ? "Hide" : "Show"} details</span>
                       </Button>
                       <AppointmentActions appointment={appointment} hasCapability={hasCapability} onAction={onAction} />
+                      {appointment.status === "SCHEDULED" && hasCapability(PORTAL_CAPABILITIES.counselingSessionsQueueView) ? <Button onClick={() => onOpenSession(appointment)} size="xs" type="button" variant="ghost">Open session</Button> : null}
                     </div>
                   </td>
                 </tr>
@@ -807,6 +811,23 @@ export function PortalAppointmentsPage() {
     }
   };
 
+  const openSession = async (appointment: PortalAppointment) => {
+    const fingerprint = JSON.stringify({ appointment: appointment.reference_code, action: "open-session" });
+    const scope = `appointment:open-session:${appointment.reference_code}`;
+    const key = getMutationKey(scope, fingerprint);
+    setMutation({ referenceCode: appointment.reference_code, message: "Opening counseling session…", state: "pending" });
+    try {
+      const result = await openPortalAppointmentSession(appointment.reference_code, key);
+      mutationKeysRef.current.delete(scope);
+      setMutation({ referenceCode: appointment.reference_code, message: "Session opened.", state: "success" });
+      router.push(`/portal/counseling/sessions/${encodeURIComponent(result.reference_code)}`);
+    } catch (error: unknown) {
+      const apiError = error instanceof AppointmentsApiError ? error : new AppointmentsApiError("unavailable");
+      if (apiError.kind !== "unavailable" && apiError.kind !== "rate_limited") mutationKeysRef.current.delete(scope);
+      setMutation({ referenceCode: appointment.reference_code, message: mutationMessage(apiError), state: "error" });
+    }
+  };
+
   const toggleDetails = (appointment: PortalAppointment) => {
     if (expandedReference === appointment.reference_code) {
       setExpandedReference(null);
@@ -871,6 +892,7 @@ export function PortalAppointmentsPage() {
             hasCapability={hasCapability}
             mutation={mutation}
             onAction={openAction}
+            onOpenSession={openSession}
             onRetryDetail={retryDetails}
             onToggle={toggleDetails}
           />

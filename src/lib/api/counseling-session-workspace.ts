@@ -1,11 +1,18 @@
 import {
   counselingEcounselingDetail,
   counselingEcounselingJoin,
+  counselingEcounselingRecordingDownload,
   counselingEcounselingRecordingStart,
   counselingEcounselingRecordingStatus,
   counselingEcounselingRecordingStop,
+  counselingEcounselingTranscriptDownload,
+  counselingEcounselingTranscriptMetadata,
+  counselingEcounselingTranscriptionStatus,
   counselingNoteDetail,
+  counselingSessionRelatedRecords,
+  counselingSessionUrgentSupportOptions,
   counselingSessionWorkspace,
+  counselingUrgentLinkSession,
 } from "@/lib/api/generated/counseling/counseling";
 import type {
   CounselingNoteProjectionSchema,
@@ -72,6 +79,29 @@ export type PortalEcounselingJoinState = {
 export type PortalEcounselingJoinContext = ECounselingJoinContextSchema;
 export type PortalRecordingStatus = RecordingStatusSchema;
 export type PortalRecordingMutationResponse = RecordingMutationResponseSchema;
+export type PortalRelatedRecordType = "appointment" | "referral" | "call_slip" | "routine_interview" | "case" | "urgent_support" | "ecounseling";
+export type PortalRelatedRecord = {
+  record_type: PortalRelatedRecordType;
+  reference_code: string;
+  status: string | null;
+  created_at: string | null;
+  updated_at: string | null;
+};
+export type PortalRelatedRecords = { items: PortalRelatedRecord[] };
+export type PortalLinkOption = { reference_code: string; status: string | null };
+export type PortalLinkOptionPage = { items: PortalLinkOption[]; page: number; page_size: number; total: number };
+export type PortalTranscriptionStatus = {
+  available: boolean;
+  available_at: string | null;
+  expires_at: string | null;
+  status: string;
+};
+export type PortalTranscriptMetadata = {
+  available: boolean;
+  content_type: string;
+  expires_at: string | null;
+  file_size_bytes: number;
+};
 
 const MAX_REFERENCE_LENGTH = 25;
 const MAX_MESSAGE_LENGTH = 500;
@@ -235,6 +265,59 @@ function parseMutation(value: unknown): PortalRecordingMutationResponse | null {
   return isRecord(value) ? value as PortalRecordingMutationResponse : null;
 }
 
+const RELATED_RECORD_TYPES = new Set<PortalRelatedRecordType>([
+  "appointment", "referral", "call_slip", "routine_interview", "case", "urgent_support", "ecounseling",
+]);
+
+function parseRelatedRecords(value: unknown): PortalRelatedRecords | null {
+  if (!isRecord(value) || !Array.isArray(value.items)) return null;
+  const items = value.items.map((item): PortalRelatedRecord | null => {
+    if (!isRecord(item) || typeof item.record_type !== "string" || !RELATED_RECORD_TYPES.has(item.record_type as PortalRelatedRecordType)) return null;
+    if (!boundedString(item.reference_code, MAX_REFERENCE_LENGTH) || !optionalBoundedString(item.status, 80) || !optionalTimestamp(item.created_at) || !optionalTimestamp(item.updated_at)) return null;
+    return {
+      record_type: item.record_type as PortalRelatedRecordType,
+      reference_code: item.reference_code,
+      status: item.status ?? null,
+      created_at: item.created_at ?? null,
+      updated_at: item.updated_at ?? null,
+    };
+  }).filter((item): item is PortalRelatedRecord => item !== null);
+  return { items };
+}
+
+function parseLinkOption(value: unknown): PortalLinkOption | null {
+  if (!isRecord(value) || !boundedString(value.reference_code, MAX_REFERENCE_LENGTH) || !optionalBoundedString(value.status, 80)) return null;
+  return { reference_code: value.reference_code, status: value.status ?? null };
+}
+
+function parseLinkOptionPage(value: unknown): PortalLinkOptionPage | null {
+  if (!isRecord(value) || !Array.isArray(value.items) || typeof value.page !== "number" || !Number.isSafeInteger(value.page) || value.page < 1 || typeof value.page_size !== "number" || !Number.isSafeInteger(value.page_size) || value.page_size < 1 || value.page_size > 100 || typeof value.total !== "number" || !Number.isSafeInteger(value.total) || value.total < 0) return null;
+  const items = value.items.map(parseLinkOption).filter((item): item is PortalLinkOption => item !== null);
+  return { items, page: value.page, page_size: value.page_size, total: value.total };
+}
+
+function parseTranscriptionStatus(value: unknown): PortalTranscriptionStatus | null {
+  if (!isRecord(value) || typeof value.available !== "boolean" || !optionalTimestamp(value.available_at) || !optionalTimestamp(value.expires_at) || !boundedString(value.status, 80)) return null;
+  return { available: value.available, available_at: value.available_at ?? null, expires_at: value.expires_at ?? null, status: value.status };
+}
+
+function parseTranscriptMetadata(value: unknown): PortalTranscriptMetadata | null {
+  if (!isRecord(value) || typeof value.available !== "boolean" || !boundedString(value.content_type, 120) || !optionalTimestamp(value.expires_at) || typeof value.file_size_bytes !== "number" || !Number.isSafeInteger(value.file_size_bytes) || value.file_size_bytes < 0) return null;
+  return { available: value.available, content_type: value.content_type, expires_at: value.expires_at ?? null, file_size_bytes: value.file_size_bytes };
+}
+
+async function readBlobRequest(request: Promise<GeneratedResponse>) {
+  try {
+    const response = await request;
+    if (response.status === 200 && response.data instanceof Blob) return response.data;
+    throw new CounselingApiError(errorKind(response.status));
+  } catch (error) {
+    if (isAbortError(error)) throw error;
+    if (error instanceof CounselingApiError) throw error;
+    throw new CounselingApiError("unavailable");
+  }
+}
+
 export function getPortalCounselingSessionWorkspace(referenceCode: string, signal?: AbortSignal) {
   return readRequest(counselingSessionWorkspace(safeReference(referenceCode), cookieSessionReadOptions(signal)), parseWorkspace);
 }
@@ -260,6 +343,44 @@ export async function joinPortalEcounseling(referenceCode: string, signal?: Abor
 
 export function getPortalRecordingStatus(referenceCode: string, signal?: AbortSignal) {
   return readRequest(counselingEcounselingRecordingStatus(safeReference(referenceCode), cookieSessionReadOptions(signal)), parseRecordingStatus);
+}
+
+export function getPortalRelatedRecords(referenceCode: string, signal?: AbortSignal) {
+  return readRequest(counselingSessionRelatedRecords(safeReference(referenceCode), cookieSessionReadOptions(signal)), parseRelatedRecords);
+}
+
+export function getPortalSessionUrgentSupportOptions(referenceCode: string, signal?: AbortSignal) {
+  return readRequest(
+    counselingSessionUrgentSupportOptions(safeReference(referenceCode), { page: 1, page_size: 20 }, cookieSessionReadOptions(signal)),
+    parseLinkOptionPage,
+  );
+}
+
+export function linkPortalUrgentSupportToSession(referenceCode: string, urgentSupportReference: string, intent: "originating" | "documentation", key: IdempotencyKey, signal?: AbortSignal) {
+  const target = safeReference(urgentSupportReference);
+  return runRecordingMutation(
+    (options) => counselingUrgentLinkSession(target, { target_reference_code: safeReference(referenceCode), intent }, options),
+    key,
+    signal,
+  );
+}
+
+export function getPortalTranscriptionStatus(referenceCode: string, signal?: AbortSignal) {
+  return readRequest(counselingEcounselingTranscriptionStatus(safeReference(referenceCode), cookieSessionReadOptions(signal)), parseTranscriptionStatus);
+}
+
+export function getPortalTranscriptMetadata(referenceCode: string, signal?: AbortSignal) {
+  return readRequest(counselingEcounselingTranscriptMetadata(safeReference(referenceCode), cookieSessionReadOptions(signal)), parseTranscriptMetadata);
+}
+
+export function downloadPortalTranscript(referenceCode: string, signal?: AbortSignal) {
+  return readBlobRequest(counselingEcounselingTranscriptDownload(safeReference(referenceCode), cookieSessionReadOptions(signal)));
+}
+
+export function downloadPortalRecording(referenceCode: string, runId: string, signal?: AbortSignal) {
+  const safeRunId = runId.trim().slice(0, 80);
+  if (!safeRunId) throw new CounselingApiError("validation");
+  return readBlobRequest(counselingEcounselingRecordingDownload(safeReference(referenceCode), safeRunId, cookieSessionReadOptions(signal)));
 }
 
 async function runRecordingMutation(

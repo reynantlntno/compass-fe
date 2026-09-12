@@ -6,8 +6,7 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export type ProfilesStaffStudentsParams = {
-q?: string;
+export type CounselingSessionUrgentSupportOptionsParams = {
 /**
  * @minimum 1
  */

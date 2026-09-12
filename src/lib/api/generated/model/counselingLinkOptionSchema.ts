@@ -6,7 +6,7 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export interface ReferralAssignmentSchema {
-  counselor_id: number;
-  reason_code: string;
+export interface CounselingLinkOptionSchema {
+  reference_code: string;
+  status?: string | null;
 }

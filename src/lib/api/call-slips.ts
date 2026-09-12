@@ -55,6 +55,11 @@ export type CallSlipDestination = (typeof CALL_SLIP_DESTINATIONS)[number];
 export type CallSlipQueueOrder = (typeof CALL_SLIP_QUEUE_ORDERS)[number];
 export type CallSlipAssignment = (typeof CALL_SLIP_ASSIGNMENTS)[number];
 
+type CallSlipCreatePayload = Omit<CallSlipDraftSchema, "student_id"> & {
+  student_id?: number;
+  student_selection_token?: string;
+};
+
 export type CallSlipAction =
   | "issue" | "attendance" | "no-show" | "expire" | "cancel" | "assign" | "reassign";
 
@@ -439,9 +444,9 @@ async function runMutation(
   }
 }
 
-export async function createPortalCallSlip(payload: CallSlipDraftSchema, key: IdempotencyKey, signal?: AbortSignal) {
+export async function createPortalCallSlip(payload: CallSlipCreatePayload, key: IdempotencyKey, signal?: AbortSignal) {
   try {
-    const response = await callSlipsCreate(payload, withIdempotencyKey(key, await cookieSessionMutationOptions(signal)));
+    const response = await callSlipsCreate(payload as unknown as CallSlipDraftSchema, withIdempotencyKey(key, await cookieSessionMutationOptions(signal)));
     if (response.status === 200 && isRecord(response.data) && typeof response.data.reference_code === "string") {
       return response.data.reference_code;
     }
@@ -501,7 +506,7 @@ export function assignPortalCallSlip(
   key: IdempotencyKey,
   signal?: AbortSignal,
 ) {
-  const payload: CallSlipAssignmentSchema = { counselor_selection_token: selectionToken, reason_code: reasonCode.trim().slice(0, 50) };
+  const payload = { counselor_selection_token: selectionToken, reason_code: reasonCode.trim().slice(0, 50) } as unknown as CallSlipAssignmentSchema;
   return runMutation((options) => callSlipsAssign(safeReference(referenceCode), payload, options), key, signal);
 }
 
@@ -512,7 +517,7 @@ export function reassignPortalCallSlip(
   key: IdempotencyKey,
   signal?: AbortSignal,
 ) {
-  const payload: CallSlipAssignmentSchema = { counselor_selection_token: selectionToken, reason_code: reasonCode.trim().slice(0, 50) };
+  const payload = { counselor_selection_token: selectionToken, reason_code: reasonCode.trim().slice(0, 50) } as unknown as CallSlipAssignmentSchema;
   return runMutation((options) => callSlipsReassign(safeReference(referenceCode), payload, options), key, signal);
 }
 

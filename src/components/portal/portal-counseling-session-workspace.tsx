@@ -5,12 +5,14 @@ import {
   ArrowLeft,
   Check,
   CircleStop,
+  Download,
   FileText,
   HeartHandshake,
   Info,
   LockKeyhole,
   RefreshCw,
   Save,
+  Link2,
   Video,
 } from "lucide-react";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
@@ -39,14 +41,27 @@ import {
 import {
   getPortalCounselorNote,
   getPortalCounselingSessionWorkspace,
+  getPortalRelatedRecords,
+  getPortalSessionUrgentSupportOptions,
   getPortalRecordingStatus,
+  getPortalTranscriptMetadata,
+  getPortalTranscriptionStatus,
   joinPortalEcounseling,
+  linkPortalUrgentSupportToSession,
+  downloadPortalRecording,
+  downloadPortalTranscript,
   startPortalRecording,
   stopPortalRecording,
+  type PortalLinkOption,
+  type PortalRelatedRecord,
+  type PortalRelatedRecords,
   type PortalCounselingNote,
   type PortalCounselingSessionWorkspace,
   type PortalRecordingStatus,
+  type PortalTranscriptMetadata,
+  type PortalTranscriptionStatus,
 } from "@/lib/api/counseling-session-workspace";
+import { downloadPortalBlob } from "@/lib/api/browser-download";
 import { createIdempotencyKey, type IdempotencyKey } from "@/lib/api/idempotency";
 import {
   getPortalRoutineInterviewDetail,
@@ -54,8 +69,9 @@ import {
   type PortalRoutineInterviewDetail,
   type PortalRoutineInterviewSensitiveDetail,
 } from "@/lib/api/routine-interviews";
+import { RoutineInterviewDocumentActions } from "@/components/portal/portal-routine-interviews";
 
-type Panel = "student" | "pre-intake" | "notes" | "summary" | "recording";
+type Panel = "student" | "pre-intake" | "notes" | "summary" | "recording" | "related";
 type WorkspaceLoadState =
   | { kind: "loading" }
   | { kind: "ready"; context: PortalCounselingSessionWorkspace }
@@ -71,6 +87,13 @@ type RecordingState =
   | { kind: "loading" }
   | { kind: "error" }
   | { kind: "ready"; status: PortalRecordingStatus };
+type RelatedState =
+  | { kind: "idle" | "loading" | "error" }
+  | { kind: "ready"; records: PortalRelatedRecords };
+type LinkOptionsState =
+  | { kind: "idle" | "loading" | "error" }
+  | { kind: "ready"; options: PortalLinkOption[] };
+type AccessState<T> = { kind: "idle" | "loading" | "error" } | { kind: "ready"; value: T };
 type VideoState = "idle" | "joining" | "joined" | "error";
 type SessionAction = "start" | "save" | "complete" | "cancel" | "no-show" | "finalize" | "lock";
 type MutationState = { kind: "pending" | "success" | "error"; message: string };
@@ -81,6 +104,7 @@ const PANELS: readonly { value: Panel; label: string }[] = [
   { value: "notes", label: "Evaluation and notes" },
   { value: "summary", label: "Shared summary" },
   { value: "recording", label: "Recording" },
+  { value: "related", label: "Related records" },
 ];
 
 const EMPTY_NOTE: PortalCounselingNote = {
@@ -148,6 +172,45 @@ function StateMessage({ message, onRetry }: { message: string; onRetry?: () => v
   return <div className="portal-session-workspace__state" role="status"><p>{message}</p>{onRetry ? <Button onClick={onRetry} size="sm" type="button" variant="outline"><RefreshCw aria-hidden="true" />Try again</Button> : null}</div>;
 }
 
+function relatedRecordLabel(recordType: PortalRelatedRecord["record_type"]) {
+  switch (recordType) {
+    case "call_slip": return "Call slip";
+    case "routine_interview": return "Routine interview";
+    case "urgent_support": return "Urgent support";
+    case "ecounseling": return "E-counseling";
+    default: return recordType.charAt(0).toUpperCase() + recordType.slice(1);
+  }
+}
+
+function relatedRecordHref(record: PortalRelatedRecord) {
+  const reference = encodeURIComponent(record.reference_code);
+  if (record.record_type === "appointment") return `/portal/appointments?q=${reference}`;
+  if (record.record_type === "referral") return `/portal/referrals?section=referrals&q=${reference}`;
+  if (record.record_type === "call_slip") return `/portal/referrals?section=call-slips&q=${reference}`;
+  if (record.record_type === "case") return `/portal/counseling?section=cases&q=${reference}`;
+  if (record.record_type === "urgent_support") return `/portal/counseling?section=urgent-support&q=${reference}`;
+  if (record.record_type === "routine_interview") {
+    return `/portal/counseling?section=routine-interviews${record.status ? `&status=${encodeURIComponent(record.status)}` : ""}`;
+  }
+  return null;
+}
+
+function RelatedPanel({ state, onLoad, canLinkUrgentSupport, onLinkUrgentSupport }: { state: RelatedState; onLoad: () => void; canLinkUrgentSupport: boolean; onLinkUrgentSupport: () => void }) {
+  if (state.kind === "idle") return <StateMessage message="Related records are loaded only when requested." onRetry={onLoad} />;
+  if (state.kind === "loading") return <div className="portal-session-workspace__state" role="status"><Skeleton as="span" /><Skeleton as="span" /></div>;
+  if (state.kind === "error") return <StateMessage message="Related records are unavailable right now." onRetry={onLoad} />;
+  const records = state.kind === "ready" ? state.records : null;
+  if (!records) return <StateMessage message="Related records are unavailable right now." onRetry={onLoad} />;
+  return <div className="portal-session-workspace__panel-body">
+    <p className="portal-session-workspace__eyebrow">Policy-filtered context</p>
+    {records.items.length ? <ul className="portal-session-workspace__related-records">{records.items.map((record) => {
+      const href = relatedRecordHref(record);
+      return <li key={`${record.record_type}-${record.reference_code}`}><div><strong>{relatedRecordLabel(record.record_type)}</strong><span>{record.reference_code}</span></div>{href ? <Link href={href}>Open</Link> : <span>{record.status ? labelForValue(record.status) : "Available"}</span>}</li>;
+    })}</ul> : <p className="portal-session-workspace__help">No related records are available to this account.</p>}
+    {canLinkUrgentSupport ? <Button onClick={onLinkUrgentSupport} size="sm" type="button" variant="outline"><Link2 aria-hidden="true" />Link urgent support</Button> : null}
+  </div>;
+}
+
 function RoutinePanel({ state, onLoad, onLoadSensitive }: { state: RoutineState; onLoad: () => void; onLoadSensitive: () => void }) {
   if (state.kind === "idle") return <StateMessage message="Pre-intake is loaded only when requested." onRetry={onLoad} />;
   if (state.kind === "loading") return <div className="portal-session-workspace__state" role="status"><Skeleton as="span" /><Skeleton as="span" /></div>;
@@ -162,6 +225,7 @@ function RoutinePanel({ state, onLoad, onLoadSensitive }: { state: RoutineState;
       ["Interview time", detail.visit_time ?? "Not set"],
       ["Last submitted", formatTimestamp(detail.submitted_at)],
     ]} />
+    <RoutineInterviewDocumentActions referenceCode={detail.session_reference_code} />
     {sensitive ? <div className="portal-session-workspace__sensitive-copy">
       <h3>Intake and evaluation details</h3>
       <FactList facts={[
@@ -197,24 +261,33 @@ function NotesPanel({ mode, state, note, canEdit, onChange, onLoad, onSave }: { 
   </div>;
 }
 
-function RecordingPanel({ context, state, onLoad, onStart, onStop }: { context: PortalCounselingSessionWorkspace; state: RecordingState; onLoad: () => void; onStart: () => void; onStop: (runId: string) => void }) {
+function RecordingPanel({ context, state, transcription, metadata, onLoad, onStart, onStop, onDownloadTranscript, onDownloadRecording }: { context: PortalCounselingSessionWorkspace; state: RecordingState; transcription: AccessState<PortalTranscriptionStatus>; metadata: AccessState<PortalTranscriptMetadata>; onLoad: () => void; onStart: () => void; onStop: (runId: string) => void; onDownloadTranscript: () => void; onDownloadRecording: (runId: string) => void }) {
   if (!context.ecounseling_reference_code) return <StateMessage message="Recording is available only for an authorized online session." />;
   if (state.kind === "idle") return <StateMessage message="Recording status is loaded only when requested." onRetry={onLoad} />;
   if (state.kind === "loading") return <div className="portal-session-workspace__state" role="status"><Skeleton as="span" /><Skeleton as="span" /></div>;
   if (state.kind === "error") return <StateMessage message="Recording status is unavailable right now." onRetry={onLoad} />;
   const run = state.status.run;
   const active = Boolean(run && ["REQUESTED", "STARTING", "RECORDING", "STOP_REQUESTED", "PROCESSING"].includes(run.status));
+  const transcriptAvailable = transcription.kind === "ready" ? transcription.value.available : Boolean(run?.transcript_available);
+  const recordingAvailable = Boolean(run && ["AVAILABLE", "PROCESSING"].includes(run.status) && run.available_at);
   return <div className="portal-session-workspace__panel-body">
     <p className="portal-session-workspace__eyebrow">Consent-bound recording</p>
     <FactList facts={[
       ["Consent", <Badge key="consent" variant="outline">{labelForValue(context.recording_consent_status)}</Badge>],
       ["Requested", context.recording_requested ? "Yes" : "No"],
       ["Current status", labelForValue(state.status.status)],
-      ["Transcript", run?.transcript_available ? "Available" : "Not available"],
+      ["Transcript", transcriptAvailable ? "Available" : "Not available"],
+      ["Transcription", transcription.kind === "ready" ? labelForValue(transcription.value.status) : "Not loaded"],
+      ["Recording expiry", run?.expires_at ? formatTimestamp(run.expires_at) : "Not available"],
     ]} />
+    {metadata.kind === "ready" && metadata.value.available ? <p className="portal-session-workspace__help">Transcript file: {metadata.value.content_type} · {metadata.value.file_size_bytes.toLocaleString()} bytes{metadata.value.expires_at ? ` · expires ${formatTimestamp(metadata.value.expires_at)}` : ""}</p> : null}
     <p className="portal-session-workspace__help">Recording never starts automatically. Student consent and the server recording policy must allow it.</p>
     {context.recording_controls_enabled && context.recording_consent_status === "APPROVED" && context.status === "IN_PROGRESS" && !active ? <Button onClick={onStart} size="sm" type="button"><Video aria-hidden="true" />Start audio recording</Button> : null}
     {context.recording_controls_enabled && run?.run_id && active ? <Button onClick={() => onStop(run.run_id)} size="sm" type="button" variant="outline"><CircleStop aria-hidden="true" />Stop recording</Button> : null}
+    <div className="portal-session-workspace__related-links">
+      {transcriptAvailable ? <Button onClick={onDownloadTranscript} size="sm" type="button" variant="outline"><Download aria-hidden="true" />Download transcript</Button> : null}
+      {recordingAvailable && run?.run_id ? <Button onClick={() => onDownloadRecording(run.run_id)} size="sm" type="button" variant="outline"><Download aria-hidden="true" />Download recording</Button> : null}
+    </div>
   </div>;
 }
 
@@ -227,6 +300,13 @@ export function PortalCounselingSessionWorkspace({ referenceCode }: { referenceC
   const [note, setNote] = useState<PortalCounselingNote>(EMPTY_NOTE);
   const [routineState, setRoutineState] = useState<RoutineState>({ kind: "idle" });
   const [recordingState, setRecordingState] = useState<RecordingState>({ kind: "idle" });
+  const [relatedState, setRelatedState] = useState<RelatedState>({ kind: "idle" });
+  const [transcriptionState, setTranscriptionState] = useState<AccessState<PortalTranscriptionStatus>>({ kind: "idle" });
+  const [transcriptMetadataState, setTranscriptMetadataState] = useState<AccessState<PortalTranscriptMetadata>>({ kind: "idle" });
+  const [linkOptionsState, setLinkOptionsState] = useState<LinkOptionsState>({ kind: "idle" });
+  const [linkDialogOpen, setLinkDialogOpen] = useState(false);
+  const [linkReference, setLinkReference] = useState("");
+  const [linkIntent, setLinkIntent] = useState<"originating" | "documentation">("originating");
   const [videoState, setVideoState] = useState<VideoState>("idle");
   const [actionIntent, setActionIntent] = useState<SessionAction | null>(null);
   const [actionReason, setActionReason] = useState("");
@@ -303,6 +383,47 @@ export function PortalCounselingSessionWorkspace({ referenceCode }: { referenceC
   }, [loadState, panel, recordingState.kind]);
 
   useEffect(() => {
+    if (loadState.kind !== "ready" || panel !== "related" || relatedState.kind !== "idle") return;
+    const controller = new AbortController();
+    let active = true;
+    void Promise.resolve().then(() => {
+      if (!active || controller.signal.aborted) return null;
+      setRelatedState({ kind: "loading" });
+      return getPortalRelatedRecords(referenceCode, controller.signal);
+    }).then((records) => {
+      if (!active || controller.signal.aborted) return;
+      setRelatedState(records ? { kind: "ready", records } : { kind: "error" });
+    }).catch((error: unknown) => {
+      if (active && !controller.signal.aborted && !isAbortError(error)) setRelatedState({ kind: "error" });
+    });
+    return () => { active = false; controller.abort(); };
+  }, [loadState, panel, referenceCode, relatedState.kind]);
+
+  useEffect(() => {
+    if (loadState.kind !== "ready" || panel !== "recording" || recordingState.kind !== "ready" || !loadState.context.ecounseling_reference_code || transcriptionState.kind !== "idle") return;
+    const ecounselingReferenceCode = loadState.context.ecounseling_reference_code;
+    let active = true;
+    void getPortalTranscriptionStatus(ecounselingReferenceCode).then((status) => {
+      if (active) setTranscriptionState({ kind: "ready", value: status });
+    }).catch((error: unknown) => {
+      if (active && !isAbortError(error)) setTranscriptionState({ kind: "error" });
+    });
+    return () => { active = false; };
+  }, [loadState, panel, recordingState.kind, transcriptionState.kind]);
+
+  useEffect(() => {
+    if (loadState.kind !== "ready" || panel !== "recording" || transcriptionState.kind !== "ready" || !transcriptionState.value.available || !loadState.context.ecounseling_reference_code || transcriptMetadataState.kind !== "idle") return;
+    const ecounselingReferenceCode = loadState.context.ecounseling_reference_code;
+    let active = true;
+    void getPortalTranscriptMetadata(ecounselingReferenceCode).then((metadata) => {
+      if (active) setTranscriptMetadataState({ kind: "ready", value: metadata });
+    }).catch((error: unknown) => {
+      if (active && !isAbortError(error)) setTranscriptMetadataState({ kind: "error" });
+    });
+    return () => { active = false; };
+  }, [loadState, panel, transcriptMetadataState.kind, transcriptionState]);
+
+  useEffect(() => {
     return () => {
       videoGenerationRef.current += 1;
       const call = dailyCallRef.current;
@@ -329,12 +450,17 @@ export function PortalCounselingSessionWorkspace({ referenceCode }: { referenceC
     setNoteState({ kind: "idle" });
     setRoutineState({ kind: "idle" });
     setRecordingState({ kind: "idle" });
+    setRelatedState({ kind: "idle" });
+    setTranscriptionState({ kind: "idle" });
+    setTranscriptMetadataState({ kind: "idle" });
+    setLinkOptionsState({ kind: "idle" });
   };
 
   const retryPanel = (target: Panel) => {
     if (target === "notes" || target === "summary") setNoteState({ kind: "idle" });
     if (target === "pre-intake") setRoutineState({ kind: "idle" });
     if (target === "recording") setRecordingState({ kind: "idle" });
+    if (target === "related") setRelatedState({ kind: "idle" });
   };
 
   const loadRoutineSensitive = () => {
@@ -444,12 +570,66 @@ export function PortalCounselingSessionWorkspace({ referenceCode }: { referenceC
     }).catch((error: unknown) => setMutation({ kind: "error", message: mutationMessage(error instanceof CounselingApiError ? error : new CounselingApiError("unavailable")) }));
   };
 
+  const openUrgentLinkDialog = () => {
+    if (linkOptionsState.kind === "ready") {
+      setLinkReference(linkOptionsState.options[0]?.reference_code ?? "");
+      setLinkDialogOpen(true);
+      return;
+    }
+    setLinkOptionsState({ kind: "loading" });
+    void getPortalSessionUrgentSupportOptions(referenceCode).then((page) => {
+      setLinkOptionsState({ kind: "ready", options: page.items });
+      setLinkReference(page.items[0]?.reference_code ?? "");
+      setLinkDialogOpen(true);
+    }).catch((error: unknown) => {
+      if (!isAbortError(error)) setLinkOptionsState({ kind: "error" });
+    });
+  };
+
+  const confirmUrgentLink = async () => {
+    if (!linkReference) return;
+    const fingerprint = JSON.stringify({ referenceCode, linkReference, linkIntent });
+    const scope = `counseling-session-link-urgent:${referenceCode}`;
+    const key = getMutationKey(scope, fingerprint);
+    setMutation({ kind: "pending", message: "Linking urgent support…" });
+    try {
+      await linkPortalUrgentSupportToSession(referenceCode, linkReference, linkIntent, key);
+      mutationKeysRef.current.delete(scope);
+      setMutation({ kind: "success", message: "Urgent support linked." });
+      setLinkDialogOpen(false);
+      updateContext();
+    } catch (error: unknown) {
+      const apiError = error instanceof CounselingApiError ? error : new CounselingApiError("unavailable");
+      if (apiError.kind !== "unavailable" && apiError.kind !== "rate_limited") mutationKeysRef.current.delete(scope);
+      setMutation({ kind: "error", message: mutationMessage(apiError) });
+    }
+  };
+
+  const downloadTranscript = () => {
+    if (!context?.ecounseling_reference_code) return;
+    setMutation({ kind: "pending", message: "Preparing transcript download…" });
+    void downloadPortalTranscript(context.ecounseling_reference_code).then((blob) => {
+      downloadPortalBlob(blob, "counseling-transcript");
+      setMutation({ kind: "success", message: "Transcript download started." });
+    }).catch((error: unknown) => setMutation({ kind: "error", message: mutationMessage(error instanceof CounselingApiError ? error : new CounselingApiError("unavailable")) }));
+  };
+
+  const downloadRecording = (runId: string) => {
+    if (!context?.ecounseling_reference_code) return;
+    setMutation({ kind: "pending", message: "Preparing recording download…" });
+    void downloadPortalRecording(context.ecounseling_reference_code, runId).then((blob) => {
+      downloadPortalBlob(blob, "counseling-recording");
+      setMutation({ kind: "success", message: "Recording download started." });
+    }).catch((error: unknown) => setMutation({ kind: "error", message: mutationMessage(error instanceof CounselingApiError ? error : new CounselingApiError("unavailable")) }));
+  };
+
   const panelContent = context ? (
     panel === "student" ? <div className="portal-session-workspace__panel-body"><FactList facts={[["Student", context.student_display_name ?? "Student details unavailable"], ["Student number", context.student_number ?? "Not available"], ["Session", context.reference_code], ["Type", labelForValue(context.session_type)], ["Mode", labelForValue(context.session_mode)], ["Source", labelForValue(context.session_source)], ["Schedule", formatSchedule(context)], ["Assignment", context.assignment_state ?? "Assignment unavailable"]]} /><div className="portal-session-workspace__related-links"><Link href="/portal/counseling?section=sessions">Back to sessions</Link>{context.routine_interview_available ? <Link href={`/portal/counseling?section=routine-interviews&status=${encodeURIComponent("INTAKE_SUBMITTED")}`}>Open routine interviews</Link> : null}</div></div>
       : panel === "pre-intake" ? <RoutinePanel onLoad={() => retryPanel("pre-intake")} onLoadSensitive={loadRoutineSensitive} state={routineState} />
         : panel === "notes" ? <NotesPanel canEdit={canEditNotes} mode="notes" note={note} onChange={(patch) => setNote((current) => ({ ...current, ...patch }))} onLoad={() => retryPanel("notes")} onSave={saveNotes} state={noteState} />
           : panel === "summary" ? <NotesPanel canEdit={canEditNotes} mode="summary" note={note} onChange={(patch) => setNote((current) => ({ ...current, ...patch }))} onLoad={() => retryPanel("summary")} onSave={saveNotes} state={noteState} />
-            : <RecordingPanel context={context} onLoad={() => retryPanel("recording")} onStart={startRecordingAction} onStop={stopRecordingAction} state={recordingState} />
+            : panel === "recording" ? <RecordingPanel context={context} metadata={transcriptMetadataState} onDownloadRecording={downloadRecording} onDownloadTranscript={downloadTranscript} onLoad={() => { retryPanel("recording"); setTranscriptionState({ kind: "idle" }); setTranscriptMetadataState({ kind: "idle" }); }} onStart={startRecordingAction} onStop={stopRecordingAction} state={recordingState} transcription={transcriptionState} />
+              : <RelatedPanel canLinkUrgentSupport={hasCapability(PORTAL_CAPABILITIES.urgentSupportQueueReview)} onLinkUrgentSupport={openUrgentLinkDialog} onLoad={() => retryPanel("related")} state={relatedState} />
   ) : null;
 
   if (loadState.kind === "loading") return <section aria-busy="true" className="portal-session-workspace portal-session-workspace--state" role="status"><PortalPageHeader current="Counseling session" description="Loading the authorized session workspace." headingId="portal-session-workspace-heading" title="Counseling session" /><PortalCollectionFrame className="portal-session-workspace__loading"><Skeleton as="span" /><Skeleton as="span" /><Skeleton as="span" /></PortalCollectionFrame></section>;
@@ -467,11 +647,20 @@ export function PortalCounselingSessionWorkspace({ referenceCode }: { referenceC
       </PortalCollectionFrame>
       <PortalCollectionFrame className="portal-session-workspace__context-frame">
         <nav aria-label="Session context" className="portal-session-workspace__panel-nav" role="tablist">{PANELS.map((item) => <button aria-controls={`${detailId(referenceCode)}-${item.value}`} aria-selected={panel === item.value} className={panel === item.value ? "is-current" : undefined} key={item.value} onClick={() => setPanel(item.value)} role="tab" type="button">{item.label}</button>)}</nav>
-        <div aria-live="polite" className="portal-session-workspace__panel" id={`${detailId(referenceCode)}-${panel}`} role="tabpanel"><div className="portal-session-workspace__panel-heading"><div><p className="portal-session-workspace__eyebrow">Session context</p><h2>{PANELS.find((item) => item.value === panel)?.label}</h2></div>{panel === "summary" ? <Check aria-hidden="true" /> : panel === "notes" ? <FileText aria-hidden="true" /> : <Info aria-hidden="true" />}</div>{panelContent}</div>
+        <div aria-live="polite" className="portal-session-workspace__panel" id={`${detailId(referenceCode)}-${panel}`} role="tabpanel"><div className="portal-session-workspace__panel-heading"><div><p className="portal-session-workspace__eyebrow">Session context</p><h2>{PANELS.find((item) => item.value === panel)?.label}</h2></div>{panel === "summary" ? <Check aria-hidden="true" /> : panel === "notes" ? <FileText aria-hidden="true" /> : panel === "related" ? <Link2 aria-hidden="true" /> : <Info aria-hidden="true" />}</div>{panelContent}</div>
       </PortalCollectionFrame>
     </div>
     <AlertDialog onOpenChange={(open) => { if (!open && mutation?.kind !== "pending") { setActionIntent(null); setActionError(null); } }} open={actionIntent !== null}>
       <AlertDialogContent className="portal-session-workspace__dialog" size="sm"><AlertDialogHeader><AlertDialogTitle>{actionIntent ? actionLabel(actionIntent) : "Session action"}</AlertDialogTitle><AlertDialogDescription>{actionIntent === "cancel" ? "Canceling a session requires a short reason." : "Review this session action before continuing."}</AlertDialogDescription></AlertDialogHeader>{actionIntent === "cancel" ? <div className="portal-session-workspace__field"><Label htmlFor="portal-session-action-reason">Reason</Label><Textarea id="portal-session-action-reason" maxLength={2_000} onChange={(event) => setActionReason(event.target.value)} value={actionReason} /></div> : null}{actionError ? <p className="portal-session-workspace__error" role="alert">{actionError}</p> : null}<AlertDialogFooter><AlertDialogCancel disabled={mutation?.kind === "pending"}>Keep session</AlertDialogCancel><AlertDialogAction disabled={mutation?.kind === "pending"} onClick={() => void confirmAction()}>{mutation?.kind === "pending" ? "Saving…" : "Continue"}</AlertDialogAction></AlertDialogFooter></AlertDialogContent>
+    </AlertDialog>
+    <AlertDialog onOpenChange={(open) => { if (!open && mutation?.kind !== "pending") setLinkDialogOpen(false); }} open={linkDialogOpen}>
+      <AlertDialogContent className="portal-session-workspace__dialog" size="sm"><AlertDialogHeader><AlertDialogTitle>Link urgent support</AlertDialogTitle><AlertDialogDescription>Choose an authorized urgent-support request and how this session relates to it.</AlertDialogDescription></AlertDialogHeader>
+        {linkOptionsState.kind === "loading" ? <div className="portal-session-workspace__state" role="status"><Skeleton as="span" /></div> : null}
+        {linkOptionsState.kind === "error" ? <StateMessage message="Urgent-support options are unavailable right now." onRetry={openUrgentLinkDialog} /> : null}
+        {linkOptionsState.kind === "ready" && linkOptionsState.options.length ? <div className="portal-session-workspace__dialog-fields"><div className="portal-session-workspace__field"><Label htmlFor="portal-session-urgent-link-target">Urgent support request</Label><select id="portal-session-urgent-link-target" onChange={(event) => setLinkReference(event.target.value)} value={linkReference}>{linkOptionsState.options.map((option) => <option key={option.reference_code} value={option.reference_code}>{option.reference_code}{option.status ? ` · ${labelForValue(option.status)}` : ""}</option>)}</select></div><div className="portal-session-workspace__field"><Label htmlFor="portal-session-urgent-link-intent">Relationship</Label><select id="portal-session-urgent-link-intent" onChange={(event) => setLinkIntent(event.target.value as "originating" | "documentation")} value={linkIntent}><option value="originating">Originating session</option><option value="documentation">Documentation session</option></select></div></div> : null}
+        {linkOptionsState.kind === "ready" && !linkOptionsState.options.length ? <p className="portal-session-workspace__help">No eligible urgent-support requests are available for this session.</p> : null}
+        <AlertDialogFooter><AlertDialogCancel disabled={mutation?.kind === "pending"}>Cancel</AlertDialogCancel><AlertDialogAction disabled={mutation?.kind === "pending" || linkOptionsState.kind !== "ready" || !linkReference} onClick={() => void confirmUrgentLink()}>{mutation?.kind === "pending" ? "Linking…" : "Link request"}</AlertDialogAction></AlertDialogFooter>
+      </AlertDialogContent>
     </AlertDialog>
   </section>;
 }

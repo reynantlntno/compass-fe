@@ -51,6 +51,11 @@ export type ReferralReasonCategory = (typeof REFERRAL_REASON_CATEGORIES)[number]
 export type ReferralQueueOrder = (typeof REFERRAL_QUEUE_ORDERS)[number];
 export type ReferralAssignment = (typeof REFERRAL_ASSIGNMENTS)[number];
 
+type ReferralCreatePayload = Omit<ReferralDraftSchema, "student_id"> & {
+  student_id?: number;
+  student_selection_token?: string;
+};
+
 export type ReferralTransition = "receive" | "review" | "action-required" | "escalate" | "close" | "cancel" | "reopen";
 
 export type ReferralsFilters = {
@@ -425,7 +430,10 @@ export function getPortalReferralCounselorOptions(referenceCode: string, q = "",
 
 export function getPortalStaffStudents(q = "", workflow: "referral" | "call_slip" = "referral", signal?: AbortSignal) {
   return readRequest(
-    profilesStaffStudents({ page: 1, page_size: 25, q: q || undefined, workflow }, cookieSessionReadOptions(signal)),
+    profilesStaffStudents(
+      { page: 1, page_size: 25, q: q || undefined, workflow } as unknown as Parameters<typeof profilesStaffStudents>[0],
+      cookieSessionReadOptions(signal),
+    ),
     (value): StaffStudentOption[] | null => {
       if (!isRecord(value) || !Array.isArray(value.items)) return null;
       return value.items
@@ -456,9 +464,9 @@ async function runMutation(
   }
 }
 
-export async function createPortalReferral(payload: ReferralDraftSchema, key: IdempotencyKey, signal?: AbortSignal) {
+export async function createPortalReferral(payload: ReferralCreatePayload, key: IdempotencyKey, signal?: AbortSignal) {
   try {
-    const response = await referralsCreate(payload, withIdempotencyKey(key, await cookieSessionMutationOptions(signal)));
+    const response = await referralsCreate(payload as unknown as ReferralDraftSchema, withIdempotencyKey(key, await cookieSessionMutationOptions(signal)));
     if (response.status === 200 && isRecord(response.data) && typeof response.data.reference_code === "string") {
       return response.data.reference_code;
     }
@@ -503,7 +511,7 @@ export function assignPortalReferral(
   key: IdempotencyKey,
   signal?: AbortSignal,
 ) {
-  const payload: ReferralAssignmentSchema = { counselor_selection_token: selectionToken, reason_code: reasonCode.trim().slice(0, 50) };
+  const payload = { counselor_selection_token: selectionToken, reason_code: reasonCode.trim().slice(0, 50) } as unknown as ReferralAssignmentSchema;
   return runMutation((options) => referralsAssign(safeReference(referenceCode), payload, options), key, signal);
 }
 
@@ -514,7 +522,7 @@ export function reassignPortalReferral(
   key: IdempotencyKey,
   signal?: AbortSignal,
 ) {
-  const payload: ReferralAssignmentSchema = { counselor_selection_token: selectionToken, reason_code: reasonCode.trim().slice(0, 50) };
+  const payload = { counselor_selection_token: selectionToken, reason_code: reasonCode.trim().slice(0, 50) } as unknown as ReferralAssignmentSchema;
   return runMutation((options) => referralsReassign(safeReference(referenceCode), payload, options), key, signal);
 }
 

@@ -2014,6 +2014,59 @@
   }
 
   .portal-session-workspace__panel-body,
+  .portal-session-workspace__related-records {
+    display: grid;
+    gap: 0.55rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .portal-session-workspace__related-records li {
+    display: flex;
+    min-width: 0;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+    border-top: 1px solid var(--compass-border);
+    padding-top: 0.55rem;
+  }
+
+  .portal-session-workspace__related-records li > div {
+    display: grid;
+    min-width: 0;
+    gap: 0.15rem;
+  }
+
+  .portal-session-workspace__related-records strong,
+  .portal-session-workspace__related-records span {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .portal-session-workspace__related-records strong {
+    color: var(--compass-brand-maroon-strong);
+    font-size: 0.8rem;
+  }
+
+  .portal-session-workspace__related-records span {
+    color: var(--muted-foreground);
+    font-size: 0.76rem;
+  }
+
+  .portal-session-workspace__related-records a {
+    flex: 0 0 auto;
+    color: var(--compass-brand-maroon-strong);
+    font-size: 0.76rem;
+    font-weight: var(--compass-weight-bold);
+    text-underline-offset: 0.18rem;
+  }
+
+  .portal-session-workspace__related-records a:focus-visible {
+    outline: 2px solid var(--compass-brand-gold);
+    outline-offset: 3px;
+  }
+
   .portal-session-workspace__state {
     display: grid;
     min-width: 0;
@@ -11348,6 +11401,19 @@
     height: 1.8rem;
     padding-inline: 0.5rem;
     font-size: 0.7rem;
+  }
+
+  .portal-counseling__document-actions {
+    display: grid;
+    min-width: 0;
+    gap: 0.55rem;
+    margin-top: 0.25rem;
+    border-top: 1px solid var(--compass-border);
+    padding-top: 0.75rem;
+  }
+
+  .portal-counseling__document-actions .portal-counseling__kicker {
+    margin-bottom: 0;
   }
 
   .portal-counseling__urgent-grant-list {

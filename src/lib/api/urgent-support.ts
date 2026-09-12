@@ -4,6 +4,9 @@ import {
   counselingUrgentClose,
   counselingUrgentCounselorOptions,
   counselingUrgentDetail,
+  counselingUrgentLinkCase,
+  counselingUrgentLinkOptions,
+  counselingUrgentLinkSession,
   counselingUrgentList,
   counselingUrgentReview,
   counselingUrgentTriage,
@@ -115,6 +118,9 @@ export type PortalUrgentCounselorOption = {
   display_name: string;
   selection_token: string;
 };
+
+export type PortalUrgentLinkOption = { reference_code: string; status: string | null };
+export type PortalUrgentLinkOptions = { sessions: PortalUrgentLinkOption[]; cases: PortalUrgentLinkOption[] };
 
 export type UrgentSupportMutationResponse =
   | counselingUrgentAccessGrantResponse
@@ -321,6 +327,17 @@ function parseOptions(value: unknown): PortalUrgentCounselorOption[] | null {
   }).filter((item): item is PortalUrgentCounselorOption => item !== null);
 }
 
+function parseLinkOptions(value: unknown): PortalUrgentLinkOptions | null {
+  if (!isRecord(value) || !Array.isArray(value.sessions) || !Array.isArray(value.cases)) return null;
+  const parseOption = (item: unknown): PortalUrgentLinkOption | null => {
+    if (!isRecord(item) || typeof item.reference_code !== "string" || item.reference_code.length === 0 || item.reference_code.length > MAX_REFERENCE_LENGTH || !optionalString(item.status, 80)) return null;
+    return { reference_code: item.reference_code, status: item.status ?? null };
+  };
+  const sessions = value.sessions.map(parseOption).filter((item): item is PortalUrgentLinkOption => item !== null);
+  const cases = value.cases.map(parseOption).filter((item): item is PortalUrgentLinkOption => item !== null);
+  return { sessions, cases };
+}
+
 function errorKind(status: number) {
   if (status === 409) return "conflict" as const;
   if (status === 429) return "rate_limited" as const;
@@ -376,6 +393,10 @@ export function getPortalUrgentCounselorOptions(referenceCode: string, q?: strin
   );
 }
 
+export function getPortalUrgentLinkOptions(referenceCode: string, signal?: AbortSignal) {
+  return readRequest(counselingUrgentLinkOptions(safeReference(referenceCode), cookieSessionReadOptions(signal)), parseLinkOptions);
+}
+
 async function runMutation(
   request: (options: RequestInit) => Promise<GeneratedResponse>,
   key: IdempotencyKey,
@@ -416,4 +437,20 @@ export function grantPortalUrgentSupportAccess(referenceCode: string, payload: U
 
 export function revokePortalUrgentSupportAccess(payload: UrgentRevokePayload, key: IdempotencyKey, signal?: AbortSignal) {
   return runMutation((options) => counselingUrgentAccessRevoke(payload, options), key, signal);
+}
+
+export function linkPortalUrgentSupportToSession(referenceCode: string, sessionReference: string, intent: "originating" | "documentation", key: IdempotencyKey, signal?: AbortSignal) {
+  return runMutation(
+    (options) => counselingUrgentLinkSession(safeReference(referenceCode), { target_reference_code: safeReference(sessionReference), intent }, options),
+    key,
+    signal,
+  );
+}
+
+export function linkPortalUrgentSupportToCase(referenceCode: string, caseReference: string, key: IdempotencyKey, signal?: AbortSignal) {
+  return runMutation(
+    (options) => counselingUrgentLinkCase(safeReference(referenceCode), { target_reference_code: safeReference(caseReference) }, options),
+    key,
+    signal,
+  );
 }

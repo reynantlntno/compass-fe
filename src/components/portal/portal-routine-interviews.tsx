@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronDown, ChevronUp, HeartHandshake, RefreshCw } from "lucide-react";
+import { ChevronDown, ChevronUp, Download, Eye, HeartHandshake, RefreshCw } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   Fragment,
@@ -42,10 +42,13 @@ import { PortalStatusFilter } from "@/components/portal/portal-status-filter";
 import { PortalWorkspaceNav } from "@/components/portal/portal-workspace-nav";
 import { COUNSELING_NAV_ITEMS, type CounselingNavItem } from "@/components/portal/portal-counseling-navigation";
 import { CounselingApiError } from "@/lib/api/counseling";
+import { downloadPortalBlob, previewPortalBlob } from "@/lib/api/browser-download";
 import {
   getPortalRoutineInterviewDetail,
   getPortalRoutineInterviewSensitiveDetail,
   getPortalRoutineInterviews,
+  downloadPortalRoutineInterviewDocument,
+  generatePortalRoutineInterviewDocument,
   lockPortalRoutineInterview,
   completePortalRoutineInterview,
   finalizePortalRoutineInterview,
@@ -58,6 +61,7 @@ import {
   type RoutineInterviewStatus,
   routineInterviewHref,
   parseRoutineInterviewStatuses,
+  previewPortalRoutineInterviewDocument,
 } from "@/lib/api/routine-interviews";
 import { createIdempotencyKey, type IdempotencyKey } from "@/lib/api/idempotency";
 
@@ -227,12 +231,48 @@ function SafeDetails({ detail, onRetry, onSensitive, sensitive }: { detail: Port
   return (
     <div className="portal-counseling__detail-content">
       <dl>{facts.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>
+      <RoutineInterviewDocumentActions referenceCode={detail.session_reference_code} />
       {!sensitive ? <Button onClick={onSensitive} size="sm" type="button" variant="outline">View intake and evaluation details</Button> : null}
       {sensitive?.kind === "loading" ? <div className="portal-counseling__detail-state" role="status"><Skeleton as="span" /><Skeleton as="span" /></div> : null}
       {sensitive?.kind === "error" ? <div className="portal-counseling__detail-state" role="status"><p>Additional interview details are unavailable right now.</p><Button onClick={onRetry} size="sm" type="button" variant="outline"><RefreshCw aria-hidden="true" />Try again</Button></div> : null}
       {sensitive?.kind === "ready" ? <SensitiveDetails detail={sensitive.detail} /> : null}
     </div>
   );
+}
+
+export function RoutineInterviewDocumentActions({ referenceCode }: { referenceCode: string }) {
+  const [state, setState] = useState<{ kind: "idle" | "pending" | "success" | "error"; message?: string }>({ kind: "idle" });
+  const mutationKeyRef = useRef<{ fingerprint: string; key: IdempotencyKey } | null>(null);
+
+  const generate = () => {
+    const fingerprint = `routine-document-generate:${referenceCode}`;
+    const current = mutationKeyRef.current;
+    const key = current?.fingerprint === fingerprint ? current.key : createIdempotencyKey();
+    mutationKeyRef.current = { fingerprint, key };
+    setState({ kind: "pending", message: "Generating document…" });
+    void generatePortalRoutineInterviewDocument(referenceCode, null, key).then(() => {
+      mutationKeyRef.current = null;
+      setState({ kind: "success", message: "Document generated." });
+    }).catch(() => setState({ kind: "error", message: "The document could not be generated right now." }));
+  };
+
+  const preview = () => {
+    setState({ kind: "pending", message: "Preparing preview…" });
+    void previewPortalRoutineInterviewDocument(referenceCode).then((blob) => {
+      previewPortalBlob(blob);
+      setState({ kind: "success", message: "Preview opened." });
+    }).catch(() => setState({ kind: "error", message: "The document preview is unavailable right now." }));
+  };
+
+  const download = () => {
+    setState({ kind: "pending", message: "Preparing download…" });
+    void downloadPortalRoutineInterviewDocument(referenceCode).then((blob) => {
+      downloadPortalBlob(blob, "routine-interview-document");
+      setState({ kind: "success", message: "Download started." });
+    }).catch(() => setState({ kind: "error", message: "The document download is unavailable right now." }));
+  };
+
+  return <div className="portal-counseling__document-actions"><p className="portal-counseling__kicker">Interview document</p><div className="portal-counseling__row-actions"><Button disabled={state.kind === "pending"} onClick={preview} size="xs" type="button" variant="outline"><Eye aria-hidden="true" />Preview</Button><Button disabled={state.kind === "pending"} onClick={generate} size="xs" type="button" variant="outline"><RefreshCw aria-hidden="true" />Generate</Button><Button disabled={state.kind === "pending"} onClick={download} size="xs" type="button" variant="outline"><Download aria-hidden="true" />Download</Button></div>{state.message ? <p className={`portal-counseling__mutation portal-counseling__mutation--${state.kind === "error" ? "error" : state.kind === "success" ? "success" : "pending"}`} role={state.kind === "error" ? "alert" : "status"}>{state.message}</p> : null}</div>;
 }
 
 function SensitiveDetails({ detail }: { detail: PortalRoutineInterviewSensitiveDetail }) {

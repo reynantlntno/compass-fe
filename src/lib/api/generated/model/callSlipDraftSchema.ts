@@ -18,8 +18,7 @@ export interface CallSlipDraftSchema {
   reissued_from_reference?: string | null;
   report_to_destination?: string;
   source_type: string;
-  student_id?: number | null;
+  student_id: number;
   student_safe_instructions?: string;
   student_safe_location?: string;
-  student_selection_token?: string | null;
 }
