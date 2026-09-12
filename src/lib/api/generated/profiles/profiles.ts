@@ -7,8 +7,10 @@
  */
 import type {
   ApiErrorSchema,
+  ProfilesStaffStudentsParams,
   ProfilesSupportDirectoryParams,
   SelfProfileSchema,
+  StaffStudentOptionPageSchema,
   SupportDirectoryPageSchema
 } from '../model';
 
@@ -196,6 +198,106 @@ export const getProfilesMeUrl = () => {
 export const profilesMe = async ( options?: Parameters<typeof compassFetch>[1]): Promise<profilesMeResponse> => {
 
   return compassFetch<profilesMeResponse>(getProfilesMeUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+export type profilesStaffStudentsResponse200 = {
+  data: StaffStudentOptionPageSchema
+  status: 200
+}
+
+export type profilesStaffStudentsResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type profilesStaffStudentsResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type profilesStaffStudentsResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type profilesStaffStudentsResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type profilesStaffStudentsResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type profilesStaffStudentsResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type profilesStaffStudentsResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type profilesStaffStudentsResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type profilesStaffStudentsResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type profilesStaffStudentsResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type profilesStaffStudentsResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type profilesStaffStudentsResponseSuccess = (profilesStaffStudentsResponse200) & {
+  headers: Record<string, string>;
+};
+export type profilesStaffStudentsResponseError = (profilesStaffStudentsResponse400 | profilesStaffStudentsResponse401 | profilesStaffStudentsResponse403 | profilesStaffStudentsResponse404 | profilesStaffStudentsResponse405 | profilesStaffStudentsResponse409 | profilesStaffStudentsResponse413 | profilesStaffStudentsResponse422 | profilesStaffStudentsResponse429 | profilesStaffStudentsResponse500 | profilesStaffStudentsResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type profilesStaffStudentsResponse = (profilesStaffStudentsResponseSuccess | profilesStaffStudentsResponseError)
+
+export const getProfilesStaffStudentsUrl = (params?: ProfilesStaffStudentsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/profiles/staff-students/?${stringifiedParams}` : `/api/v1/profiles/staff-students/`
+}
+
+/**
+ * Scoped staff student search for supported workflow creation.
+ * @summary Profiles Staff Students
+ */
+export const profilesStaffStudents = async (params?: ProfilesStaffStudentsParams, options?: Parameters<typeof compassFetch>[1]): Promise<profilesStaffStudentsResponse> => {
+
+  return compassFetch<profilesStaffStudentsResponse>(getProfilesStaffStudentsUrl(params),
   {
     ...options,
     method: 'GET'

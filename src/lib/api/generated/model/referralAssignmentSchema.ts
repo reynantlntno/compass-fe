@@ -7,6 +7,7 @@
  */
 
 export interface ReferralAssignmentSchema {
-  counselor_id: number;
+  counselor_id?: number | null;
+  counselor_selection_token?: string | null;
   reason_code: string;
 }

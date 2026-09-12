@@ -5,6 +5,7 @@ import { ChevronDown, ChevronUp, HeartHandshake, RefreshCw } from "lucide-react"
 import { useRouter, useSearchParams } from "next/navigation";
 import {
   Fragment,
+  useCallback,
   useEffect,
   useMemo,
   useRef,
@@ -58,9 +59,11 @@ import {
   cancelPortalCounselingSession,
   completePortalCounselingSession,
   CounselingApiError,
+  createPortalWalkInCounselingSession,
   finalizePortalCounselingSession,
   getPortalCounselingSessionDetail,
   getPortalCounselingSessions,
+  getPortalCounselingSessionStudents,
   lockPortalCounselingSession,
   noShowPortalCounselingSession,
   savePortalCounselingNote,
@@ -74,6 +77,7 @@ import {
   type CounselingSessionType,
   type PortalCounselingSession,
   type PortalCounselingSessionPage,
+  type PortalCounselingStudentOption,
 } from "@/lib/api/counseling";
 import { createIdempotencyKey, type IdempotencyKey } from "@/lib/api/idempotency";
 import {
@@ -110,6 +114,18 @@ type MutationState = {
 };
 
 type MutationKeyEntry = { fingerprint: string; key: IdempotencyKey };
+
+function getMutationKeyForMap(
+  map: Map<string, MutationKeyEntry>,
+  scope: string,
+  fingerprint: string,
+) {
+  const existing = map.get(scope);
+  if (existing?.fingerprint === fingerprint) return existing.key;
+  const key = createIdempotencyKey();
+  map.set(scope, { fingerprint, key });
+  return key;
+}
 
 const SESSION_STATUS_OPTIONS: readonly { label: string; value: CounselingSessionStatus }[] = [
   { label: "Scheduled", value: "SCHEDULED" },
@@ -252,6 +268,15 @@ function mutationMessage(error: CounselingApiError) {
     case "validation": return "Check the session details and try again.";
     case "rate_limited": return "Too many attempts. Please wait before trying again.";
     default: return "This session action is temporarily unavailable. Try again.";
+  }
+}
+
+function walkInReadMessage(error: CounselingApiError) {
+  switch (error.kind) {
+    case "permission": return "Student selection is not available for this account.";
+    case "rate_limited": return "Too many searches. Please wait and try again.";
+    case "validation": return "The student search could not be completed.";
+    default: return "Student options are unavailable right now. Try again.";
   }
 }
 
@@ -455,6 +480,126 @@ function SessionsPagination({ page, filters }: { page: PortalCounselingSessionPa
   return <Pagination aria-label="Counseling session pages" className="portal-counseling__pagination"><PaginationContent><PaginationItem>{page.page > 1 ? <PaginationPrevious href={sessionHref(page.page - 1, filters)} text="Previous" /> : <span aria-hidden="true" className="portal-counseling__pagination-spacer" />}</PaginationItem><PaginationItem className="portal-counseling__pagination-current"><span aria-current="page">Page {page.page} of {totalPages}</span></PaginationItem><PaginationItem>{page.page < totalPages ? <PaginationNext href={sessionHref(page.page + 1, filters)} text="Next" /> : <span aria-hidden="true" className="portal-counseling__pagination-spacer" />}</PaginationItem></PaginationContent></Pagination>;
 }
 
+type WalkInSessionDialogProps = {
+  error: string | null;
+  open: boolean;
+  pending: boolean;
+  startFailureReference: string | null;
+  students: PortalCounselingStudentOption[];
+  studentsError: string | null;
+  studentsLoading: boolean;
+  onClose: () => void;
+  onOpenScheduled: () => void;
+  onRetryStart: () => void;
+  onSearch: (query: string) => void;
+  onSelectionChange: () => void;
+  onSubmit: (selectionToken: string) => void;
+};
+
+function WalkInSessionDialog({
+  error,
+  open,
+  pending,
+  startFailureReference,
+  students,
+  studentsError,
+  studentsLoading,
+  onClose,
+  onOpenScheduled,
+  onRetryStart,
+  onSearch,
+  onSelectionChange,
+  onSubmit,
+}: WalkInSessionDialogProps) {
+  const [query, setQuery] = useState("");
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    const timer = window.setTimeout(() => onSearch(query), 220);
+    return () => window.clearTimeout(timer);
+  }, [onSearch, open, query]);
+
+  const handleQueryChange = (value: string) => {
+    setQuery(value);
+    setSelectedIndex(null);
+    onSelectionChange();
+  };
+
+  const handleSelectionChange = (value: string) => {
+    const nextIndex = value === "" ? null : Number(value);
+    setSelectedIndex(Number.isSafeInteger(nextIndex) ? nextIndex : null);
+    onSelectionChange();
+  };
+
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (pending || selectedIndex === null) return;
+    const selectionToken = students[selectedIndex]?.selection_token;
+    if (selectionToken) onSubmit(selectionToken);
+  };
+
+  const canSubmit = !pending && selectedIndex !== null && Boolean(students[selectedIndex]);
+  const scheduledHref = startFailureReference
+    ? `/portal/counseling/sessions/${encodeURIComponent(startFailureReference)}`
+    : null;
+
+  return (
+    <AlertDialog onOpenChange={(nextOpen) => { if (!nextOpen && !pending) onClose(); }} open={open}>
+      <AlertDialogContent className="portal-counseling__dialog portal-counseling__walk-in-dialog" size="sm">
+        <AlertDialogHeader>
+          <AlertDialogTitle>Start walk-in session</AlertDialogTitle>
+          <AlertDialogDescription>Select the student who is here for an on-site counseling session.</AlertDialogDescription>
+        </AlertDialogHeader>
+        <form onSubmit={handleSubmit}>
+          <div className="portal-counseling__dialog-fields">
+            <div className="portal-counseling__dialog-field">
+              <Label htmlFor="portal-counseling-walk-in-search">Student search</Label>
+              <Input
+                autoComplete="off"
+                disabled={pending}
+                id="portal-counseling-walk-in-search"
+                maxLength={80}
+                onChange={(event) => handleQueryChange(event.target.value)}
+                placeholder="Search by name or student number"
+                value={query}
+              />
+            </div>
+            <div className="portal-counseling__dialog-field">
+              <Label htmlFor="portal-counseling-walk-in-student">Student</Label>
+              <select
+                disabled={pending || studentsLoading || students.length === 0}
+                id="portal-counseling-walk-in-student"
+                onChange={(event) => handleSelectionChange(event.target.value)}
+                value={selectedIndex === null ? "" : String(selectedIndex)}
+              >
+                <option value="">Choose a student</option>
+                {students.map((student, index) => <option key={`${student.label}-${index}`} value={String(index)}>{student.label}</option>)}
+              </select>
+              {studentsLoading ? <p className="portal-counseling__dialog-hint" role="status">Loading available students…</p> : null}
+              {studentsError ? <p className="portal-counseling__dialog-error" role="alert">{studentsError}</p> : null}
+              {!studentsLoading && !studentsError && query.trim().length < 2 ? <p className="portal-counseling__dialog-hint">Type at least two characters to search.</p> : null}
+              {!studentsLoading && !studentsError && query.trim().length >= 2 && students.length === 0 ? <p className="portal-counseling__dialog-hint">No matching students are available.</p> : null}
+            </div>
+            <div aria-label="Fixed walk-in session settings" className="portal-counseling__walk-in-settings">
+              <span>Counseling</span>
+              <span>On-site</span>
+              <span>Walk-in</span>
+            </div>
+          </div>
+          {startFailureReference ? <div className="portal-counseling__walk-in-failure" role="alert"><p>The session was created but could not be started. It remains scheduled.</p><p>You can open it now or try starting it again.</p></div> : null}
+          {error && !startFailureReference ? <p className="portal-counseling__dialog-error" role="alert">{error}</p> : null}
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={pending} type="button">Cancel</AlertDialogCancel>
+            {scheduledHref ? <Link className="portal-counseling__dialog-link" href={scheduledHref} onClick={onOpenScheduled}>Open scheduled session</Link> : null}
+            {startFailureReference ? <Button disabled={pending} onClick={onRetryStart} type="button">{pending ? "Starting…" : "Try start again"}</Button> : <Button disabled={!canSubmit} type="submit">{pending ? "Creating session…" : "Create and start"}</Button>}
+          </AlertDialogFooter>
+        </form>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+}
+
 export function PortalCounselingPage() {
   const { hasCapability, refreshAccess, status: accessStatus } = usePortalAccess();
   const searchParams = useSearchParams();
@@ -491,9 +636,61 @@ export function PortalCounselingPage() {
   const [noteValues, setNoteValues] = useState({ student_visible_summary: "", counselor_narrative: "", recommendations: "", special_concerns: "", follow_up_needed: false, follow_up_notes: "" });
   const [actionError, setActionError] = useState<string | null>(null);
   const [mutation, setMutation] = useState<MutationState | null>(null);
+  const [walkInOpen, setWalkInOpen] = useState(false);
+  const [walkInStudents, setWalkInStudents] = useState<PortalCounselingStudentOption[]>([]);
+  const [walkInStudentsLoading, setWalkInStudentsLoading] = useState(false);
+  const [walkInStudentsError, setWalkInStudentsError] = useState<string | null>(null);
+  const [walkInError, setWalkInError] = useState<string | null>(null);
+  const [walkInPending, setWalkInPending] = useState(false);
+  const [walkInScheduledReference, setWalkInScheduledReference] = useState<string | null>(null);
+  const walkInSearchControllerRef = useRef<AbortController | null>(null);
+  const walkInKeysRef = useRef<Map<string, MutationKeyEntry>>(new Map());
   const mutationKeysRef = useRef<Map<string, MutationKeyEntry>>(new Map());
   const canQueue = accessStatus === "ready" && availableNavItems.length > 0;
   const queryKey = `${rawQuery}:${reloadKey}:${canQueue}:${section}`;
+
+  const searchWalkInStudents = useCallback((query: string) => {
+    if (!walkInOpen) return;
+    walkInSearchControllerRef.current?.abort();
+    const normalizedQuery = query.trim();
+    if (normalizedQuery.length < 2) {
+      setWalkInStudents([]);
+      setWalkInStudentsLoading(false);
+      setWalkInStudentsError(null);
+      return;
+    }
+    const controller = new AbortController();
+    walkInSearchControllerRef.current = controller;
+    setWalkInStudentsLoading(true);
+    setWalkInStudentsError(null);
+    void getPortalCounselingSessionStudents(normalizedQuery, controller.signal).then((students) => {
+      if (controller.signal.aborted) return;
+      setWalkInStudents(students);
+      setWalkInStudentsLoading(false);
+    }).catch((error: unknown) => {
+      if (controller.signal.aborted || isAbortError(error)) return;
+      const apiError = error instanceof CounselingApiError ? error : new CounselingApiError("unavailable");
+      setWalkInStudents([]);
+      setWalkInStudentsLoading(false);
+      setWalkInStudentsError(walkInReadMessage(apiError));
+    });
+  }, [walkInOpen]);
+
+  const resetWalkInState = () => {
+    walkInSearchControllerRef.current?.abort();
+    walkInSearchControllerRef.current = null;
+    walkInKeysRef.current.clear();
+    setWalkInStudents([]);
+    setWalkInStudentsLoading(false);
+    setWalkInStudentsError(null);
+    setWalkInError(null);
+    setWalkInPending(false);
+    setWalkInScheduledReference(null);
+  };
+
+  useEffect(() => () => {
+    walkInSearchControllerRef.current?.abort();
+  }, []);
 
   useEffect(() => {
     if (rawQuery !== canonicalQuery) router.replace(canonicalHref, { scroll: false });
@@ -525,6 +722,92 @@ export function PortalCounselingPage() {
     const key = createIdempotencyKey();
     mutationKeysRef.current.set(scope, { fingerprint, key });
     return key;
+  };
+
+  const openWalkIn = () => {
+    resetWalkInState();
+    setWalkInOpen(true);
+  };
+
+  const closeWalkIn = () => {
+    if (walkInPending) return;
+    resetWalkInState();
+    setWalkInOpen(false);
+  };
+
+  const handleWalkInSelectionChange = () => {
+    walkInKeysRef.current.clear();
+    setWalkInError(null);
+    setWalkInScheduledReference(null);
+  };
+
+  const handleWalkInSubmit = async (studentSelectionToken: string) => {
+    if (walkInPending) return;
+    const createFingerprint = JSON.stringify({
+      studentSelectionToken,
+      sessionType: "COUNSELING",
+      sessionMode: "ONSITE",
+      sessionSource: "WALK_IN",
+    });
+    const createScope = "counseling:walk-in:create";
+    const createKey = getMutationKeyForMap(walkInKeysRef.current, createScope, createFingerprint);
+    setWalkInError(null);
+    setWalkInPending(true);
+    try {
+      const referenceCode = await createPortalWalkInCounselingSession(studentSelectionToken, createKey);
+      walkInKeysRef.current.delete(createScope);
+      const startScope = "counseling:walk-in:start";
+      const startFingerprint = JSON.stringify({ action: "start", referenceCode });
+      const startKey = getMutationKeyForMap(walkInKeysRef.current, startScope, startFingerprint);
+      try {
+        await startPortalCounselingSession(referenceCode, startKey);
+        resetWalkInState();
+        setWalkInOpen(false);
+        router.push(`/portal/counseling/sessions/${encodeURIComponent(referenceCode)}`);
+      } catch (error: unknown) {
+        const apiError = error instanceof CounselingApiError ? error : new CounselingApiError("unavailable");
+        if (apiError.kind !== "unavailable" && apiError.kind !== "rate_limited") walkInKeysRef.current.delete(startScope);
+        setWalkInPending(false);
+        setWalkInScheduledReference(referenceCode);
+        setWalkInError("The session was created but could not be started. It remains scheduled.");
+        setReloadKey((value) => value + 1);
+      }
+    } catch (error: unknown) {
+      const apiError = error instanceof CounselingApiError ? error : new CounselingApiError("unavailable");
+      if (apiError.kind !== "unavailable" && apiError.kind !== "rate_limited") walkInKeysRef.current.delete(createScope);
+      setWalkInPending(false);
+      setWalkInError(apiError.kind === "permission" ? "This student is no longer available for a walk-in session." : "The walk-in session could not be created. Try again.");
+    }
+  };
+
+  const handleWalkInRetryStart = async () => {
+    const referenceCode = walkInScheduledReference;
+    if (!referenceCode || walkInPending) return;
+    const startScope = "counseling:walk-in:start";
+    const startKey = getMutationKeyForMap(
+      walkInKeysRef.current,
+      startScope,
+      JSON.stringify({ action: "start", referenceCode }),
+    );
+    setWalkInPending(true);
+    setWalkInError(null);
+    try {
+      await startPortalCounselingSession(referenceCode, startKey);
+      resetWalkInState();
+      setWalkInOpen(false);
+      router.push(`/portal/counseling/sessions/${encodeURIComponent(referenceCode)}`);
+    } catch (error: unknown) {
+      const apiError = error instanceof CounselingApiError ? error : new CounselingApiError("unavailable");
+      if (apiError.kind !== "unavailable" && apiError.kind !== "rate_limited") walkInKeysRef.current.delete(startScope);
+      setWalkInPending(false);
+      setWalkInError("The session could not be started. It remains scheduled.");
+    }
+  };
+
+  const handleWalkInOpenScheduled = () => {
+    if (walkInPending) return;
+    resetWalkInState();
+    setWalkInOpen(false);
   };
 
   const openAction = (action: SessionAction, session: PortalCounselingSession) => {
@@ -602,13 +885,30 @@ export function PortalCounselingPage() {
       <div className="portal-counseling__active-content">
         <CounselingFilterPanel filters={filters} />
         <PortalCollectionFrame aria-labelledby="portal-counseling-results-heading" className="portal-counseling__frame">
-          <div className="portal-counseling__frame-heading"><div><p className="portal-counseling__kicker">Sessions</p><h2 id="portal-counseling-results-heading">Counseling sessions</h2></div><p className="portal-counseling__result-count">{page.total} {page.total === 1 ? "session" : "sessions"}</p></div>
+          <div className="portal-counseling__frame-heading"><div><p className="portal-counseling__kicker">Sessions</p><h2 id="portal-counseling-results-heading">Counseling sessions</h2></div><div className="portal-counseling__frame-actions"><p className="portal-counseling__result-count">{page.total} {page.total === 1 ? "session" : "sessions"}</p><Button onClick={openWalkIn} size="sm" type="button">New walk-in session</Button></div></div>
           {mutation ? <p className={`portal-counseling__mutation portal-counseling__mutation--${mutation.state}`} role={mutation.state === "error" ? "alert" : "status"}>{mutation.message}</p> : null}
           {page.items.length ? <SessionTable details={details} expandedReference={expandedReference} hasCapability={hasCapability} mutation={mutation} onAction={openAction} onRetryDetail={retryDetails} onToggle={toggleDetails} sessions={page.items} /> : <EmptyState />}
           <SessionsPagination filters={filters} page={page} />
         </PortalCollectionFrame>
       </div>
     </div>
+
+    <WalkInSessionDialog
+      key={walkInOpen ? "open" : "closed"}
+      error={walkInError}
+      onClose={closeWalkIn}
+      onOpenScheduled={handleWalkInOpenScheduled}
+      onRetryStart={() => void handleWalkInRetryStart()}
+      onSearch={searchWalkInStudents}
+      onSelectionChange={handleWalkInSelectionChange}
+      onSubmit={(selectionToken) => void handleWalkInSubmit(selectionToken)}
+      open={walkInOpen}
+      pending={walkInPending}
+      startFailureReference={walkInScheduledReference}
+      students={walkInStudents}
+      studentsError={walkInStudentsError}
+      studentsLoading={walkInStudentsLoading}
+    />
 
     <AlertDialog onOpenChange={(open) => { if (!open && mutation?.state !== "pending") { setActionIntent(null); setActionError(null); } }} open={actionIntent !== null}>
       <AlertDialogContent className="portal-counseling__dialog" size="sm">

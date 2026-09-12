@@ -15,5 +15,6 @@ export interface SessionCreateSchema {
   session_mode: string;
   session_source?: string;
   session_type: string;
-  student_id: number;
+  student_id?: number | null;
+  student_selection_token?: string | null;
 }

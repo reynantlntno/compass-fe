@@ -7,6 +7,7 @@
  */
 
 export interface CallSlipAssignmentSchema {
+  counselor_selection_token?: string | null;
   reason_code: string;
-  target_counselor_id: number;
+  target_counselor_id?: number | null;
 }

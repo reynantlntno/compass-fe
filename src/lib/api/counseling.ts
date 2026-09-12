@@ -3,6 +3,7 @@ import {
   counselingRoutineInterviewsList,
   counselingSessionCancel,
   counselingSessionComplete,
+  counselingSessionCreate,
   counselingSessionDetail,
   counselingSessionFinalize,
   counselingSessionLock,
@@ -16,12 +17,14 @@ import type {
   CounselingSessionPageSchema,
   CounselingSessionProjectionSchema,
   NoteSchema,
+  SessionCreateSchema,
 } from "@/lib/api/generated/model";
 import {
   cookieSessionMutationOptions,
   cookieSessionReadOptions,
 } from "@/lib/api/auth";
 import { withIdempotencyKey, type IdempotencyKey } from "@/lib/api/idempotency";
+import { profilesStaffStudents } from "@/lib/api/generated/profiles/profiles";
 
 export const COUNSELING_SESSIONS_PAGE_SIZE = 20;
 
@@ -103,6 +106,11 @@ export type PortalCounselingSessionPage = {
   total: number;
 };
 
+export type PortalCounselingStudentOption = {
+  selection_token: string;
+  label: string;
+};
+
 export type CounselingErrorKind =
   | "conflict"
   | "permission"
@@ -125,6 +133,7 @@ const MAX_REFERENCE_LENGTH = 25;
 const MAX_QUERY_LENGTH = 120;
 const MAX_DISPLAY_NAME_LENGTH = 160;
 const MAX_STUDENT_NUMBER_LENGTH = 50;
+const MAX_SELECTION_TOKEN_LENGTH = 500;
 const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
 const STATUS_SET = new Set<string>(COUNSELING_SESSION_STATUSES);
 const TYPE_SET = new Set<string>(COUNSELING_SESSION_TYPES);
@@ -135,6 +144,19 @@ const ORDER_SET = new Set<string>(COUNSELING_SESSION_ORDERS);
 const ASSIGNMENT_STATES = new Set(["Assigned to you", "Assigned", "Unassigned"]);
 
 type GeneratedResponse = { data: unknown; status: number };
+
+const MUTATION_BOOLEAN_FIELDS = [
+  "added",
+  "cancelled",
+  "created",
+  "decided",
+  "granted",
+  "requested",
+  "revoked",
+  "saved",
+  "submitted",
+  "withdrawn",
+] as const;
 
 function isAbortError(error: unknown) {
   return error instanceof Error && error.name === "AbortError";
@@ -214,6 +236,48 @@ function parsePage(value: unknown): PortalCounselingSessionPage | null {
     page_size: value.page_size,
     total: value.total,
   };
+}
+
+function parseMutationResponse(value: unknown): CounselingMutationResponseSchema | null {
+  if (!isRecord(value)) return null;
+  if (
+    value.reference_code !== undefined &&
+    value.reference_code !== null &&
+    !boundedString(value.reference_code, MAX_REFERENCE_LENGTH)
+  ) return null;
+  if (value.status !== undefined && value.status !== null && !boundedString(value.status, 64)) return null;
+
+  const parsed: Record<string, boolean | string | null> = {};
+  if (value.reference_code !== undefined) parsed.reference_code = value.reference_code as string | null;
+  if (value.status !== undefined) parsed.status = value.status as string | null;
+  for (const field of MUTATION_BOOLEAN_FIELDS) {
+    if (value[field] !== undefined) {
+      if (value[field] !== null && typeof value[field] !== "boolean") return null;
+      parsed[field] = value[field] as boolean | null;
+    }
+  }
+  return parsed as CounselingMutationResponseSchema;
+}
+
+function parseStudentOptions(value: unknown): PortalCounselingStudentOption[] | null {
+  if (!isRecord(value) || !Array.isArray(value.items)) return null;
+  if (
+    typeof value.page !== "number" || !Number.isSafeInteger(value.page) || value.page < 1 || value.page > MAX_PAGE ||
+    typeof value.page_size !== "number" || !Number.isSafeInteger(value.page_size) || value.page_size < 1 || value.page_size > 100 ||
+    typeof value.total !== "number" || !Number.isSafeInteger(value.total) || value.total < 0 || value.items.length > value.page_size
+  ) return null;
+
+  const options: PortalCounselingStudentOption[] = [];
+  for (const entry of value.items) {
+    if (!isRecord(entry)) return null;
+    if (!boundedString(entry.selection_token, MAX_SELECTION_TOKEN_LENGTH)) return null;
+    if (!boundedString(entry.label, 200)) return null;
+    options.push({
+      selection_token: entry.selection_token,
+      label: entry.label,
+    });
+  }
+  return options;
 }
 
 type RoutineInterviewCountPage = {
@@ -314,6 +378,22 @@ export function getPortalCounselingSessionDetail(referenceCode: string, signal?:
   return readRequest(counselingSessionDetail(safeReference(referenceCode), cookieSessionReadOptions(signal)), parseSession);
 }
 
+export function getPortalCounselingSessionStudents(query = "", signal?: AbortSignal) {
+  const normalizedQuery = query.trim().slice(0, 80);
+  return readRequest(
+    profilesStaffStudents(
+      {
+        page: 1,
+        page_size: 25,
+        q: normalizedQuery || undefined,
+        workflow: "counseling_session",
+      },
+      cookieSessionReadOptions(signal),
+    ),
+    parseStudentOptions,
+  );
+}
+
 export function getPortalRoutineInterviewCount(signal?: AbortSignal) {
   return readRequest(
     counselingRoutineInterviewsList({ page: 1, page_size: COUNSELING_SESSIONS_PAGE_SIZE, status: "INTAKE_SUBMITTED" }, cookieSessionReadOptions(signal)),
@@ -328,7 +408,46 @@ async function runMutation(
 ): Promise<CounselingMutationResponseSchema> {
   try {
     const response = await request(withIdempotencyKey(key, await cookieSessionMutationOptions(signal)));
-    if (response.status === 200 && isRecord(response.data)) return response.data as CounselingMutationResponseSchema;
+    if (response.status === 200) {
+      const parsed = parseMutationResponse(response.data);
+      if (parsed) return parsed;
+    }
+    throw new CounselingApiError(errorKind(response.status));
+  } catch (error) {
+    if (isAbortError(error)) throw error;
+    if (error instanceof CounselingApiError) throw error;
+    throw new CounselingApiError("unavailable");
+  }
+}
+
+function safeSelectionToken(value: string) {
+  const normalized = value.trim();
+  if (!normalized || normalized.length > MAX_SELECTION_TOKEN_LENGTH) {
+    throw new CounselingApiError("validation");
+  }
+  return normalized;
+}
+
+export async function createPortalWalkInCounselingSession(
+  studentSelectionToken: string,
+  key: IdempotencyKey,
+  signal?: AbortSignal,
+) {
+  const payload: SessionCreateSchema = {
+    student_selection_token: safeSelectionToken(studentSelectionToken),
+    session_type: "COUNSELING",
+    session_mode: "ONSITE",
+    session_source: "WALK_IN",
+  };
+  try {
+    const response = await counselingSessionCreate(
+      payload,
+      withIdempotencyKey(key, await cookieSessionMutationOptions(signal)),
+    );
+    if (response.status === 200) {
+      const parsed = parseMutationResponse(response.data);
+      if (parsed?.reference_code) return parsed.reference_code;
+    }
     throw new CounselingApiError(errorKind(response.status));
   } catch (error) {
     if (isAbortError(error)) throw error;

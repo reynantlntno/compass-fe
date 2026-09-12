@@ -11,6 +11,7 @@ import type {
   GeneratedDocumentMetadataSchema,
   ReferralActionSchema,
   ReferralAssignmentSchema,
+  ReferralCounselorOptionPageSchema,
   ReferralDecisionSchema,
   ReferralDetailSchema,
   ReferralDraftSchema,
@@ -18,9 +19,12 @@ import type {
   ReferralPageResultSchema,
   ReferralReassignmentDetailSchema,
   ReferralReassignmentSchema,
+  ReferralStaffQueuePageResultSchema,
   ReferralSubmitSchema,
   ReferralTransitionSchema,
-  ReferralsListParams
+  ReferralsCounselorOptionsParams,
+  ReferralsListParams,
+  ReferralsQueueListParams
 } from '../model';
 
 import { compassFetch } from '../../client';
@@ -218,6 +222,106 @@ return compassFetch<referralsCreateResponse>(getReferralsCreateUrl(),
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
     body: JSON.stringify(referralDraftSchema)
+  }
+);}
+
+
+export type referralsQueueListResponse200 = {
+  data: ReferralStaffQueuePageResultSchema
+  status: 200
+}
+
+export type referralsQueueListResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type referralsQueueListResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type referralsQueueListResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type referralsQueueListResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type referralsQueueListResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type referralsQueueListResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type referralsQueueListResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type referralsQueueListResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type referralsQueueListResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type referralsQueueListResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type referralsQueueListResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type referralsQueueListResponseSuccess = (referralsQueueListResponse200) & {
+  headers: Record<string, string>;
+};
+export type referralsQueueListResponseError = (referralsQueueListResponse400 | referralsQueueListResponse401 | referralsQueueListResponse403 | referralsQueueListResponse404 | referralsQueueListResponse405 | referralsQueueListResponse409 | referralsQueueListResponse413 | referralsQueueListResponse422 | referralsQueueListResponse429 | referralsQueueListResponse500 | referralsQueueListResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type referralsQueueListResponse = (referralsQueueListResponseSuccess | referralsQueueListResponseError)
+
+export const getReferralsQueueListUrl = (params?: ReferralsQueueListParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/referrals/queue/?${stringifiedParams}` : `/api/v1/referrals/queue/`
+}
+
+/**
+ * Staff-facing Referrals queue with bounded filters and an allowlist row.
+ * @summary List Referral Queue
+ */
+export const referralsQueueList = async (params?: ReferralsQueueListParams, options?: Parameters<typeof compassFetch>[1]): Promise<referralsQueueListResponse> => {
+
+  return compassFetch<referralsQueueListResponse>(getReferralsQueueListUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
   }
 );}
 
@@ -897,6 +1001,107 @@ return compassFetch<referralsCloseResponse>(getReferralsCloseUrl(referenceCode),
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
     body: JSON.stringify(referralTransitionSchema)
+  }
+);}
+
+
+export type referralsCounselorOptionsResponse200 = {
+  data: ReferralCounselorOptionPageSchema
+  status: 200
+}
+
+export type referralsCounselorOptionsResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type referralsCounselorOptionsResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type referralsCounselorOptionsResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type referralsCounselorOptionsResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type referralsCounselorOptionsResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type referralsCounselorOptionsResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type referralsCounselorOptionsResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type referralsCounselorOptionsResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type referralsCounselorOptionsResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type referralsCounselorOptionsResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type referralsCounselorOptionsResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type referralsCounselorOptionsResponseSuccess = (referralsCounselorOptionsResponse200) & {
+  headers: Record<string, string>;
+};
+export type referralsCounselorOptionsResponseError = (referralsCounselorOptionsResponse400 | referralsCounselorOptionsResponse401 | referralsCounselorOptionsResponse403 | referralsCounselorOptionsResponse404 | referralsCounselorOptionsResponse405 | referralsCounselorOptionsResponse409 | referralsCounselorOptionsResponse413 | referralsCounselorOptionsResponse422 | referralsCounselorOptionsResponse429 | referralsCounselorOptionsResponse500 | referralsCounselorOptionsResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type referralsCounselorOptionsResponse = (referralsCounselorOptionsResponseSuccess | referralsCounselorOptionsResponseError)
+
+export const getReferralsCounselorOptionsUrl = (referenceCode: string,
+    params?: ReferralsCounselorOptionsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/referrals/${referenceCode}/counselor-options/?${stringifiedParams}` : `/api/v1/referrals/${referenceCode}/counselor-options/`
+}
+
+/**
+ * @summary Referral Counselor Options
+ */
+export const referralsCounselorOptions = async (referenceCode: string,
+    params?: ReferralsCounselorOptionsParams, options?: Parameters<typeof compassFetch>[1]): Promise<referralsCounselorOptionsResponse> => {
+
+  return compassFetch<referralsCounselorOptionsResponse>(getReferralsCounselorOptionsUrl(referenceCode,params),
+  {
+    ...options,
+    method: 'GET'
+
+
   }
 );}
 

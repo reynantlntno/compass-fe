@@ -9,6 +9,7 @@ import type {
   ApiErrorSchema,
   CallSlipAssignmentSchema,
   CallSlipAttendanceSchema,
+  CallSlipCounselorOptionPageSchema,
   CallSlipDecisionSchema,
   CallSlipDetailSchema,
   CallSlipDraftSchema,
@@ -20,7 +21,10 @@ import type {
   CallSlipReasonSchema,
   CallSlipRescheduleRequestDetailSchema,
   CallSlipRescheduleSchema,
+  CallSlipStaffQueuePageResultSchema,
+  CallSlipsCounselorOptionsParams,
   CallSlipsListParams,
+  CallSlipsQueueListParams,
   DocumentGenerateSchema,
   GeneratedDocumentMetadataSchema,
   PrintableCallSlipSchema,
@@ -320,6 +324,106 @@ return compassFetch<callSlipsFromReferralResponse>(getCallSlipsFromReferralUrl()
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
     body: JSON.stringify(callSlipFromReferralSchema)
+  }
+);}
+
+
+export type callSlipsQueueListResponse200 = {
+  data: CallSlipStaffQueuePageResultSchema
+  status: 200
+}
+
+export type callSlipsQueueListResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type callSlipsQueueListResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type callSlipsQueueListResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type callSlipsQueueListResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type callSlipsQueueListResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type callSlipsQueueListResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type callSlipsQueueListResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type callSlipsQueueListResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type callSlipsQueueListResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type callSlipsQueueListResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type callSlipsQueueListResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type callSlipsQueueListResponseSuccess = (callSlipsQueueListResponse200) & {
+  headers: Record<string, string>;
+};
+export type callSlipsQueueListResponseError = (callSlipsQueueListResponse400 | callSlipsQueueListResponse401 | callSlipsQueueListResponse403 | callSlipsQueueListResponse404 | callSlipsQueueListResponse405 | callSlipsQueueListResponse409 | callSlipsQueueListResponse413 | callSlipsQueueListResponse422 | callSlipsQueueListResponse429 | callSlipsQueueListResponse500 | callSlipsQueueListResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type callSlipsQueueListResponse = (callSlipsQueueListResponseSuccess | callSlipsQueueListResponseError)
+
+export const getCallSlipsQueueListUrl = (params?: CallSlipsQueueListParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/call-slips/queue/?${stringifiedParams}` : `/api/v1/call-slips/queue/`
+}
+
+/**
+ * Staff-facing Call Slips queue with bounded filters and an allowlist row.
+ * @summary List Call Slip Queue
+ */
+export const callSlipsQueueList = async (params?: CallSlipsQueueListParams, options?: Parameters<typeof compassFetch>[1]): Promise<callSlipsQueueListResponse> => {
+
+  return compassFetch<callSlipsQueueListResponse>(getCallSlipsQueueListUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
   }
 );}
 
@@ -1091,6 +1195,107 @@ return compassFetch<callSlipsCancelResponse>(getCallSlipsCancelUrl(referenceCode
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
     body: JSON.stringify(callSlipReasonSchema)
+  }
+);}
+
+
+export type callSlipsCounselorOptionsResponse200 = {
+  data: CallSlipCounselorOptionPageSchema
+  status: 200
+}
+
+export type callSlipsCounselorOptionsResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type callSlipsCounselorOptionsResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type callSlipsCounselorOptionsResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type callSlipsCounselorOptionsResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type callSlipsCounselorOptionsResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type callSlipsCounselorOptionsResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type callSlipsCounselorOptionsResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type callSlipsCounselorOptionsResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type callSlipsCounselorOptionsResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type callSlipsCounselorOptionsResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type callSlipsCounselorOptionsResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type callSlipsCounselorOptionsResponseSuccess = (callSlipsCounselorOptionsResponse200) & {
+  headers: Record<string, string>;
+};
+export type callSlipsCounselorOptionsResponseError = (callSlipsCounselorOptionsResponse400 | callSlipsCounselorOptionsResponse401 | callSlipsCounselorOptionsResponse403 | callSlipsCounselorOptionsResponse404 | callSlipsCounselorOptionsResponse405 | callSlipsCounselorOptionsResponse409 | callSlipsCounselorOptionsResponse413 | callSlipsCounselorOptionsResponse422 | callSlipsCounselorOptionsResponse429 | callSlipsCounselorOptionsResponse500 | callSlipsCounselorOptionsResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type callSlipsCounselorOptionsResponse = (callSlipsCounselorOptionsResponseSuccess | callSlipsCounselorOptionsResponseError)
+
+export const getCallSlipsCounselorOptionsUrl = (referenceCode: string,
+    params?: CallSlipsCounselorOptionsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/call-slips/${referenceCode}/counselor-options/?${stringifiedParams}` : `/api/v1/call-slips/${referenceCode}/counselor-options/`
+}
+
+/**
+ * @summary Call Slip Counselor Options
+ */
+export const callSlipsCounselorOptions = async (referenceCode: string,
+    params?: CallSlipsCounselorOptionsParams, options?: Parameters<typeof compassFetch>[1]): Promise<callSlipsCounselorOptionsResponse> => {
+
+  return compassFetch<callSlipsCounselorOptionsResponse>(getCallSlipsCounselorOptionsUrl(referenceCode,params),
+  {
+    ...options,
+    method: 'GET'
+
+
   }
 );}
 
