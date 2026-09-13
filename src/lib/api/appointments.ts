@@ -2,9 +2,11 @@ import {
   appointmentsCancel,
   appointmentsComplete,
   appointmentsDetail,
+  appointmentsLateCancellationDecision,
   appointmentsLateCancellationRequest,
   appointmentsList,
   appointmentsNoShow,
+  appointmentsReviewAndSchedule,
   appointmentsReviewDecision,
   appointmentsSchedule,
 } from "@/lib/api/generated/appointments/appointments";
@@ -417,6 +419,32 @@ export function reviewAppointment(
   signal?: AbortSignal,
 ) {
   return runMutation((options) => appointmentsReviewDecision(safeReference(referenceCode), payload, options), key, signal);
+}
+
+export function reviewAndScheduleAppointment(
+  referenceCode: string,
+  payload: ReviewDecisionSchema,
+  key: IdempotencyKey,
+  signal?: AbortSignal,
+) {
+  return runMutation(
+    (options) => appointmentsReviewAndSchedule(safeReference(referenceCode), payload, options),
+    key,
+    signal,
+  );
+}
+
+export function decideLateCancellation(
+  referenceCode: string,
+  payload: DecisionSchema,
+  key: IdempotencyKey,
+  signal?: AbortSignal,
+) {
+  return runMutation(
+    (options) => appointmentsLateCancellationDecision(safeReference(referenceCode), payload, options),
+    key,
+    signal,
+  );
 }
 
 export function scheduleAppointment(

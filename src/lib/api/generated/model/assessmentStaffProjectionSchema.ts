@@ -17,5 +17,8 @@ export interface AssessmentStaffProjectionSchema {
   released_to_student: boolean;
   reviewed_at: string | null;
   status: string;
+  student_display_name: string;
+  student_number: string | null;
   student_reference: string;
+  updated_at?: string | null;
 }

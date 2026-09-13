@@ -181,7 +181,7 @@ export function PortalHomeAppointmentsOverview() {
   );
   const reviewLoader = useMemo(
     () => (signal: AbortSignal) =>
-      getPortalAppointments(1, { status: "PENDING_REVIEW", order: "recent" }, signal),
+      getPortalAppointments(1, { status: "SUBMITTED,PENDING_REVIEW", order: "recent" }, signal),
     [],
   );
 

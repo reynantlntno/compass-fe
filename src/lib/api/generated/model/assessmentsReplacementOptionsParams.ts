@@ -6,8 +6,14 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export interface CallSlipAssignmentSchema {
-  counselor_selection_token?: string | null;
-  reason_code: string;
-  target_counselor_id?: number | null;
-}
+export type AssessmentsReplacementOptionsParams = {
+/**
+ * @minimum 1
+ */
+page?: number;
+/**
+ * @minimum 1
+ * @maximum 100
+ */
+page_size?: number;
+};

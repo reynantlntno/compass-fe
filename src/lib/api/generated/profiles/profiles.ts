@@ -292,7 +292,7 @@ export const getProfilesStaffStudentsUrl = (params?: ProfilesStaffStudentsParams
 }
 
 /**
- * Scoped staff intake student search for Referral/Call Slip creation.
+ * Scoped staff student search for supported workflow creation.
  * @summary Profiles Staff Students
  */
 export const profilesStaffStudents = async (params?: ProfilesStaffStudentsParams, options?: Parameters<typeof compassFetch>[1]): Promise<profilesStaffStudentsResponse> => {

@@ -48,7 +48,9 @@ export type FormsListFilters = {
   status: string | null;
   statuses: string[];
   academicYear: string | null;
+  graduationYear: string | null;
   revision: string | null;
+  employmentStatus: string | null;
   order: FormsQueueOrder;
 };
 
@@ -368,7 +370,9 @@ export function parseInventoryFilters(params: { get: (name: string) => string | 
     status: statuses.length ? statuses.join(",") : null,
     statuses,
     academicYear: params.get("academic_year")?.trim().slice(0, MAX_FILTER_LENGTH) || null,
+    graduationYear: null,
     revision: params.get("revision")?.trim().slice(0, MAX_REVISION_LENGTH) || null,
+    employmentStatus: null,
     order: order && ORDER_SET.has(order) ? order as FormsQueueOrder : "recent",
   };
 }
@@ -381,16 +385,23 @@ export function parseExitInterviewFilters(params: { get: (name: string) => strin
     status: statuses.length ? statuses.join(",") : null,
     statuses,
     academicYear: params.get("academic_year")?.trim().slice(0, MAX_FILTER_LENGTH) || null,
+    graduationYear: null,
     revision: params.get("revision")?.trim().slice(0, MAX_REVISION_LENGTH) || null,
+    employmentStatus: null,
     order: order && ORDER_SET.has(order) ? order as FormsQueueOrder : "recent",
   };
 }
 
-export function formsHref(section: "inventory" | "exit-interviews", page = 1, filters: FormsListFilters) {
+export function formsHref(section: "inventory" | "exit-interviews" | "graduate-tracer", page = 1, filters: FormsListFilters) {
   const params = new URLSearchParams({ section });
   if (filters.statuses.length) params.set("status", filters.statuses.join(","));
   if (filters.q?.trim()) params.set("q", filters.q.trim().slice(0, MAX_QUERY_LENGTH));
-  if (filters.academicYear?.trim()) params.set("academic_year", filters.academicYear.trim().slice(0, MAX_FILTER_LENGTH));
+  if (section === "graduate-tracer") {
+    if (filters.graduationYear?.trim()) params.set("graduation_year", filters.graduationYear.trim().slice(0, MAX_FILTER_LENGTH));
+    if (filters.employmentStatus?.trim()) params.set("employment_status", filters.employmentStatus.trim().slice(0, MAX_FILTER_LENGTH));
+  } else if (filters.academicYear?.trim()) {
+    params.set("academic_year", filters.academicYear.trim().slice(0, MAX_FILTER_LENGTH));
+  }
   if (filters.revision?.trim()) params.set("revision", filters.revision.trim().slice(0, MAX_REVISION_LENGTH));
   if (filters.order !== "recent") params.set("order", filters.order);
   if (page > 1) params.set("page", String(page));

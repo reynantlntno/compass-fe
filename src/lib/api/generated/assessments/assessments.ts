@@ -17,6 +17,7 @@ import type {
   AssessmentsFileAttachBody,
   AssessmentsInstrumentsParams,
   AssessmentsListParams,
+  AssessmentsReplacementOptionsParams,
   AssessmentsStudentSummariesParams,
   CreateSchema,
   ExpectedStateSchema,
@@ -1307,6 +1308,107 @@ return compassFetch<assessmentsReleaseResponse>(getAssessmentsReleaseUrl(recordI
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
     body: JSON.stringify(expectedStateSchema)
+  }
+);}
+
+
+export type assessmentsReplacementOptionsResponse200 = {
+  data: AssessmentPageSchema
+  status: 200
+}
+
+export type assessmentsReplacementOptionsResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type assessmentsReplacementOptionsResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type assessmentsReplacementOptionsResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type assessmentsReplacementOptionsResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type assessmentsReplacementOptionsResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type assessmentsReplacementOptionsResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type assessmentsReplacementOptionsResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type assessmentsReplacementOptionsResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type assessmentsReplacementOptionsResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type assessmentsReplacementOptionsResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type assessmentsReplacementOptionsResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type assessmentsReplacementOptionsResponseSuccess = (assessmentsReplacementOptionsResponse200) & {
+  headers: Record<string, string>;
+};
+export type assessmentsReplacementOptionsResponseError = (assessmentsReplacementOptionsResponse400 | assessmentsReplacementOptionsResponse401 | assessmentsReplacementOptionsResponse403 | assessmentsReplacementOptionsResponse404 | assessmentsReplacementOptionsResponse405 | assessmentsReplacementOptionsResponse409 | assessmentsReplacementOptionsResponse413 | assessmentsReplacementOptionsResponse422 | assessmentsReplacementOptionsResponse429 | assessmentsReplacementOptionsResponse500 | assessmentsReplacementOptionsResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type assessmentsReplacementOptionsResponse = (assessmentsReplacementOptionsResponseSuccess | assessmentsReplacementOptionsResponseError)
+
+export const getAssessmentsReplacementOptionsUrl = (recordId: number,
+    params?: AssessmentsReplacementOptionsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/assessments/${recordId}/replacement-options/?${stringifiedParams}` : `/api/v1/assessments/${recordId}/replacement-options/`
+}
+
+/**
+ * @summary Replacement Options
+ */
+export const assessmentsReplacementOptions = async (recordId: number,
+    params?: AssessmentsReplacementOptionsParams, options?: Parameters<typeof compassFetch>[1]): Promise<assessmentsReplacementOptionsResponse> => {
+
+  return compassFetch<assessmentsReplacementOptionsResponse>(getAssessmentsReplacementOptionsUrl(recordId,params),
+  {
+    ...options,
+    method: 'GET'
+
+
   }
 );}
 

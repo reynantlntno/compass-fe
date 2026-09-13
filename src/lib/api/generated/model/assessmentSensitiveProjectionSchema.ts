@@ -21,5 +21,8 @@ export interface AssessmentSensitiveProjectionSchema {
   scaled_score: string | null;
   score_label: string | null;
   status: string;
+  student_display_name: string;
+  student_number: string | null;
   student_reference: string;
+  updated_at?: string | null;
 }

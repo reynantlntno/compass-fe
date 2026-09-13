@@ -51,11 +51,12 @@ import {
   AppointmentsApiError,
   cancelPortalAppointment,
   completePortalAppointment,
+  decideLateCancellation,
   getPortalAppointmentDetail,
   getPortalAppointments,
   openPortalAppointmentSession,
   markAppointmentNoShow,
-  reviewAppointment,
+  reviewAndScheduleAppointment,
   scheduleAppointment,
   type AppointmentAssignment,
   type AppointmentListFilters,
@@ -86,6 +87,7 @@ type DetailState =
 type AppointmentAction =
   | "cancel"
   | "complete"
+  | "late-cancellation"
   | "no-show"
   | "review"
   | "schedule";
@@ -284,6 +286,8 @@ function isAbortError(error: unknown) {
 function actionLabel(action: AppointmentAction) {
   return action === "no-show"
     ? "Mark no-show"
+    : action === "late-cancellation"
+      ? "Review cancellation"
     : action === "schedule"
       ? "Schedule"
       : action.charAt(0).toUpperCase() + action.slice(1);
@@ -299,6 +303,9 @@ function canAction(
   }
   if (action === "complete" || action === "no-show") {
     return appointment.status === "SCHEDULED" && hasCapability(PORTAL_CAPABILITIES.appointmentsOutcomeManage);
+  }
+  if (action === "late-cancellation") {
+    return appointment.status === "LATE_CANCELLATION_REQUESTED" && hasCapability(PORTAL_CAPABILITIES.appointmentsReview);
   }
   if (action === "review") {
     return ACTIVE_REVIEW_STATUSES.has(appointment.status) && hasCapability(PORTAL_CAPABILITIES.appointmentsReview);
@@ -549,7 +556,7 @@ function AppointmentActions({
   hasCapability: (capability: string) => boolean;
   onAction: (action: AppointmentAction, appointment: PortalAppointment) => void;
 }) {
-  const actions: AppointmentAction[] = ["review", "schedule", "cancel", "complete", "no-show"].filter(
+  const actions: AppointmentAction[] = ["review", "late-cancellation", "schedule", "cancel", "complete", "no-show"].filter(
     (action): action is AppointmentAction => canAction(action as AppointmentAction, appointment, hasCapability),
   );
   if (!actions.length) return null;
@@ -748,7 +755,10 @@ export function PortalAppointmentsPage() {
   };
 
   const closeAction = (open: boolean) => {
-    if (!open) {
+    if (!open && mutation?.state !== "pending") {
+      if (actionIntent) {
+        mutationKeysRef.current.delete(`appointment:${actionIntent.action}:${actionIntent.appointment.reference_code}`);
+      }
       setActionIntent(null);
       setActionError(null);
     }
@@ -770,7 +780,7 @@ export function PortalAppointmentsPage() {
       setActionError("Add a short reason before cancelling this appointment.");
       return;
     }
-    if (action === "schedule" && (!scheduleDate || !scheduleStart || !scheduleEnd)) {
+    if ((action === "schedule" || (action === "review" && reviewDecision === "approve")) && (!scheduleDate || !scheduleStart || !scheduleEnd)) {
       setActionError("Add a date and start and end times before scheduling.");
       return;
     }
@@ -786,12 +796,20 @@ export function PortalAppointmentsPage() {
       } else if (action === "no-show") {
         await markAppointmentNoShow(appointment.reference_code, key);
       } else if (action === "review") {
-        await reviewAppointment(appointment.reference_code, {
+        await reviewAndScheduleAppointment(appointment.reference_code, {
           action: reviewDecision,
-          decline_reason: reviewDecision === "decline" ? reason : "",
-          internal_notes: reviewDecision === "approve" ? reason : "",
+          ...(reviewDecision === "approve" ? {
+            confirmed_date: scheduleDate,
+            confirmed_start_time: scheduleStart,
+            confirmed_end_time: scheduleEnd,
+            internal_notes: reason,
+          } : {
+            decline_reason: reason,
+          }),
           reason,
         }, key);
+      } else if (action === "late-cancellation") {
+        await decideLateCancellation(appointment.reference_code, { decision: reviewDecision, notes: reason }, key);
       } else {
         await scheduleAppointment(appointment.reference_code, {
           confirmed_date: scheduleDate,
@@ -908,22 +926,22 @@ export function PortalAppointmentsPage() {
               {activeAppointment ? `${activeAppointment.reference_code} will be updated using the current appointment state.` : "Review this appointment action before continuing."}
             </AlertDialogDescription>
           </AlertDialogHeader>
-          {actionIntent?.action === "review" ? (
+          {actionIntent && ["review", "late-cancellation"].includes(actionIntent.action) ? (
             <div className="portal-appointments__dialog-field">
-              <Label htmlFor="portal-appointments-review-decision">Decision</Label>
+              <Label htmlFor="portal-appointments-review-decision">{actionIntent.action === "late-cancellation" ? "Cancellation decision" : "Decision"}</Label>
               <select id="portal-appointments-review-decision" onChange={(event) => setReviewDecision(event.target.value as "approve" | "decline")} value={reviewDecision}>
                 <option value="approve">Approve</option>
                 <option value="decline">Decline</option>
               </select>
             </div>
           ) : null}
-          {actionIntent && ["cancel", "review", "schedule"].includes(actionIntent.action) ? (
+          {actionIntent && ["cancel", "review", "late-cancellation", "schedule"].includes(actionIntent.action) ? (
             <div className="portal-appointments__dialog-field">
-              <Label htmlFor="portal-appointments-action-reason">{actionIntent.action === "schedule" ? "Notes (optional)" : "Reason or notes"}</Label>
+              <Label htmlFor="portal-appointments-action-reason">{actionIntent.action === "schedule" || actionIntent.action === "late-cancellation" ? "Notes (optional)" : "Reason or notes"}</Label>
               <textarea id="portal-appointments-action-reason" maxLength={2_000} onChange={(event) => setActionReason(event.target.value)} value={actionReason} />
             </div>
           ) : null}
-          {actionIntent?.action === "schedule" ? (
+          {actionIntent && (actionIntent.action === "schedule" || (actionIntent.action === "review" && reviewDecision === "approve")) ? (
             <div className="portal-appointments__dialog-schedule">
               <div><Label htmlFor="portal-appointments-schedule-date">Date</Label><Input id="portal-appointments-schedule-date" onChange={(event) => setScheduleDate(event.target.value)} type="date" value={scheduleDate} /></div>
               <div><Label htmlFor="portal-appointments-schedule-start">Start</Label><Input id="portal-appointments-schedule-start" onChange={(event) => setScheduleStart(event.target.value)} type="time" value={scheduleStart} /></div>

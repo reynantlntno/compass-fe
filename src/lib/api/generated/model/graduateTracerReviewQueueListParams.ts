@@ -6,8 +6,7 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export type ProfilesStaffStudentsParams = {
-q?: string;
+export type GraduateTracerReviewQueueListParams = {
 /**
  * @minimum 1
  */
@@ -17,5 +16,10 @@ page?: number;
  * @maximum 100
  */
 page_size?: number;
-workflow?: string;
+q?: string;
+status?: string;
+graduation_year?: string;
+revision?: string;
+employment_status?: string;
+order?: string;
 };

@@ -16,6 +16,7 @@ export interface ReferralDraftSchema {
   referrer_display_snapshot?: string;
   source_signed_on?: string | null;
   source_type: string;
-  student_id: number;
+  student_id?: number | null;
+  student_selection_token?: string | null;
   year_level_snapshot?: string;
 }

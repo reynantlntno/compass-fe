@@ -44,6 +44,7 @@ import { PORTAL_CAPABILITIES } from "@/components/portal/portal-navigation";
 import { PortalStatusFilter } from "@/components/portal/portal-status-filter";
 import { PortalWorkspaceNav } from "@/components/portal/portal-workspace-nav";
 import { FORMS_NAV_ITEMS, getFormsNavItems, type FormsNavItem, type FormsSection } from "@/components/portal/portal-forms-navigation";
+import { PortalGraduateTracerSection } from "@/components/portal/portal-graduate-tracer";
 import {
   EXIT_INTERVIEW_QUEUE_STATUSES,
   FORMS_QUEUE_ORDERS,
@@ -70,6 +71,7 @@ import {
   type PortalInventoryQueueDetail,
   type PortalInventoryQueueItem,
 } from "@/lib/api/forms";
+import { parseGraduateTracerFilters } from "@/lib/api/graduate-tracer";
 import { createIdempotencyKey, type IdempotencyKey } from "@/lib/api/idempotency";
 
 const INVENTORY_STATUS_OPTIONS = [
@@ -218,7 +220,9 @@ function FormsFilterPanel({ section, filters }: { section: FormsSection; filters
       status: statuses.length ? statuses.join(",") : null,
       statuses,
       academicYear: String(form.get("academic_year") ?? "").trim().slice(0, 100) || null,
+      graduationYear: null,
       revision: String(form.get("revision") ?? "").trim().slice(0, 100) || null,
+      employmentStatus: null,
       order: ORDER_SET.has(orderValue) ? orderValue as FormsListFilters["order"] : "recent",
     };
     startTransition(() => router.push(formsHref(section, 1, next), { scroll: false }));
@@ -484,10 +488,10 @@ export function PortalFormsPage() {
   const router = useRouter();
   const rawQuery = searchParams.toString();
   const requestedSection = searchParams.get("section");
-  const requested = requestedSection === "exit-interviews" ? "exit-interviews" : requestedSection === "inventory" ? "inventory" : "inventory";
+  const requested = requestedSection === "exit-interviews" ? "exit-interviews" : requestedSection === "graduate-tracer" ? "graduate-tracer" : "inventory";
   const navItems = useMemo<FormsNavItem[]>(() => accessStatus === "ready" ? getFormsNavItems(hasCapability) : [...FORMS_NAV_ITEMS], [accessStatus, hasCapability]);
   const section = (navItems.find((item) => item.value === requested)?.value ?? navItems[0]?.value ?? "inventory") as FormsSection;
-  const filters = useMemo(() => section === "inventory" ? parseInventoryFilters(searchParams) : parseExitInterviewFilters(searchParams), [searchParams, section]);
+  const filters = useMemo(() => section === "inventory" ? parseInventoryFilters(searchParams) : section === "exit-interviews" ? parseExitInterviewFilters(searchParams) : parseGraduateTracerFilters(searchParams), [searchParams, section]);
   const pageNumber = parsePage(searchParams.get("page"));
   const canonicalHref = formsHref(section, pageNumber, filters);
   const canonicalQuery = canonicalHref.split("?")[1] ?? "";
@@ -513,6 +517,7 @@ export function PortalFormsPage() {
     if (!canQueue) return;
     const controller = new AbortController();
     let active = true;
+    if (section === "graduate-tracer") return () => { active = false; controller.abort(); };
     void Promise.resolve().then(async () => {
       if (!active || controller.signal.aborted) return;
       setMutation(null);
@@ -684,13 +689,13 @@ export function PortalFormsPage() {
       <FormsHeader />
       <div className="portal-counseling__workspace">
         <PortalWorkspaceNav activeValue={section} ariaLabel="Forms and submissions sections" items={navItems} />
-        <div className="portal-counseling__active-content">
+        {section === "graduate-tracer" ? <PortalGraduateTracerSection filters={filters} hasCapability={hasCapability} pageNumber={pageNumber} /> : <div className="portal-counseling__active-content">
           <FormsFilterPanel filters={filters} section={section} />
           {currentLoadState.kind === "loading" ? <PortalCollectionFrame className="portal-counseling__frame"><div aria-hidden="true" className="portal-counseling__table-skeleton">{Array.from({ length: 5 }, (_, row) => <div className="portal-counseling__table-skeleton-row" key={row}>{Array.from({ length: section === "inventory" ? 6 : 7 }, (_, cell) => <Skeleton as="span" key={cell} />)}</div>)}</div></PortalCollectionFrame> : null}
           {currentLoadState.kind === "forbidden" ? <PortalCollectionFrame className="portal-counseling__frame portal-counseling__frame--state"><h2>This page isn’t available for this account.</h2><p>Return to your workspace to continue.</p></PortalCollectionFrame> : null}
           {currentLoadState.kind === "unavailable" ? <PortalCollectionFrame className="portal-counseling__frame portal-counseling__frame--state"><h2>{formsLoadMessage(currentLoadState.error)}</h2><p>Try again when the connection is ready.</p><Button onClick={() => setReloadKey((value) => value + 1)} type="button" variant="outline"><RefreshCw aria-hidden="true" />Try again</Button></PortalCollectionFrame> : null}
           {currentLoadState.kind === "ready" && currentPage ? <PortalCollectionFrame aria-labelledby="portal-forms-results-heading" className="portal-counseling__frame"><div className="portal-counseling__frame-heading"><div><p className="portal-counseling__kicker">{section === "inventory" ? "Individual Inventory" : "Exit Interviews"}</p><h2 id="portal-forms-results-heading">{section === "inventory" ? "Inventory submissions" : "Exit interviews"}</h2></div><p className="portal-counseling__result-count">{currentPage.total} {currentPage.total === 1 ? "submission" : "submissions"}</p></div>{mutation ? <p className={`portal-counseling__mutation portal-counseling__mutation--${mutation.state}`} role={mutation.state === "error" ? "alert" : "status"}>{mutation.message}</p> : null}{currentPage.items.length === 0 ? <EmptyState section={section} /> : section === "inventory" ? <InventoryTable canReopen={hasCapability(PORTAL_CAPABILITIES.inventoryReopen)} details={inventoryDetails} expanded={expandedInventory} items={currentPage.items as PortalInventoryQueueItem[]} mutation={mutation} onAction={(item) => { setActionIntent({ kind: "inventory-reopen", item }); setActionReason(""); setActionError(null); }} onRetry={(item) => loadInventoryDetail(item)} onSensitive={(item) => loadInventorySensitive(item)} onSensitiveRetry={(item) => loadInventorySensitive(item)} onToggle={toggleInventory} /> : <ExitInterviewTable capabilities={hasCapability} details={exitDetails} expanded={expandedExit} items={currentPage.items as PortalExitInterviewQueueItem[]} mutation={mutation} onAction={(action, item) => { setActionIntent({ kind: "exit", action, item }); setActionReason(""); setActionError(null); }} onRetry={(item) => loadExitDetail(item)} onSensitive={(item) => loadExitSensitive(item)} onSensitiveRetry={(item) => loadExitSensitive(item)} onToggle={toggleExit} />}<FormsPagination filters={filters} page={currentPage as PortalFormsPage<unknown>} section={section} /></PortalCollectionFrame> : null}
-        </div>
+        </div>}
       </div>
       <AlertDialog onOpenChange={(open) => { if (!open && mutation?.state !== "pending") { setActionIntent(null); setActionReason(""); setActionError(null); } }} open={actionIntent !== null}>
         <AlertDialogContent className="portal-counseling__dialog" size="sm">

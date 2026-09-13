@@ -6,8 +6,7 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export interface CallSlipAssignmentSchema {
-  counselor_selection_token?: string | null;
-  reason_code: string;
-  target_counselor_id?: number | null;
+export interface GraduateTracerReviewLifecycleSchema {
+  expected_updated_at?: string | null;
+  reason?: string;
 }

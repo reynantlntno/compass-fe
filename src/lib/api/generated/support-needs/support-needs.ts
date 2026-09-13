@@ -12,10 +12,18 @@ import type {
   SupportNeedMutationResponseSchema,
   SupportNeedPageSchema,
   SupportNeedProjectionSchema,
+  SupportNeedReasonCodeSchema,
+  SupportNeedStaffCreateSchema,
+  SupportNeedStaffMutationResponseSchema,
+  SupportNeedStaffPageSchema,
+  SupportNeedStaffProjectionSchema,
+  SupportNeedStaffReasonSchema,
+  SupportNeedStaffUpdateSchema,
   SupportNeedTypePageSchema,
   SupportNeedUpdateSchema,
   SupportNeedsListParams,
   SupportNeedsReviewQueueParams,
+  SupportNeedsStaffQueueParams,
   SupportNeedsTypesParams
 } from '../model';
 
@@ -313,6 +321,981 @@ export const supportNeedsReviewQueue = async (params?: SupportNeedsReviewQueuePa
     method: 'GET'
 
 
+  }
+);}
+
+
+export type supportNeedsStaffQueueResponse200 = {
+  data: SupportNeedStaffPageSchema
+  status: 200
+}
+
+export type supportNeedsStaffQueueResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type supportNeedsStaffQueueResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type supportNeedsStaffQueueResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type supportNeedsStaffQueueResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type supportNeedsStaffQueueResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type supportNeedsStaffQueueResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type supportNeedsStaffQueueResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type supportNeedsStaffQueueResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type supportNeedsStaffQueueResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type supportNeedsStaffQueueResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type supportNeedsStaffQueueResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type supportNeedsStaffQueueResponseSuccess = (supportNeedsStaffQueueResponse200) & {
+  headers: Record<string, string>;
+};
+export type supportNeedsStaffQueueResponseError = (supportNeedsStaffQueueResponse400 | supportNeedsStaffQueueResponse401 | supportNeedsStaffQueueResponse403 | supportNeedsStaffQueueResponse404 | supportNeedsStaffQueueResponse405 | supportNeedsStaffQueueResponse409 | supportNeedsStaffQueueResponse413 | supportNeedsStaffQueueResponse422 | supportNeedsStaffQueueResponse429 | supportNeedsStaffQueueResponse500 | supportNeedsStaffQueueResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type supportNeedsStaffQueueResponse = (supportNeedsStaffQueueResponseSuccess | supportNeedsStaffQueueResponseError)
+
+export const getSupportNeedsStaffQueueUrl = (params?: SupportNeedsStaffQueueParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/support-needs/staff-queue/?${stringifiedParams}` : `/api/v1/support-needs/staff-queue/`
+}
+
+/**
+ * @summary Staff Queue
+ */
+export const supportNeedsStaffQueue = async (params?: SupportNeedsStaffQueueParams, options?: Parameters<typeof compassFetch>[1]): Promise<supportNeedsStaffQueueResponse> => {
+
+  return compassFetch<supportNeedsStaffQueueResponse>(getSupportNeedsStaffQueueUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+export type supportNeedsStaffCreateResponse200 = {
+  data: SupportNeedStaffMutationResponseSchema
+  status: 200
+}
+
+export type supportNeedsStaffCreateResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type supportNeedsStaffCreateResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type supportNeedsStaffCreateResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type supportNeedsStaffCreateResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type supportNeedsStaffCreateResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type supportNeedsStaffCreateResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type supportNeedsStaffCreateResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type supportNeedsStaffCreateResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type supportNeedsStaffCreateResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type supportNeedsStaffCreateResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type supportNeedsStaffCreateResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type supportNeedsStaffCreateResponseSuccess = (supportNeedsStaffCreateResponse200) & {
+  headers: Record<string, string>;
+};
+export type supportNeedsStaffCreateResponseError = (supportNeedsStaffCreateResponse400 | supportNeedsStaffCreateResponse401 | supportNeedsStaffCreateResponse403 | supportNeedsStaffCreateResponse404 | supportNeedsStaffCreateResponse405 | supportNeedsStaffCreateResponse409 | supportNeedsStaffCreateResponse413 | supportNeedsStaffCreateResponse422 | supportNeedsStaffCreateResponse429 | supportNeedsStaffCreateResponse500 | supportNeedsStaffCreateResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type supportNeedsStaffCreateResponse = (supportNeedsStaffCreateResponseSuccess | supportNeedsStaffCreateResponseError)
+
+export const getSupportNeedsStaffCreateUrl = () => {
+
+
+
+
+  return `/api/v1/support-needs/staff-queue/`
+}
+
+/**
+ * @summary Staff Create Route
+ */
+export const supportNeedsStaffCreate = async (supportNeedStaffCreateSchema: SupportNeedStaffCreateSchema, options?: Parameters<typeof compassFetch>[1]): Promise<supportNeedsStaffCreateResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return compassFetch<supportNeedsStaffCreateResponse>(getSupportNeedsStaffCreateUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(supportNeedStaffCreateSchema)
+  }
+);}
+
+
+export type supportNeedsStaffReasonCodesResponse200 = {
+  data: SupportNeedReasonCodeSchema[]
+  status: 200
+}
+
+export type supportNeedsStaffReasonCodesResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type supportNeedsStaffReasonCodesResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type supportNeedsStaffReasonCodesResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type supportNeedsStaffReasonCodesResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type supportNeedsStaffReasonCodesResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type supportNeedsStaffReasonCodesResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type supportNeedsStaffReasonCodesResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type supportNeedsStaffReasonCodesResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type supportNeedsStaffReasonCodesResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type supportNeedsStaffReasonCodesResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type supportNeedsStaffReasonCodesResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type supportNeedsStaffReasonCodesResponseSuccess = (supportNeedsStaffReasonCodesResponse200) & {
+  headers: Record<string, string>;
+};
+export type supportNeedsStaffReasonCodesResponseError = (supportNeedsStaffReasonCodesResponse400 | supportNeedsStaffReasonCodesResponse401 | supportNeedsStaffReasonCodesResponse403 | supportNeedsStaffReasonCodesResponse404 | supportNeedsStaffReasonCodesResponse405 | supportNeedsStaffReasonCodesResponse409 | supportNeedsStaffReasonCodesResponse413 | supportNeedsStaffReasonCodesResponse422 | supportNeedsStaffReasonCodesResponse429 | supportNeedsStaffReasonCodesResponse500 | supportNeedsStaffReasonCodesResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type supportNeedsStaffReasonCodesResponse = (supportNeedsStaffReasonCodesResponseSuccess | supportNeedsStaffReasonCodesResponseError)
+
+export const getSupportNeedsStaffReasonCodesUrl = () => {
+
+
+
+
+  return `/api/v1/support-needs/staff-queue/reason-codes/`
+}
+
+/**
+ * @summary Staff Reason Codes
+ */
+export const supportNeedsStaffReasonCodes = async ( options?: Parameters<typeof compassFetch>[1]): Promise<supportNeedsStaffReasonCodesResponse> => {
+
+  return compassFetch<supportNeedsStaffReasonCodesResponse>(getSupportNeedsStaffReasonCodesUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+export type supportNeedsStaffDetailResponse200 = {
+  data: SupportNeedStaffProjectionSchema
+  status: 200
+}
+
+export type supportNeedsStaffDetailResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type supportNeedsStaffDetailResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type supportNeedsStaffDetailResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type supportNeedsStaffDetailResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type supportNeedsStaffDetailResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type supportNeedsStaffDetailResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type supportNeedsStaffDetailResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type supportNeedsStaffDetailResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type supportNeedsStaffDetailResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type supportNeedsStaffDetailResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type supportNeedsStaffDetailResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type supportNeedsStaffDetailResponseSuccess = (supportNeedsStaffDetailResponse200) & {
+  headers: Record<string, string>;
+};
+export type supportNeedsStaffDetailResponseError = (supportNeedsStaffDetailResponse400 | supportNeedsStaffDetailResponse401 | supportNeedsStaffDetailResponse403 | supportNeedsStaffDetailResponse404 | supportNeedsStaffDetailResponse405 | supportNeedsStaffDetailResponse409 | supportNeedsStaffDetailResponse413 | supportNeedsStaffDetailResponse422 | supportNeedsStaffDetailResponse429 | supportNeedsStaffDetailResponse500 | supportNeedsStaffDetailResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type supportNeedsStaffDetailResponse = (supportNeedsStaffDetailResponseSuccess | supportNeedsStaffDetailResponseError)
+
+export const getSupportNeedsStaffDetailUrl = (referenceCode: string,) => {
+
+
+
+
+  return `/api/v1/support-needs/staff-queue/${referenceCode}/`
+}
+
+/**
+ * @summary Staff Detail Route
+ */
+export const supportNeedsStaffDetail = async (referenceCode: string, options?: Parameters<typeof compassFetch>[1]): Promise<supportNeedsStaffDetailResponse> => {
+
+  return compassFetch<supportNeedsStaffDetailResponse>(getSupportNeedsStaffDetailUrl(referenceCode),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+export type supportNeedsStaffUpdateResponse200 = {
+  data: SupportNeedStaffMutationResponseSchema
+  status: 200
+}
+
+export type supportNeedsStaffUpdateResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type supportNeedsStaffUpdateResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type supportNeedsStaffUpdateResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type supportNeedsStaffUpdateResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type supportNeedsStaffUpdateResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type supportNeedsStaffUpdateResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type supportNeedsStaffUpdateResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type supportNeedsStaffUpdateResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type supportNeedsStaffUpdateResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type supportNeedsStaffUpdateResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type supportNeedsStaffUpdateResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type supportNeedsStaffUpdateResponseSuccess = (supportNeedsStaffUpdateResponse200) & {
+  headers: Record<string, string>;
+};
+export type supportNeedsStaffUpdateResponseError = (supportNeedsStaffUpdateResponse400 | supportNeedsStaffUpdateResponse401 | supportNeedsStaffUpdateResponse403 | supportNeedsStaffUpdateResponse404 | supportNeedsStaffUpdateResponse405 | supportNeedsStaffUpdateResponse409 | supportNeedsStaffUpdateResponse413 | supportNeedsStaffUpdateResponse422 | supportNeedsStaffUpdateResponse429 | supportNeedsStaffUpdateResponse500 | supportNeedsStaffUpdateResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type supportNeedsStaffUpdateResponse = (supportNeedsStaffUpdateResponseSuccess | supportNeedsStaffUpdateResponseError)
+
+export const getSupportNeedsStaffUpdateUrl = (referenceCode: string,) => {
+
+
+
+
+  return `/api/v1/support-needs/staff-queue/${referenceCode}/`
+}
+
+/**
+ * @summary Staff Update Route
+ */
+export const supportNeedsStaffUpdate = async (referenceCode: string,
+    supportNeedStaffUpdateSchema: SupportNeedStaffUpdateSchema, options?: Parameters<typeof compassFetch>[1]): Promise<supportNeedsStaffUpdateResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return compassFetch<supportNeedsStaffUpdateResponse>(getSupportNeedsStaffUpdateUrl(referenceCode),
+  {
+    ...options,
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(supportNeedStaffUpdateSchema)
+  }
+);}
+
+
+export type supportNeedsStaffArchiveResponse200 = {
+  data: SupportNeedStaffMutationResponseSchema
+  status: 200
+}
+
+export type supportNeedsStaffArchiveResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type supportNeedsStaffArchiveResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type supportNeedsStaffArchiveResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type supportNeedsStaffArchiveResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type supportNeedsStaffArchiveResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type supportNeedsStaffArchiveResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type supportNeedsStaffArchiveResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type supportNeedsStaffArchiveResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type supportNeedsStaffArchiveResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type supportNeedsStaffArchiveResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type supportNeedsStaffArchiveResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type supportNeedsStaffArchiveResponseSuccess = (supportNeedsStaffArchiveResponse200) & {
+  headers: Record<string, string>;
+};
+export type supportNeedsStaffArchiveResponseError = (supportNeedsStaffArchiveResponse400 | supportNeedsStaffArchiveResponse401 | supportNeedsStaffArchiveResponse403 | supportNeedsStaffArchiveResponse404 | supportNeedsStaffArchiveResponse405 | supportNeedsStaffArchiveResponse409 | supportNeedsStaffArchiveResponse413 | supportNeedsStaffArchiveResponse422 | supportNeedsStaffArchiveResponse429 | supportNeedsStaffArchiveResponse500 | supportNeedsStaffArchiveResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type supportNeedsStaffArchiveResponse = (supportNeedsStaffArchiveResponseSuccess | supportNeedsStaffArchiveResponseError)
+
+export const getSupportNeedsStaffArchiveUrl = (referenceCode: string,) => {
+
+
+
+
+  return `/api/v1/support-needs/staff-queue/${referenceCode}/archive/`
+}
+
+/**
+ * @summary Staff Archive Route
+ */
+export const supportNeedsStaffArchive = async (referenceCode: string,
+    supportNeedStaffReasonSchemaNull?: SupportNeedStaffReasonSchema | null, options?: Parameters<typeof compassFetch>[1]): Promise<supportNeedsStaffArchiveResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return compassFetch<supportNeedsStaffArchiveResponse>(getSupportNeedsStaffArchiveUrl(referenceCode),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(supportNeedStaffReasonSchemaNull)
+  }
+);}
+
+
+export type supportNeedsStaffDeactivateResponse200 = {
+  data: SupportNeedStaffMutationResponseSchema
+  status: 200
+}
+
+export type supportNeedsStaffDeactivateResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type supportNeedsStaffDeactivateResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type supportNeedsStaffDeactivateResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type supportNeedsStaffDeactivateResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type supportNeedsStaffDeactivateResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type supportNeedsStaffDeactivateResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type supportNeedsStaffDeactivateResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type supportNeedsStaffDeactivateResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type supportNeedsStaffDeactivateResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type supportNeedsStaffDeactivateResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type supportNeedsStaffDeactivateResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type supportNeedsStaffDeactivateResponseSuccess = (supportNeedsStaffDeactivateResponse200) & {
+  headers: Record<string, string>;
+};
+export type supportNeedsStaffDeactivateResponseError = (supportNeedsStaffDeactivateResponse400 | supportNeedsStaffDeactivateResponse401 | supportNeedsStaffDeactivateResponse403 | supportNeedsStaffDeactivateResponse404 | supportNeedsStaffDeactivateResponse405 | supportNeedsStaffDeactivateResponse409 | supportNeedsStaffDeactivateResponse413 | supportNeedsStaffDeactivateResponse422 | supportNeedsStaffDeactivateResponse429 | supportNeedsStaffDeactivateResponse500 | supportNeedsStaffDeactivateResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type supportNeedsStaffDeactivateResponse = (supportNeedsStaffDeactivateResponseSuccess | supportNeedsStaffDeactivateResponseError)
+
+export const getSupportNeedsStaffDeactivateUrl = (referenceCode: string,) => {
+
+
+
+
+  return `/api/v1/support-needs/staff-queue/${referenceCode}/deactivate/`
+}
+
+/**
+ * @summary Staff Deactivate Route
+ */
+export const supportNeedsStaffDeactivate = async (referenceCode: string,
+    supportNeedStaffReasonSchemaNull?: SupportNeedStaffReasonSchema | null, options?: Parameters<typeof compassFetch>[1]): Promise<supportNeedsStaffDeactivateResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return compassFetch<supportNeedsStaffDeactivateResponse>(getSupportNeedsStaffDeactivateUrl(referenceCode),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(supportNeedStaffReasonSchemaNull)
+  }
+);}
+
+
+export type supportNeedsStaffDisputeResponse200 = {
+  data: SupportNeedStaffMutationResponseSchema
+  status: 200
+}
+
+export type supportNeedsStaffDisputeResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type supportNeedsStaffDisputeResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type supportNeedsStaffDisputeResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type supportNeedsStaffDisputeResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type supportNeedsStaffDisputeResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type supportNeedsStaffDisputeResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type supportNeedsStaffDisputeResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type supportNeedsStaffDisputeResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type supportNeedsStaffDisputeResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type supportNeedsStaffDisputeResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type supportNeedsStaffDisputeResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type supportNeedsStaffDisputeResponseSuccess = (supportNeedsStaffDisputeResponse200) & {
+  headers: Record<string, string>;
+};
+export type supportNeedsStaffDisputeResponseError = (supportNeedsStaffDisputeResponse400 | supportNeedsStaffDisputeResponse401 | supportNeedsStaffDisputeResponse403 | supportNeedsStaffDisputeResponse404 | supportNeedsStaffDisputeResponse405 | supportNeedsStaffDisputeResponse409 | supportNeedsStaffDisputeResponse413 | supportNeedsStaffDisputeResponse422 | supportNeedsStaffDisputeResponse429 | supportNeedsStaffDisputeResponse500 | supportNeedsStaffDisputeResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type supportNeedsStaffDisputeResponse = (supportNeedsStaffDisputeResponseSuccess | supportNeedsStaffDisputeResponseError)
+
+export const getSupportNeedsStaffDisputeUrl = (referenceCode: string,) => {
+
+
+
+
+  return `/api/v1/support-needs/staff-queue/${referenceCode}/dispute/`
+}
+
+/**
+ * @summary Staff Dispute Route
+ */
+export const supportNeedsStaffDispute = async (referenceCode: string,
+    supportNeedStaffReasonSchemaNull?: SupportNeedStaffReasonSchema | null, options?: Parameters<typeof compassFetch>[1]): Promise<supportNeedsStaffDisputeResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return compassFetch<supportNeedsStaffDisputeResponse>(getSupportNeedsStaffDisputeUrl(referenceCode),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(supportNeedStaffReasonSchemaNull)
+  }
+);}
+
+
+export type supportNeedsStaffMarkReviewResponse200 = {
+  data: SupportNeedStaffMutationResponseSchema
+  status: 200
+}
+
+export type supportNeedsStaffMarkReviewResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type supportNeedsStaffMarkReviewResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type supportNeedsStaffMarkReviewResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type supportNeedsStaffMarkReviewResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type supportNeedsStaffMarkReviewResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type supportNeedsStaffMarkReviewResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type supportNeedsStaffMarkReviewResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type supportNeedsStaffMarkReviewResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type supportNeedsStaffMarkReviewResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type supportNeedsStaffMarkReviewResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type supportNeedsStaffMarkReviewResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type supportNeedsStaffMarkReviewResponseSuccess = (supportNeedsStaffMarkReviewResponse200) & {
+  headers: Record<string, string>;
+};
+export type supportNeedsStaffMarkReviewResponseError = (supportNeedsStaffMarkReviewResponse400 | supportNeedsStaffMarkReviewResponse401 | supportNeedsStaffMarkReviewResponse403 | supportNeedsStaffMarkReviewResponse404 | supportNeedsStaffMarkReviewResponse405 | supportNeedsStaffMarkReviewResponse409 | supportNeedsStaffMarkReviewResponse413 | supportNeedsStaffMarkReviewResponse422 | supportNeedsStaffMarkReviewResponse429 | supportNeedsStaffMarkReviewResponse500 | supportNeedsStaffMarkReviewResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type supportNeedsStaffMarkReviewResponse = (supportNeedsStaffMarkReviewResponseSuccess | supportNeedsStaffMarkReviewResponseError)
+
+export const getSupportNeedsStaffMarkReviewUrl = (referenceCode: string,) => {
+
+
+
+
+  return `/api/v1/support-needs/staff-queue/${referenceCode}/needs-review/`
+}
+
+/**
+ * @summary Staff Mark Review Route
+ */
+export const supportNeedsStaffMarkReview = async (referenceCode: string,
+    supportNeedStaffReasonSchemaNull?: SupportNeedStaffReasonSchema | null, options?: Parameters<typeof compassFetch>[1]): Promise<supportNeedsStaffMarkReviewResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return compassFetch<supportNeedsStaffMarkReviewResponse>(getSupportNeedsStaffMarkReviewUrl(referenceCode),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(supportNeedStaffReasonSchemaNull)
+  }
+);}
+
+
+export type supportNeedsStaffVerifyResponse200 = {
+  data: SupportNeedStaffMutationResponseSchema
+  status: 200
+}
+
+export type supportNeedsStaffVerifyResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type supportNeedsStaffVerifyResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type supportNeedsStaffVerifyResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type supportNeedsStaffVerifyResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type supportNeedsStaffVerifyResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type supportNeedsStaffVerifyResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type supportNeedsStaffVerifyResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type supportNeedsStaffVerifyResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type supportNeedsStaffVerifyResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type supportNeedsStaffVerifyResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type supportNeedsStaffVerifyResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type supportNeedsStaffVerifyResponseSuccess = (supportNeedsStaffVerifyResponse200) & {
+  headers: Record<string, string>;
+};
+export type supportNeedsStaffVerifyResponseError = (supportNeedsStaffVerifyResponse400 | supportNeedsStaffVerifyResponse401 | supportNeedsStaffVerifyResponse403 | supportNeedsStaffVerifyResponse404 | supportNeedsStaffVerifyResponse405 | supportNeedsStaffVerifyResponse409 | supportNeedsStaffVerifyResponse413 | supportNeedsStaffVerifyResponse422 | supportNeedsStaffVerifyResponse429 | supportNeedsStaffVerifyResponse500 | supportNeedsStaffVerifyResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type supportNeedsStaffVerifyResponse = (supportNeedsStaffVerifyResponseSuccess | supportNeedsStaffVerifyResponseError)
+
+export const getSupportNeedsStaffVerifyUrl = (referenceCode: string,) => {
+
+
+
+
+  return `/api/v1/support-needs/staff-queue/${referenceCode}/verify/`
+}
+
+/**
+ * @summary Staff Verify Route
+ */
+export const supportNeedsStaffVerify = async (referenceCode: string,
+    supportNeedStaffReasonSchemaNull?: SupportNeedStaffReasonSchema | null, options?: Parameters<typeof compassFetch>[1]): Promise<supportNeedsStaffVerifyResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return compassFetch<supportNeedsStaffVerifyResponse>(getSupportNeedsStaffVerifyUrl(referenceCode),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(supportNeedStaffReasonSchemaNull)
   }
 );}
 

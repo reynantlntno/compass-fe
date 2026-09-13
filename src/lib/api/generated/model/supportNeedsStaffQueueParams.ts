@@ -6,8 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export type ProfilesStaffStudentsParams = {
+export type SupportNeedsStaffQueueParams = {
 q?: string;
+status?: string;
+type_key?: string;
+category?: string;
+source_type?: string;
+order?: string;
 /**
  * @minimum 1
  */
@@ -17,5 +22,4 @@ page?: number;
  * @maximum 100
  */
 page_size?: number;
-workflow?: string;
 };

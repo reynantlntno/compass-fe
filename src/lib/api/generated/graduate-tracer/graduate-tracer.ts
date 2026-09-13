@@ -14,6 +14,11 @@ import type {
   GraduateTracerListParams,
   GraduateTracerResponsePageSchema,
   GraduateTracerResponseSchema,
+  GraduateTracerReviewLifecycleSchema,
+  GraduateTracerReviewQueueDetailSchema,
+  GraduateTracerReviewQueueItemSchema,
+  GraduateTracerReviewQueueListParams,
+  GraduateTracerReviewQueuePageSchema,
   GraduateTracerStatusSchema,
   LifecycleSchema,
   StartSchema
@@ -214,6 +219,909 @@ return compassFetch<graduateTracerStartResponse>(getGraduateTracerStartUrl(),
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
     body: JSON.stringify(startSchema)
+  }
+);}
+
+
+export type graduateTracerReviewQueueListResponse200 = {
+  data: GraduateTracerReviewQueuePageSchema
+  status: 200
+}
+
+export type graduateTracerReviewQueueListResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type graduateTracerReviewQueueListResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type graduateTracerReviewQueueListResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type graduateTracerReviewQueueListResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type graduateTracerReviewQueueListResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type graduateTracerReviewQueueListResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type graduateTracerReviewQueueListResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type graduateTracerReviewQueueListResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type graduateTracerReviewQueueListResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type graduateTracerReviewQueueListResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type graduateTracerReviewQueueListResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type graduateTracerReviewQueueListResponseSuccess = (graduateTracerReviewQueueListResponse200) & {
+  headers: Record<string, string>;
+};
+export type graduateTracerReviewQueueListResponseError = (graduateTracerReviewQueueListResponse400 | graduateTracerReviewQueueListResponse401 | graduateTracerReviewQueueListResponse403 | graduateTracerReviewQueueListResponse404 | graduateTracerReviewQueueListResponse405 | graduateTracerReviewQueueListResponse409 | graduateTracerReviewQueueListResponse413 | graduateTracerReviewQueueListResponse422 | graduateTracerReviewQueueListResponse429 | graduateTracerReviewQueueListResponse500 | graduateTracerReviewQueueListResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type graduateTracerReviewQueueListResponse = (graduateTracerReviewQueueListResponseSuccess | graduateTracerReviewQueueListResponseError)
+
+export const getGraduateTracerReviewQueueListUrl = (params?: GraduateTracerReviewQueueListParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/graduate-tracer/review-queue/?${stringifiedParams}` : `/api/v1/graduate-tracer/review-queue/`
+}
+
+/**
+ * @summary Review Queue
+ */
+export const graduateTracerReviewQueueList = async (params?: GraduateTracerReviewQueueListParams, options?: Parameters<typeof compassFetch>[1]): Promise<graduateTracerReviewQueueListResponse> => {
+
+  return compassFetch<graduateTracerReviewQueueListResponse>(getGraduateTracerReviewQueueListUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+export type graduateTracerReviewQueueDetailResponse200 = {
+  data: GraduateTracerReviewQueueDetailSchema
+  status: 200
+}
+
+export type graduateTracerReviewQueueDetailResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type graduateTracerReviewQueueDetailResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type graduateTracerReviewQueueDetailResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type graduateTracerReviewQueueDetailResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type graduateTracerReviewQueueDetailResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type graduateTracerReviewQueueDetailResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type graduateTracerReviewQueueDetailResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type graduateTracerReviewQueueDetailResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type graduateTracerReviewQueueDetailResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type graduateTracerReviewQueueDetailResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type graduateTracerReviewQueueDetailResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type graduateTracerReviewQueueDetailResponseSuccess = (graduateTracerReviewQueueDetailResponse200) & {
+  headers: Record<string, string>;
+};
+export type graduateTracerReviewQueueDetailResponseError = (graduateTracerReviewQueueDetailResponse400 | graduateTracerReviewQueueDetailResponse401 | graduateTracerReviewQueueDetailResponse403 | graduateTracerReviewQueueDetailResponse404 | graduateTracerReviewQueueDetailResponse405 | graduateTracerReviewQueueDetailResponse409 | graduateTracerReviewQueueDetailResponse413 | graduateTracerReviewQueueDetailResponse422 | graduateTracerReviewQueueDetailResponse429 | graduateTracerReviewQueueDetailResponse500 | graduateTracerReviewQueueDetailResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type graduateTracerReviewQueueDetailResponse = (graduateTracerReviewQueueDetailResponseSuccess | graduateTracerReviewQueueDetailResponseError)
+
+export const getGraduateTracerReviewQueueDetailUrl = (referenceCode: string,) => {
+
+
+
+
+  return `/api/v1/graduate-tracer/review-queue/${referenceCode}/`
+}
+
+/**
+ * @summary Review Queue Detail
+ */
+export const graduateTracerReviewQueueDetail = async (referenceCode: string, options?: Parameters<typeof compassFetch>[1]): Promise<graduateTracerReviewQueueDetailResponse> => {
+
+  return compassFetch<graduateTracerReviewQueueDetailResponse>(getGraduateTracerReviewQueueDetailUrl(referenceCode),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+export type graduateTracerReviewQueueArchiveResponse200 = {
+  data: GraduateTracerReviewQueueItemSchema
+  status: 200
+}
+
+export type graduateTracerReviewQueueArchiveResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type graduateTracerReviewQueueArchiveResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type graduateTracerReviewQueueArchiveResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type graduateTracerReviewQueueArchiveResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type graduateTracerReviewQueueArchiveResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type graduateTracerReviewQueueArchiveResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type graduateTracerReviewQueueArchiveResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type graduateTracerReviewQueueArchiveResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type graduateTracerReviewQueueArchiveResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type graduateTracerReviewQueueArchiveResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type graduateTracerReviewQueueArchiveResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type graduateTracerReviewQueueArchiveResponseSuccess = (graduateTracerReviewQueueArchiveResponse200) & {
+  headers: Record<string, string>;
+};
+export type graduateTracerReviewQueueArchiveResponseError = (graduateTracerReviewQueueArchiveResponse400 | graduateTracerReviewQueueArchiveResponse401 | graduateTracerReviewQueueArchiveResponse403 | graduateTracerReviewQueueArchiveResponse404 | graduateTracerReviewQueueArchiveResponse405 | graduateTracerReviewQueueArchiveResponse409 | graduateTracerReviewQueueArchiveResponse413 | graduateTracerReviewQueueArchiveResponse422 | graduateTracerReviewQueueArchiveResponse429 | graduateTracerReviewQueueArchiveResponse500 | graduateTracerReviewQueueArchiveResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type graduateTracerReviewQueueArchiveResponse = (graduateTracerReviewQueueArchiveResponseSuccess | graduateTracerReviewQueueArchiveResponseError)
+
+export const getGraduateTracerReviewQueueArchiveUrl = (referenceCode: string,) => {
+
+
+
+
+  return `/api/v1/graduate-tracer/review-queue/${referenceCode}/archive/`
+}
+
+/**
+ * @summary Review Queue Archive
+ */
+export const graduateTracerReviewQueueArchive = async (referenceCode: string,
+    graduateTracerReviewLifecycleSchemaNull?: GraduateTracerReviewLifecycleSchema | null, options?: Parameters<typeof compassFetch>[1]): Promise<graduateTracerReviewQueueArchiveResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return compassFetch<graduateTracerReviewQueueArchiveResponse>(getGraduateTracerReviewQueueArchiveUrl(referenceCode),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(graduateTracerReviewLifecycleSchemaNull)
+  }
+);}
+
+
+export type graduateTracerReviewQueueDocumentDownloadResponse200ApplicationMsword = {
+  data: Blob
+  status: 200
+}
+
+export type graduateTracerReviewQueueDocumentDownloadResponse200ApplicationPdf = {
+  data: Blob
+  status: 200
+}
+
+export type graduateTracerReviewQueueDocumentDownloadResponse200ApplicationVndOpenxmlformatsOfficedocumentWordprocessingmlDocument = {
+  data: Blob
+  status: 200
+}
+
+export type graduateTracerReviewQueueDocumentDownloadResponse200ImageJpeg = {
+  data: Blob
+  status: 200
+}
+
+export type graduateTracerReviewQueueDocumentDownloadResponse200ImagePng = {
+  data: Blob
+  status: 200
+}
+
+export type graduateTracerReviewQueueDocumentDownloadResponse200TextCsv = {
+  data: Blob
+  status: 200
+}
+
+export type graduateTracerReviewQueueDocumentDownloadResponse200TextHtml = {
+  data: Blob
+  status: 200
+}
+
+export type graduateTracerReviewQueueDocumentDownloadResponse200TextPlain = {
+  data: Blob
+  status: 200
+}
+
+export type graduateTracerReviewQueueDocumentDownloadResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type graduateTracerReviewQueueDocumentDownloadResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type graduateTracerReviewQueueDocumentDownloadResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type graduateTracerReviewQueueDocumentDownloadResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type graduateTracerReviewQueueDocumentDownloadResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type graduateTracerReviewQueueDocumentDownloadResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type graduateTracerReviewQueueDocumentDownloadResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type graduateTracerReviewQueueDocumentDownloadResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type graduateTracerReviewQueueDocumentDownloadResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type graduateTracerReviewQueueDocumentDownloadResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type graduateTracerReviewQueueDocumentDownloadResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type graduateTracerReviewQueueDocumentDownloadResponseSuccess = (graduateTracerReviewQueueDocumentDownloadResponse200ApplicationMsword | graduateTracerReviewQueueDocumentDownloadResponse200ApplicationPdf | graduateTracerReviewQueueDocumentDownloadResponse200ApplicationVndOpenxmlformatsOfficedocumentWordprocessingmlDocument | graduateTracerReviewQueueDocumentDownloadResponse200ImageJpeg | graduateTracerReviewQueueDocumentDownloadResponse200ImagePng | graduateTracerReviewQueueDocumentDownloadResponse200TextCsv | graduateTracerReviewQueueDocumentDownloadResponse200TextHtml | graduateTracerReviewQueueDocumentDownloadResponse200TextPlain) & {
+  headers: Record<string, string>;
+};
+export type graduateTracerReviewQueueDocumentDownloadResponseError = (graduateTracerReviewQueueDocumentDownloadResponse400 | graduateTracerReviewQueueDocumentDownloadResponse401 | graduateTracerReviewQueueDocumentDownloadResponse403 | graduateTracerReviewQueueDocumentDownloadResponse404 | graduateTracerReviewQueueDocumentDownloadResponse405 | graduateTracerReviewQueueDocumentDownloadResponse409 | graduateTracerReviewQueueDocumentDownloadResponse413 | graduateTracerReviewQueueDocumentDownloadResponse422 | graduateTracerReviewQueueDocumentDownloadResponse429 | graduateTracerReviewQueueDocumentDownloadResponse500 | graduateTracerReviewQueueDocumentDownloadResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type graduateTracerReviewQueueDocumentDownloadResponse = (graduateTracerReviewQueueDocumentDownloadResponseSuccess | graduateTracerReviewQueueDocumentDownloadResponseError)
+
+export const getGraduateTracerReviewQueueDocumentDownloadUrl = (referenceCode: string,) => {
+
+
+
+
+  return `/api/v1/graduate-tracer/review-queue/${referenceCode}/document/download/`
+}
+
+/**
+ * @summary Review Queue Document Download
+ */
+export const graduateTracerReviewQueueDocumentDownload = async (referenceCode: string, options?: Parameters<typeof compassFetch>[1]): Promise<graduateTracerReviewQueueDocumentDownloadResponse> => {
+
+  return compassFetch<graduateTracerReviewQueueDocumentDownloadResponse>(getGraduateTracerReviewQueueDocumentDownloadUrl(referenceCode),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+export type graduateTracerReviewQueueDocumentGenerateResponse200 = {
+  data: GeneratedDocumentMetadataSchema
+  status: 200
+}
+
+export type graduateTracerReviewQueueDocumentGenerateResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type graduateTracerReviewQueueDocumentGenerateResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type graduateTracerReviewQueueDocumentGenerateResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type graduateTracerReviewQueueDocumentGenerateResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type graduateTracerReviewQueueDocumentGenerateResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type graduateTracerReviewQueueDocumentGenerateResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type graduateTracerReviewQueueDocumentGenerateResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type graduateTracerReviewQueueDocumentGenerateResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type graduateTracerReviewQueueDocumentGenerateResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type graduateTracerReviewQueueDocumentGenerateResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type graduateTracerReviewQueueDocumentGenerateResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type graduateTracerReviewQueueDocumentGenerateResponseSuccess = (graduateTracerReviewQueueDocumentGenerateResponse200) & {
+  headers: Record<string, string>;
+};
+export type graduateTracerReviewQueueDocumentGenerateResponseError = (graduateTracerReviewQueueDocumentGenerateResponse400 | graduateTracerReviewQueueDocumentGenerateResponse401 | graduateTracerReviewQueueDocumentGenerateResponse403 | graduateTracerReviewQueueDocumentGenerateResponse404 | graduateTracerReviewQueueDocumentGenerateResponse405 | graduateTracerReviewQueueDocumentGenerateResponse409 | graduateTracerReviewQueueDocumentGenerateResponse413 | graduateTracerReviewQueueDocumentGenerateResponse422 | graduateTracerReviewQueueDocumentGenerateResponse429 | graduateTracerReviewQueueDocumentGenerateResponse500 | graduateTracerReviewQueueDocumentGenerateResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type graduateTracerReviewQueueDocumentGenerateResponse = (graduateTracerReviewQueueDocumentGenerateResponseSuccess | graduateTracerReviewQueueDocumentGenerateResponseError)
+
+export const getGraduateTracerReviewQueueDocumentGenerateUrl = (referenceCode: string,) => {
+
+
+
+
+  return `/api/v1/graduate-tracer/review-queue/${referenceCode}/document/generate/`
+}
+
+/**
+ * @summary Review Queue Document Generate
+ */
+export const graduateTracerReviewQueueDocumentGenerate = async (referenceCode: string,
+    documentGenerateSchema: DocumentGenerateSchema, options?: Parameters<typeof compassFetch>[1]): Promise<graduateTracerReviewQueueDocumentGenerateResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return compassFetch<graduateTracerReviewQueueDocumentGenerateResponse>(getGraduateTracerReviewQueueDocumentGenerateUrl(referenceCode),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(documentGenerateSchema)
+  }
+);}
+
+
+export type graduateTracerReviewQueueDocumentPreviewResponse200ApplicationPdf = {
+  data: Blob
+  status: 200
+}
+
+export type graduateTracerReviewQueueDocumentPreviewResponse200TextHtml = {
+  data: Blob
+  status: 200
+}
+
+export type graduateTracerReviewQueueDocumentPreviewResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type graduateTracerReviewQueueDocumentPreviewResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type graduateTracerReviewQueueDocumentPreviewResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type graduateTracerReviewQueueDocumentPreviewResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type graduateTracerReviewQueueDocumentPreviewResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type graduateTracerReviewQueueDocumentPreviewResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type graduateTracerReviewQueueDocumentPreviewResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type graduateTracerReviewQueueDocumentPreviewResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type graduateTracerReviewQueueDocumentPreviewResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type graduateTracerReviewQueueDocumentPreviewResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type graduateTracerReviewQueueDocumentPreviewResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type graduateTracerReviewQueueDocumentPreviewResponseSuccess = (graduateTracerReviewQueueDocumentPreviewResponse200ApplicationPdf | graduateTracerReviewQueueDocumentPreviewResponse200TextHtml) & {
+  headers: Record<string, string>;
+};
+export type graduateTracerReviewQueueDocumentPreviewResponseError = (graduateTracerReviewQueueDocumentPreviewResponse400 | graduateTracerReviewQueueDocumentPreviewResponse401 | graduateTracerReviewQueueDocumentPreviewResponse403 | graduateTracerReviewQueueDocumentPreviewResponse404 | graduateTracerReviewQueueDocumentPreviewResponse405 | graduateTracerReviewQueueDocumentPreviewResponse409 | graduateTracerReviewQueueDocumentPreviewResponse413 | graduateTracerReviewQueueDocumentPreviewResponse422 | graduateTracerReviewQueueDocumentPreviewResponse429 | graduateTracerReviewQueueDocumentPreviewResponse500 | graduateTracerReviewQueueDocumentPreviewResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type graduateTracerReviewQueueDocumentPreviewResponse = (graduateTracerReviewQueueDocumentPreviewResponseSuccess | graduateTracerReviewQueueDocumentPreviewResponseError)
+
+export const getGraduateTracerReviewQueueDocumentPreviewUrl = (referenceCode: string,) => {
+
+
+
+
+  return `/api/v1/graduate-tracer/review-queue/${referenceCode}/document/preview/`
+}
+
+/**
+ * @summary Review Queue Document Preview
+ */
+export const graduateTracerReviewQueueDocumentPreview = async (referenceCode: string, options?: Parameters<typeof compassFetch>[1]): Promise<graduateTracerReviewQueueDocumentPreviewResponse> => {
+
+  return compassFetch<graduateTracerReviewQueueDocumentPreviewResponse>(getGraduateTracerReviewQueueDocumentPreviewUrl(referenceCode),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+export type graduateTracerReviewQueueReopenResponse200 = {
+  data: GraduateTracerReviewQueueItemSchema
+  status: 200
+}
+
+export type graduateTracerReviewQueueReopenResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type graduateTracerReviewQueueReopenResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type graduateTracerReviewQueueReopenResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type graduateTracerReviewQueueReopenResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type graduateTracerReviewQueueReopenResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type graduateTracerReviewQueueReopenResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type graduateTracerReviewQueueReopenResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type graduateTracerReviewQueueReopenResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type graduateTracerReviewQueueReopenResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type graduateTracerReviewQueueReopenResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type graduateTracerReviewQueueReopenResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type graduateTracerReviewQueueReopenResponseSuccess = (graduateTracerReviewQueueReopenResponse200) & {
+  headers: Record<string, string>;
+};
+export type graduateTracerReviewQueueReopenResponseError = (graduateTracerReviewQueueReopenResponse400 | graduateTracerReviewQueueReopenResponse401 | graduateTracerReviewQueueReopenResponse403 | graduateTracerReviewQueueReopenResponse404 | graduateTracerReviewQueueReopenResponse405 | graduateTracerReviewQueueReopenResponse409 | graduateTracerReviewQueueReopenResponse413 | graduateTracerReviewQueueReopenResponse422 | graduateTracerReviewQueueReopenResponse429 | graduateTracerReviewQueueReopenResponse500 | graduateTracerReviewQueueReopenResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type graduateTracerReviewQueueReopenResponse = (graduateTracerReviewQueueReopenResponseSuccess | graduateTracerReviewQueueReopenResponseError)
+
+export const getGraduateTracerReviewQueueReopenUrl = (referenceCode: string,) => {
+
+
+
+
+  return `/api/v1/graduate-tracer/review-queue/${referenceCode}/reopen/`
+}
+
+/**
+ * @summary Review Queue Reopen
+ */
+export const graduateTracerReviewQueueReopen = async (referenceCode: string,
+    graduateTracerReviewLifecycleSchemaNull?: GraduateTracerReviewLifecycleSchema | null, options?: Parameters<typeof compassFetch>[1]): Promise<graduateTracerReviewQueueReopenResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return compassFetch<graduateTracerReviewQueueReopenResponse>(getGraduateTracerReviewQueueReopenUrl(referenceCode),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(graduateTracerReviewLifecycleSchemaNull)
+  }
+);}
+
+
+export type graduateTracerReviewQueueSensitiveDetailResponse200 = {
+  data: GraduateTracerReviewQueueDetailSchema
+  status: 200
+}
+
+export type graduateTracerReviewQueueSensitiveDetailResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type graduateTracerReviewQueueSensitiveDetailResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type graduateTracerReviewQueueSensitiveDetailResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type graduateTracerReviewQueueSensitiveDetailResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type graduateTracerReviewQueueSensitiveDetailResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type graduateTracerReviewQueueSensitiveDetailResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type graduateTracerReviewQueueSensitiveDetailResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type graduateTracerReviewQueueSensitiveDetailResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type graduateTracerReviewQueueSensitiveDetailResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type graduateTracerReviewQueueSensitiveDetailResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type graduateTracerReviewQueueSensitiveDetailResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type graduateTracerReviewQueueSensitiveDetailResponseSuccess = (graduateTracerReviewQueueSensitiveDetailResponse200) & {
+  headers: Record<string, string>;
+};
+export type graduateTracerReviewQueueSensitiveDetailResponseError = (graduateTracerReviewQueueSensitiveDetailResponse400 | graduateTracerReviewQueueSensitiveDetailResponse401 | graduateTracerReviewQueueSensitiveDetailResponse403 | graduateTracerReviewQueueSensitiveDetailResponse404 | graduateTracerReviewQueueSensitiveDetailResponse405 | graduateTracerReviewQueueSensitiveDetailResponse409 | graduateTracerReviewQueueSensitiveDetailResponse413 | graduateTracerReviewQueueSensitiveDetailResponse422 | graduateTracerReviewQueueSensitiveDetailResponse429 | graduateTracerReviewQueueSensitiveDetailResponse500 | graduateTracerReviewQueueSensitiveDetailResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type graduateTracerReviewQueueSensitiveDetailResponse = (graduateTracerReviewQueueSensitiveDetailResponseSuccess | graduateTracerReviewQueueSensitiveDetailResponseError)
+
+export const getGraduateTracerReviewQueueSensitiveDetailUrl = (referenceCode: string,) => {
+
+
+
+
+  return `/api/v1/graduate-tracer/review-queue/${referenceCode}/sensitive/`
+}
+
+/**
+ * @summary Review Queue Sensitive Detail
+ */
+export const graduateTracerReviewQueueSensitiveDetail = async (referenceCode: string, options?: Parameters<typeof compassFetch>[1]): Promise<graduateTracerReviewQueueSensitiveDetailResponse> => {
+
+  return compassFetch<graduateTracerReviewQueueSensitiveDetailResponse>(getGraduateTracerReviewQueueSensitiveDetailUrl(referenceCode),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+export type graduateTracerReviewQueueVoidResponse200 = {
+  data: GraduateTracerReviewQueueItemSchema
+  status: 200
+}
+
+export type graduateTracerReviewQueueVoidResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type graduateTracerReviewQueueVoidResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type graduateTracerReviewQueueVoidResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type graduateTracerReviewQueueVoidResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type graduateTracerReviewQueueVoidResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type graduateTracerReviewQueueVoidResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type graduateTracerReviewQueueVoidResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type graduateTracerReviewQueueVoidResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type graduateTracerReviewQueueVoidResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type graduateTracerReviewQueueVoidResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type graduateTracerReviewQueueVoidResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type graduateTracerReviewQueueVoidResponseSuccess = (graduateTracerReviewQueueVoidResponse200) & {
+  headers: Record<string, string>;
+};
+export type graduateTracerReviewQueueVoidResponseError = (graduateTracerReviewQueueVoidResponse400 | graduateTracerReviewQueueVoidResponse401 | graduateTracerReviewQueueVoidResponse403 | graduateTracerReviewQueueVoidResponse404 | graduateTracerReviewQueueVoidResponse405 | graduateTracerReviewQueueVoidResponse409 | graduateTracerReviewQueueVoidResponse413 | graduateTracerReviewQueueVoidResponse422 | graduateTracerReviewQueueVoidResponse429 | graduateTracerReviewQueueVoidResponse500 | graduateTracerReviewQueueVoidResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type graduateTracerReviewQueueVoidResponse = (graduateTracerReviewQueueVoidResponseSuccess | graduateTracerReviewQueueVoidResponseError)
+
+export const getGraduateTracerReviewQueueVoidUrl = (referenceCode: string,) => {
+
+
+
+
+  return `/api/v1/graduate-tracer/review-queue/${referenceCode}/void/`
+}
+
+/**
+ * @summary Review Queue Void
+ */
+export const graduateTracerReviewQueueVoid = async (referenceCode: string,
+    graduateTracerReviewLifecycleSchemaNull?: GraduateTracerReviewLifecycleSchema | null, options?: Parameters<typeof compassFetch>[1]): Promise<graduateTracerReviewQueueVoidResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return compassFetch<graduateTracerReviewQueueVoidResponse>(getGraduateTracerReviewQueueVoidUrl(referenceCode),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(graduateTracerReviewLifecycleSchemaNull)
   }
 );}
 
