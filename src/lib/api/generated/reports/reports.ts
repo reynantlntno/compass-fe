@@ -6,7 +6,11 @@
  * OpenAPI spec version: 1.0.0
  */
 import type {
+  AggregateReportPreviewSchema,
   ApiErrorSchema,
+  GraduateTracerReportOptionsSchema,
+  ProfilingOptionsSchema,
+  ProfilingPreviewSchema,
   ReportDefinitionPageSchema,
   ReportDefinitionSchema,
   ReportExportPageSchema,
@@ -19,10 +23,104 @@ import type {
   ReportRunSchema,
   ReportsDefinitionsParams,
   ReportsExportsParams,
+  ReportsGraduateTracerPreviewParams,
+  ReportsProfilingPreviewParams,
   ReportsRunsParams
 } from '../model';
 
 import { compassFetch } from '../../client';
+
+export type reportsCsmPreviewResponse200 = {
+  data: AggregateReportPreviewSchema
+  status: 200
+}
+
+export type reportsCsmPreviewResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type reportsCsmPreviewResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type reportsCsmPreviewResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type reportsCsmPreviewResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type reportsCsmPreviewResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type reportsCsmPreviewResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type reportsCsmPreviewResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type reportsCsmPreviewResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type reportsCsmPreviewResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type reportsCsmPreviewResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type reportsCsmPreviewResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type reportsCsmPreviewResponseSuccess = (reportsCsmPreviewResponse200) & {
+  headers: Record<string, string>;
+};
+export type reportsCsmPreviewResponseError = (reportsCsmPreviewResponse400 | reportsCsmPreviewResponse401 | reportsCsmPreviewResponse403 | reportsCsmPreviewResponse404 | reportsCsmPreviewResponse405 | reportsCsmPreviewResponse409 | reportsCsmPreviewResponse413 | reportsCsmPreviewResponse422 | reportsCsmPreviewResponse429 | reportsCsmPreviewResponse500 | reportsCsmPreviewResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type reportsCsmPreviewResponse = (reportsCsmPreviewResponseSuccess | reportsCsmPreviewResponseError)
+
+export const getReportsCsmPreviewUrl = () => {
+
+
+
+
+  return `/api/v1/reports/csm/preview/`
+}
+
+/**
+ * @summary Csm Preview
+ */
+export const reportsCsmPreview = async ( options?: Parameters<typeof compassFetch>[1]): Promise<reportsCsmPreviewResponse> => {
+
+  return compassFetch<reportsCsmPreviewResponse>(getReportsCsmPreviewUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
 
 export type reportsDefinitionsResponse200 = {
   data: ReportDefinitionPageSchema
@@ -984,6 +1082,388 @@ export const reportsExportGenerate = async (exportId: string, options?: Paramete
   {
     ...options,
     method: 'POST'
+
+
+  }
+);}
+
+
+export type reportsGraduateTracerOptionsResponse200 = {
+  data: GraduateTracerReportOptionsSchema
+  status: 200
+}
+
+export type reportsGraduateTracerOptionsResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type reportsGraduateTracerOptionsResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type reportsGraduateTracerOptionsResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type reportsGraduateTracerOptionsResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type reportsGraduateTracerOptionsResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type reportsGraduateTracerOptionsResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type reportsGraduateTracerOptionsResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type reportsGraduateTracerOptionsResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type reportsGraduateTracerOptionsResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type reportsGraduateTracerOptionsResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type reportsGraduateTracerOptionsResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type reportsGraduateTracerOptionsResponseSuccess = (reportsGraduateTracerOptionsResponse200) & {
+  headers: Record<string, string>;
+};
+export type reportsGraduateTracerOptionsResponseError = (reportsGraduateTracerOptionsResponse400 | reportsGraduateTracerOptionsResponse401 | reportsGraduateTracerOptionsResponse403 | reportsGraduateTracerOptionsResponse404 | reportsGraduateTracerOptionsResponse405 | reportsGraduateTracerOptionsResponse409 | reportsGraduateTracerOptionsResponse413 | reportsGraduateTracerOptionsResponse422 | reportsGraduateTracerOptionsResponse429 | reportsGraduateTracerOptionsResponse500 | reportsGraduateTracerOptionsResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type reportsGraduateTracerOptionsResponse = (reportsGraduateTracerOptionsResponseSuccess | reportsGraduateTracerOptionsResponseError)
+
+export const getReportsGraduateTracerOptionsUrl = () => {
+
+
+
+
+  return `/api/v1/reports/graduate-tracer/options/`
+}
+
+/**
+ * @summary Graduate Tracer Options
+ */
+export const reportsGraduateTracerOptions = async ( options?: Parameters<typeof compassFetch>[1]): Promise<reportsGraduateTracerOptionsResponse> => {
+
+  return compassFetch<reportsGraduateTracerOptionsResponse>(getReportsGraduateTracerOptionsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+export type reportsGraduateTracerPreviewResponse200 = {
+  data: AggregateReportPreviewSchema
+  status: 200
+}
+
+export type reportsGraduateTracerPreviewResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type reportsGraduateTracerPreviewResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type reportsGraduateTracerPreviewResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type reportsGraduateTracerPreviewResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type reportsGraduateTracerPreviewResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type reportsGraduateTracerPreviewResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type reportsGraduateTracerPreviewResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type reportsGraduateTracerPreviewResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type reportsGraduateTracerPreviewResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type reportsGraduateTracerPreviewResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type reportsGraduateTracerPreviewResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type reportsGraduateTracerPreviewResponseSuccess = (reportsGraduateTracerPreviewResponse200) & {
+  headers: Record<string, string>;
+};
+export type reportsGraduateTracerPreviewResponseError = (reportsGraduateTracerPreviewResponse400 | reportsGraduateTracerPreviewResponse401 | reportsGraduateTracerPreviewResponse403 | reportsGraduateTracerPreviewResponse404 | reportsGraduateTracerPreviewResponse405 | reportsGraduateTracerPreviewResponse409 | reportsGraduateTracerPreviewResponse413 | reportsGraduateTracerPreviewResponse422 | reportsGraduateTracerPreviewResponse429 | reportsGraduateTracerPreviewResponse500 | reportsGraduateTracerPreviewResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type reportsGraduateTracerPreviewResponse = (reportsGraduateTracerPreviewResponseSuccess | reportsGraduateTracerPreviewResponseError)
+
+export const getReportsGraduateTracerPreviewUrl = (params?: ReportsGraduateTracerPreviewParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/reports/graduate-tracer/preview/?${stringifiedParams}` : `/api/v1/reports/graduate-tracer/preview/`
+}
+
+/**
+ * @summary Graduate Tracer Preview
+ */
+export const reportsGraduateTracerPreview = async (params?: ReportsGraduateTracerPreviewParams, options?: Parameters<typeof compassFetch>[1]): Promise<reportsGraduateTracerPreviewResponse> => {
+
+  return compassFetch<reportsGraduateTracerPreviewResponse>(getReportsGraduateTracerPreviewUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+export type reportsProfilingOptionsResponse200 = {
+  data: ProfilingOptionsSchema
+  status: 200
+}
+
+export type reportsProfilingOptionsResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type reportsProfilingOptionsResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type reportsProfilingOptionsResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type reportsProfilingOptionsResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type reportsProfilingOptionsResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type reportsProfilingOptionsResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type reportsProfilingOptionsResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type reportsProfilingOptionsResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type reportsProfilingOptionsResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type reportsProfilingOptionsResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type reportsProfilingOptionsResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type reportsProfilingOptionsResponseSuccess = (reportsProfilingOptionsResponse200) & {
+  headers: Record<string, string>;
+};
+export type reportsProfilingOptionsResponseError = (reportsProfilingOptionsResponse400 | reportsProfilingOptionsResponse401 | reportsProfilingOptionsResponse403 | reportsProfilingOptionsResponse404 | reportsProfilingOptionsResponse405 | reportsProfilingOptionsResponse409 | reportsProfilingOptionsResponse413 | reportsProfilingOptionsResponse422 | reportsProfilingOptionsResponse429 | reportsProfilingOptionsResponse500 | reportsProfilingOptionsResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type reportsProfilingOptionsResponse = (reportsProfilingOptionsResponseSuccess | reportsProfilingOptionsResponseError)
+
+export const getReportsProfilingOptionsUrl = () => {
+
+
+
+
+  return `/api/v1/reports/profiling/options/`
+}
+
+/**
+ * @summary Profiling Options
+ */
+export const reportsProfilingOptions = async ( options?: Parameters<typeof compassFetch>[1]): Promise<reportsProfilingOptionsResponse> => {
+
+  return compassFetch<reportsProfilingOptionsResponse>(getReportsProfilingOptionsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+export type reportsProfilingPreviewResponse200 = {
+  data: ProfilingPreviewSchema
+  status: 200
+}
+
+export type reportsProfilingPreviewResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type reportsProfilingPreviewResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type reportsProfilingPreviewResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type reportsProfilingPreviewResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type reportsProfilingPreviewResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type reportsProfilingPreviewResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type reportsProfilingPreviewResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type reportsProfilingPreviewResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type reportsProfilingPreviewResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type reportsProfilingPreviewResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type reportsProfilingPreviewResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type reportsProfilingPreviewResponseSuccess = (reportsProfilingPreviewResponse200) & {
+  headers: Record<string, string>;
+};
+export type reportsProfilingPreviewResponseError = (reportsProfilingPreviewResponse400 | reportsProfilingPreviewResponse401 | reportsProfilingPreviewResponse403 | reportsProfilingPreviewResponse404 | reportsProfilingPreviewResponse405 | reportsProfilingPreviewResponse409 | reportsProfilingPreviewResponse413 | reportsProfilingPreviewResponse422 | reportsProfilingPreviewResponse429 | reportsProfilingPreviewResponse500 | reportsProfilingPreviewResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type reportsProfilingPreviewResponse = (reportsProfilingPreviewResponseSuccess | reportsProfilingPreviewResponseError)
+
+export const getReportsProfilingPreviewUrl = (params: ReportsProfilingPreviewParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/reports/profiling/preview/?${stringifiedParams}` : `/api/v1/reports/profiling/preview/`
+}
+
+/**
+ * @summary Profiling Preview
+ */
+export const reportsProfilingPreview = async (params: ReportsProfilingPreviewParams, options?: Parameters<typeof compassFetch>[1]): Promise<reportsProfilingPreviewResponse> => {
+
+  return compassFetch<reportsProfilingPreviewResponse>(getReportsProfilingPreviewUrl(params),
+  {
+    ...options,
+    method: 'GET'
 
 
   }

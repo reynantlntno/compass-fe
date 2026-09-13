@@ -7,9 +7,14 @@
  */
 import type {
   ApiErrorSchema,
+  ProfilesStaffStudentDirectoryParams,
   ProfilesStaffStudentsParams,
   ProfilesSupportDirectoryParams,
   SelfProfileSchema,
+  StaffDirectoryContextRequestSchema,
+  StaffDirectoryContextSchema,
+  StaffDirectoryOptionsSchema,
+  StaffDirectoryPageSchema,
   StaffStudentOptionPageSchema,
   SupportDirectoryPageSchema
 } from '../model';
@@ -198,6 +203,295 @@ export const getProfilesMeUrl = () => {
 export const profilesMe = async ( options?: Parameters<typeof compassFetch>[1]): Promise<profilesMeResponse> => {
 
   return compassFetch<profilesMeResponse>(getProfilesMeUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+export type profilesStaffStudentDirectoryResponse200 = {
+  data: StaffDirectoryPageSchema
+  status: 200
+}
+
+export type profilesStaffStudentDirectoryResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type profilesStaffStudentDirectoryResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type profilesStaffStudentDirectoryResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type profilesStaffStudentDirectoryResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type profilesStaffStudentDirectoryResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type profilesStaffStudentDirectoryResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type profilesStaffStudentDirectoryResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type profilesStaffStudentDirectoryResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type profilesStaffStudentDirectoryResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type profilesStaffStudentDirectoryResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type profilesStaffStudentDirectoryResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type profilesStaffStudentDirectoryResponseSuccess = (profilesStaffStudentDirectoryResponse200) & {
+  headers: Record<string, string>;
+};
+export type profilesStaffStudentDirectoryResponseError = (profilesStaffStudentDirectoryResponse400 | profilesStaffStudentDirectoryResponse401 | profilesStaffStudentDirectoryResponse403 | profilesStaffStudentDirectoryResponse404 | profilesStaffStudentDirectoryResponse405 | profilesStaffStudentDirectoryResponse409 | profilesStaffStudentDirectoryResponse413 | profilesStaffStudentDirectoryResponse422 | profilesStaffStudentDirectoryResponse429 | profilesStaffStudentDirectoryResponse500 | profilesStaffStudentDirectoryResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type profilesStaffStudentDirectoryResponse = (profilesStaffStudentDirectoryResponseSuccess | profilesStaffStudentDirectoryResponseError)
+
+export const getProfilesStaffStudentDirectoryUrl = (params?: ProfilesStaffStudentDirectoryParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/profiles/staff-directory/?${stringifiedParams}` : `/api/v1/profiles/staff-directory/`
+}
+
+/**
+ * @summary Profiles Staff Student Directory
+ */
+export const profilesStaffStudentDirectory = async (params?: ProfilesStaffStudentDirectoryParams, options?: Parameters<typeof compassFetch>[1]): Promise<profilesStaffStudentDirectoryResponse> => {
+
+  return compassFetch<profilesStaffStudentDirectoryResponse>(getProfilesStaffStudentDirectoryUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+export type profilesStaffStudentContextResponse200 = {
+  data: StaffDirectoryContextSchema
+  status: 200
+}
+
+export type profilesStaffStudentContextResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type profilesStaffStudentContextResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type profilesStaffStudentContextResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type profilesStaffStudentContextResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type profilesStaffStudentContextResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type profilesStaffStudentContextResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type profilesStaffStudentContextResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type profilesStaffStudentContextResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type profilesStaffStudentContextResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type profilesStaffStudentContextResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type profilesStaffStudentContextResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type profilesStaffStudentContextResponseSuccess = (profilesStaffStudentContextResponse200) & {
+  headers: Record<string, string>;
+};
+export type profilesStaffStudentContextResponseError = (profilesStaffStudentContextResponse400 | profilesStaffStudentContextResponse401 | profilesStaffStudentContextResponse403 | profilesStaffStudentContextResponse404 | profilesStaffStudentContextResponse405 | profilesStaffStudentContextResponse409 | profilesStaffStudentContextResponse413 | profilesStaffStudentContextResponse422 | profilesStaffStudentContextResponse429 | profilesStaffStudentContextResponse500 | profilesStaffStudentContextResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type profilesStaffStudentContextResponse = (profilesStaffStudentContextResponseSuccess | profilesStaffStudentContextResponseError)
+
+export const getProfilesStaffStudentContextUrl = () => {
+
+
+
+
+  return `/api/v1/profiles/staff-directory/context/`
+}
+
+/**
+ * @summary Profiles Staff Student Context
+ */
+export const profilesStaffStudentContext = async (staffDirectoryContextRequestSchema: StaffDirectoryContextRequestSchema, options?: Parameters<typeof compassFetch>[1]): Promise<profilesStaffStudentContextResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return compassFetch<profilesStaffStudentContextResponse>(getProfilesStaffStudentContextUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(staffDirectoryContextRequestSchema)
+  }
+);}
+
+
+export type profilesStaffStudentDirectoryOptionsResponse200 = {
+  data: StaffDirectoryOptionsSchema
+  status: 200
+}
+
+export type profilesStaffStudentDirectoryOptionsResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type profilesStaffStudentDirectoryOptionsResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type profilesStaffStudentDirectoryOptionsResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type profilesStaffStudentDirectoryOptionsResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type profilesStaffStudentDirectoryOptionsResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type profilesStaffStudentDirectoryOptionsResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type profilesStaffStudentDirectoryOptionsResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type profilesStaffStudentDirectoryOptionsResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type profilesStaffStudentDirectoryOptionsResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type profilesStaffStudentDirectoryOptionsResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type profilesStaffStudentDirectoryOptionsResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type profilesStaffStudentDirectoryOptionsResponseSuccess = (profilesStaffStudentDirectoryOptionsResponse200) & {
+  headers: Record<string, string>;
+};
+export type profilesStaffStudentDirectoryOptionsResponseError = (profilesStaffStudentDirectoryOptionsResponse400 | profilesStaffStudentDirectoryOptionsResponse401 | profilesStaffStudentDirectoryOptionsResponse403 | profilesStaffStudentDirectoryOptionsResponse404 | profilesStaffStudentDirectoryOptionsResponse405 | profilesStaffStudentDirectoryOptionsResponse409 | profilesStaffStudentDirectoryOptionsResponse413 | profilesStaffStudentDirectoryOptionsResponse422 | profilesStaffStudentDirectoryOptionsResponse429 | profilesStaffStudentDirectoryOptionsResponse500 | profilesStaffStudentDirectoryOptionsResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type profilesStaffStudentDirectoryOptionsResponse = (profilesStaffStudentDirectoryOptionsResponseSuccess | profilesStaffStudentDirectoryOptionsResponseError)
+
+export const getProfilesStaffStudentDirectoryOptionsUrl = () => {
+
+
+
+
+  return `/api/v1/profiles/staff-directory/options/`
+}
+
+/**
+ * @summary Profiles Staff Student Directory Options
+ */
+export const profilesStaffStudentDirectoryOptions = async ( options?: Parameters<typeof compassFetch>[1]): Promise<profilesStaffStudentDirectoryOptionsResponse> => {
+
+  return compassFetch<profilesStaffStudentDirectoryOptionsResponse>(getProfilesStaffStudentDirectoryOptionsUrl(),
   {
     ...options,
     method: 'GET'

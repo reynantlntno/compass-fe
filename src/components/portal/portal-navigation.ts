@@ -1,6 +1,7 @@
 import type { LucideIcon } from "lucide-react";
 import {
   Activity,
+  BarChart3,
   Bell,
   CalendarDays,
   ClipboardList,
@@ -12,6 +13,7 @@ import {
   Mail,
   ScrollText,
   Settings2,
+  UsersRound,
 } from "lucide-react";
 import type { AuthorityMeProjectionSchemaAuditPlanesItem } from "@/lib/api/generated/model";
 
@@ -21,9 +23,13 @@ export const PORTAL_CAPABILITIES = {
   notificationsDeliveryOperate: "notifications.delivery.operate",
   appointmentsQueueView: "appointments.queue.view",
   counselingSessionsQueueView: "counseling.sessions.queue.view",
+  studentRecordsViewScoped: "student_support_needs.view_scoped",
   inventoryQueueView: "inventory.queue.view",
   exitInterviewsQueueView: "exit_interviews.queue.view",
   graduateTracerQueueView: "graduate_tracer.queue.view",
+  reportsProfilingView: "reports.profiling.view",
+  reportsCsmView: "reports.csm.view",
+  reportsGraduateTracerView: "reports.graduate_tracer.view",
   supportNeedsQueueView: "support_needs.queue.view",
   supportNeedsVerify: "support_needs.verify",
   supportNeedsDispute: "support_needs.dispute",
@@ -173,6 +179,15 @@ export const PORTAL_NAVIGATION: readonly PortalNavigationItem[] = [
   },
   {
     kind: "link",
+    id: "students",
+    href: "/portal/students",
+    label: "Student directory",
+    icon: UsersRound,
+    keywords: ["students", "directory", "profiles", "roster"],
+    requiredCapability: PORTAL_CAPABILITIES.studentRecordsViewScoped,
+  },
+  {
+    kind: "link",
     id: "assessments",
     href: "/portal/assessments",
     label: "Assessments",
@@ -188,6 +203,19 @@ export const PORTAL_NAVIGATION: readonly PortalNavigationItem[] = [
     icon: LifeBuoy,
     keywords: ["student support", "needs", "verification", "review"],
     requiredCapability: PORTAL_CAPABILITIES.supportNeedsQueueView,
+  },
+  {
+    kind: "link",
+    id: "reports",
+    href: "/portal/reports?section=profiling",
+    label: "Reports & profiling",
+    icon: BarChart3,
+    keywords: ["reports", "profiling", "aggregate", "privacy"],
+    requiredCapabilitiesAny: [
+      PORTAL_CAPABILITIES.reportsProfilingView,
+      PORTAL_CAPABILITIES.reportsCsmView,
+      PORTAL_CAPABILITIES.reportsGraduateTracerView,
+    ],
   },
   {
     kind: "link",
@@ -244,6 +272,14 @@ export const PORTAL_NAVIGATION: readonly PortalNavigationItem[] = [
 ];
 
 const PORTAL_SEARCH_ADDITIONS: readonly PortalSearchItem[] = [
+  {
+    group: "destination",
+    href: "/portal/students",
+    id: "students",
+    keywords: ["students", "directory", "profiles", "roster", "scope"],
+    label: "Student directory",
+    requiredCapability: PORTAL_CAPABILITIES.studentRecordsViewScoped,
+  },
   {
     group: "section",
     href: "/portal/counseling?section=sessions",
@@ -322,6 +358,33 @@ const PORTAL_SEARCH_ADDITIONS: readonly PortalSearchItem[] = [
     keywords: ["student support", "needs", "verification", "review"],
     label: "Support needs",
     requiredCapability: PORTAL_CAPABILITIES.supportNeedsQueueView,
+  },
+  {
+    group: "section",
+    href: "/portal/reports?section=profiling",
+    id: "reports-profiling",
+    keywords: ["reports", "profiling", "aggregate", "cohort", "privacy"],
+    label: "Profiling",
+    parentLabel: "Reports & profiling",
+    requiredCapability: PORTAL_CAPABILITIES.reportsProfilingView,
+  },
+  {
+    group: "section",
+    href: "/portal/reports?section=csm-feedback",
+    id: "reports-csm-feedback",
+    keywords: ["reports", "csm", "service feedback", "satisfaction", "aggregate"],
+    label: "CSM / Service Feedback",
+    parentLabel: "Reports & profiling",
+    requiredCapability: PORTAL_CAPABILITIES.reportsCsmView,
+  },
+  {
+    group: "section",
+    href: "/portal/reports?section=graduate-tracer",
+    id: "reports-graduate-tracer",
+    keywords: ["reports", "graduate tracer", "alumni", "employment", "outcomes", "aggregate"],
+    label: "Graduate Tracer summaries",
+    parentLabel: "Reports & profiling",
+    requiredCapability: PORTAL_CAPABILITIES.reportsGraduateTracerView,
   },
   {
     group: "section",

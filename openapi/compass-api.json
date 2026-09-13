@@ -476,6 +476,179 @@
         "title": "ActivityPageSchema",
         "type": "object"
       },
+      "AggregateReportChoiceSchema": {
+        "properties": {
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "value": {
+            "title": "Value",
+            "type": "string"
+          }
+        },
+        "required": [
+          "value",
+          "label"
+        ],
+        "title": "AggregateReportChoiceSchema",
+        "type": "object"
+      },
+      "AggregateReportColumnSchema": {
+        "properties": {
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "label"
+        ],
+        "title": "AggregateReportColumnSchema",
+        "type": "object"
+      },
+      "AggregateReportPreviewSchema": {
+        "properties": {
+          "filters": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "title": "Filters",
+            "type": "object"
+          },
+          "privacy_controls_enforced": {
+            "title": "Privacy Controls Enforced",
+            "type": "boolean"
+          },
+          "report_key": {
+            "title": "Report Key",
+            "type": "string"
+          },
+          "sections": {
+            "items": {
+              "$ref": "#/components/schemas/AggregateReportSectionSchema"
+            },
+            "title": "Sections",
+            "type": "array"
+          }
+        },
+        "required": [
+          "report_key",
+          "filters",
+          "sections",
+          "privacy_controls_enforced"
+        ],
+        "title": "AggregateReportPreviewSchema",
+        "type": "object"
+      },
+      "AggregateReportRowSchema": {
+        "properties": {
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "values": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "title": "Values",
+            "type": "object"
+          }
+        },
+        "required": [
+          "key",
+          "label",
+          "values"
+        ],
+        "title": "AggregateReportRowSchema",
+        "type": "object"
+      },
+      "AggregateReportSectionSchema": {
+        "properties": {
+          "columns": {
+            "items": {
+              "$ref": "#/components/schemas/AggregateReportColumnSchema"
+            },
+            "title": "Columns",
+            "type": "array"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/AggregateReportRowSchema"
+            },
+            "title": "Rows",
+            "type": "array"
+          },
+          "suppression_notice": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Suppression Notice"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "title",
+          "columns",
+          "rows"
+        ],
+        "title": "AggregateReportSectionSchema",
+        "type": "object"
+      },
       "AnnouncementCreateSchema": {
         "properties": {
           "audience": {
@@ -10506,6 +10679,78 @@
         "title": "GraduateTracerDetailSchema",
         "type": "object"
       },
+      "GraduateTracerReportOptionsSchema": {
+        "properties": {
+          "colleges": {
+            "items": {
+              "$ref": "#/components/schemas/AggregateReportChoiceSchema"
+            },
+            "title": "Colleges",
+            "type": "array"
+          },
+          "employment_statuses": {
+            "items": {
+              "$ref": "#/components/schemas/AggregateReportChoiceSchema"
+            },
+            "title": "Employment Statuses",
+            "type": "array"
+          },
+          "first_job_related": {
+            "items": {
+              "$ref": "#/components/schemas/AggregateReportChoiceSchema"
+            },
+            "title": "First Job Related",
+            "type": "array"
+          },
+          "first_job_search_durations": {
+            "items": {
+              "$ref": "#/components/schemas/AggregateReportChoiceSchema"
+            },
+            "title": "First Job Search Durations",
+            "type": "array"
+          },
+          "graduation_years": {
+            "items": {
+              "$ref": "#/components/schemas/AggregateReportChoiceSchema"
+            },
+            "title": "Graduation Years",
+            "type": "array"
+          },
+          "present_employment_categories": {
+            "items": {
+              "$ref": "#/components/schemas/AggregateReportChoiceSchema"
+            },
+            "title": "Present Employment Categories",
+            "type": "array"
+          },
+          "presently_employed": {
+            "items": {
+              "$ref": "#/components/schemas/AggregateReportChoiceSchema"
+            },
+            "title": "Presently Employed",
+            "type": "array"
+          },
+          "programs": {
+            "items": {
+              "$ref": "#/components/schemas/AggregateReportChoiceSchema"
+            },
+            "title": "Programs",
+            "type": "array"
+          }
+        },
+        "required": [
+          "graduation_years",
+          "colleges",
+          "programs",
+          "employment_statuses",
+          "present_employment_categories",
+          "presently_employed",
+          "first_job_related",
+          "first_job_search_durations"
+        ],
+        "title": "GraduateTracerReportOptionsSchema",
+        "type": "object"
+      },
       "GraduateTracerResponsePageSchema": {
         "properties": {
           "items": {
@@ -17098,6 +17343,351 @@
           "purpose_workflow"
         ],
         "title": "PrivacyWorkflowBindingSetSchema",
+        "type": "object"
+      },
+      "ProfilingColumnSchema": {
+        "properties": {
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "label"
+        ],
+        "title": "ProfilingColumnSchema",
+        "type": "object"
+      },
+      "ProfilingContextOptionSchema": {
+        "properties": {
+          "academic_year": {
+            "title": "Academic Year",
+            "type": "string"
+          },
+          "campus": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Campus"
+          },
+          "college": {
+            "title": "College",
+            "type": "string"
+          },
+          "year_level": {
+            "title": "Year Level",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "academic_year",
+          "college",
+          "year_level"
+        ],
+        "title": "ProfilingContextOptionSchema",
+        "type": "object"
+      },
+      "ProfilingLabelSchema": {
+        "properties": {
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "label"
+        ],
+        "title": "ProfilingLabelSchema",
+        "type": "object"
+      },
+      "ProfilingOptionsSchema": {
+        "properties": {
+          "contexts": {
+            "items": {
+              "$ref": "#/components/schemas/ProfilingContextOptionSchema"
+            },
+            "title": "Contexts",
+            "type": "array"
+          }
+        },
+        "required": [
+          "contexts"
+        ],
+        "title": "ProfilingOptionsSchema",
+        "type": "object"
+      },
+      "ProfilingPreviewSchema": {
+        "properties": {
+          "privacy_controls_enforced": {
+            "title": "Privacy Controls Enforced",
+            "type": "boolean"
+          },
+          "report_context": {
+            "$ref": "#/components/schemas/ProfilingReportContextSchema"
+          },
+          "sections": {
+            "items": {
+              "$ref": "#/components/schemas/ProfilingSectionSchema"
+            },
+            "title": "Sections",
+            "type": "array"
+          }
+        },
+        "required": [
+          "report_context",
+          "sections",
+          "privacy_controls_enforced"
+        ],
+        "title": "ProfilingPreviewSchema",
+        "type": "object"
+      },
+      "ProfilingReportContextSchema": {
+        "properties": {
+          "academic_year": {
+            "title": "Academic Year",
+            "type": "string"
+          },
+          "campus": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Campus"
+          },
+          "cohort_total": {
+            "title": "Cohort Total",
+            "type": "integer"
+          },
+          "college": {
+            "title": "College",
+            "type": "string"
+          },
+          "mapping_version": {
+            "title": "Mapping Version",
+            "type": "string"
+          },
+          "program_labels": {
+            "items": {
+              "$ref": "#/components/schemas/ProfilingLabelSchema"
+            },
+            "title": "Program Labels",
+            "type": "array"
+          },
+          "year_level": {
+            "title": "Year Level",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "academic_year",
+          "college",
+          "year_level",
+          "mapping_version",
+          "program_labels",
+          "cohort_total"
+        ],
+        "title": "ProfilingReportContextSchema",
+        "type": "object"
+      },
+      "ProfilingRowSchema": {
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "is_total": {
+            "title": "Is Total",
+            "type": "boolean"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "percentage": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Percentage"
+          },
+          "program_counts": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "title": "Program Counts",
+            "type": "object"
+          },
+          "total": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "integer"
+              },
+              {
+                "type": "number"
+              },
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Total"
+          },
+          "values": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "title": "Values",
+            "type": "object"
+          }
+        },
+        "required": [
+          "code",
+          "label",
+          "program_counts",
+          "total",
+          "percentage",
+          "is_total",
+          "values"
+        ],
+        "title": "ProfilingRowSchema",
+        "type": "object"
+      },
+      "ProfilingSectionSchema": {
+        "properties": {
+          "cohort_total": {
+            "title": "Cohort Total",
+            "type": "integer"
+          },
+          "columns": {
+            "items": {
+              "$ref": "#/components/schemas/ProfilingColumnSchema"
+            },
+            "title": "Columns",
+            "type": "array"
+          },
+          "metric_key": {
+            "title": "Metric Key",
+            "type": "string"
+          },
+          "program_columns": {
+            "items": {
+              "$ref": "#/components/schemas/ProfilingColumnSchema"
+            },
+            "title": "Program Columns",
+            "type": "array"
+          },
+          "row_heading": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Row Heading"
+          },
+          "rows": {
+            "items": {
+              "$ref": "#/components/schemas/ProfilingRowSchema"
+            },
+            "title": "Rows",
+            "type": "array"
+          },
+          "suppression_notice": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Suppression Notice"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "metric_key",
+          "title",
+          "columns",
+          "program_columns",
+          "rows",
+          "cohort_total"
+        ],
+        "title": "ProfilingSectionSchema",
         "type": "object"
       },
       "ProviderWebhookResponseSchema": {
@@ -25223,6 +25813,444 @@
           "detail"
         ],
         "title": "StaffAssistedRecoveryResponseSchema",
+        "type": "object"
+      },
+      "StaffDirectoryContextRequestSchema": {
+        "properties": {
+          "student_selection_token": {
+            "title": "Student Selection Token",
+            "type": "string"
+          }
+        },
+        "required": [
+          "student_selection_token"
+        ],
+        "title": "StaffDirectoryContextRequestSchema",
+        "type": "object"
+      },
+      "StaffDirectoryContextSchema": {
+        "properties": {
+          "profile": {
+            "$ref": "#/components/schemas/StaffDirectoryProfileSchema"
+          },
+          "related_work": {
+            "items": {
+              "$ref": "#/components/schemas/StaffDirectoryRelatedWorkSchema"
+            },
+            "title": "Related Work",
+            "type": "array"
+          }
+        },
+        "required": [
+          "profile",
+          "related_work"
+        ],
+        "title": "StaffDirectoryContextSchema",
+        "type": "object"
+      },
+      "StaffDirectoryOptionSchema": {
+        "properties": {
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "value": {
+            "title": "Value",
+            "type": "string"
+          }
+        },
+        "required": [
+          "value",
+          "label"
+        ],
+        "title": "StaffDirectoryOptionSchema",
+        "type": "object"
+      },
+      "StaffDirectoryOptionsSchema": {
+        "properties": {
+          "campuses": {
+            "items": {
+              "$ref": "#/components/schemas/StaffDirectoryOptionSchema"
+            },
+            "title": "Campuses",
+            "type": "array"
+          },
+          "colleges": {
+            "items": {
+              "$ref": "#/components/schemas/StaffDirectoryOptionSchema"
+            },
+            "title": "Colleges",
+            "type": "array"
+          },
+          "departments": {
+            "items": {
+              "$ref": "#/components/schemas/StaffDirectoryOptionSchema"
+            },
+            "title": "Departments",
+            "type": "array"
+          },
+          "programs": {
+            "items": {
+              "$ref": "#/components/schemas/StaffDirectoryOptionSchema"
+            },
+            "title": "Programs",
+            "type": "array"
+          },
+          "statuses": {
+            "items": {
+              "$ref": "#/components/schemas/StaffDirectoryOptionSchema"
+            },
+            "title": "Statuses",
+            "type": "array"
+          },
+          "year_levels": {
+            "items": {
+              "$ref": "#/components/schemas/StaffDirectoryYearLevelOptionSchema"
+            },
+            "title": "Year Levels",
+            "type": "array"
+          }
+        },
+        "required": [
+          "statuses",
+          "campuses",
+          "colleges",
+          "departments",
+          "programs",
+          "year_levels"
+        ],
+        "title": "StaffDirectoryOptionsSchema",
+        "type": "object"
+      },
+      "StaffDirectoryPageSchema": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/StaffDirectoryStudentSchema"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "page": {
+            "title": "Page",
+            "type": "integer"
+          },
+          "page_size": {
+            "title": "Page Size",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "page_size",
+          "total"
+        ],
+        "title": "StaffDirectoryPageSchema",
+        "type": "object"
+      },
+      "StaffDirectoryProfileSchema": {
+        "properties": {
+          "campus": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Campus"
+          },
+          "college": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "College"
+          },
+          "department": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Department"
+          },
+          "display_name": {
+            "title": "Display Name",
+            "type": "string"
+          },
+          "lifecycle_status": {
+            "title": "Lifecycle Status",
+            "type": "string"
+          },
+          "program": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Program"
+          },
+          "student_number_masked": {
+            "title": "Student Number Masked",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          },
+          "year_level": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Year Level"
+          }
+        },
+        "required": [
+          "display_name",
+          "student_number_masked",
+          "lifecycle_status",
+          "updated_at"
+        ],
+        "title": "StaffDirectoryProfileSchema",
+        "type": "object"
+      },
+      "StaffDirectoryRelatedRecordSchema": {
+        "properties": {
+          "created_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Created At"
+          },
+          "record_type": {
+            "title": "Record Type",
+            "type": "string"
+          },
+          "reference_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reference Code"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          },
+          "updated_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Updated At"
+          }
+        },
+        "required": [
+          "record_type"
+        ],
+        "title": "StaffDirectoryRelatedRecordSchema",
+        "type": "object"
+      },
+      "StaffDirectoryRelatedWorkSchema": {
+        "properties": {
+          "latest_status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latest Status"
+          },
+          "latest_updated_at": {
+            "anyOf": [
+              {
+                "format": "date-time",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latest Updated At"
+          },
+          "record_type": {
+            "title": "Record Type",
+            "type": "string"
+          },
+          "records": {
+            "items": {
+              "$ref": "#/components/schemas/StaffDirectoryRelatedRecordSchema"
+            },
+            "title": "Records",
+            "type": "array"
+          },
+          "visible_count": {
+            "title": "Visible Count",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "record_type",
+          "visible_count",
+          "records"
+        ],
+        "title": "StaffDirectoryRelatedWorkSchema",
+        "type": "object"
+      },
+      "StaffDirectoryStudentSchema": {
+        "description": "Staff-safe student row; the token exists only for the adapter.",
+        "properties": {
+          "campus": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Campus"
+          },
+          "college": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "College"
+          },
+          "department": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Department"
+          },
+          "display_name": {
+            "title": "Display Name",
+            "type": "string"
+          },
+          "lifecycle_status": {
+            "title": "Lifecycle Status",
+            "type": "string"
+          },
+          "program": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Program"
+          },
+          "student_number_masked": {
+            "title": "Student Number Masked",
+            "type": "string"
+          },
+          "student_selection_token": {
+            "title": "Student Selection Token",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "title": "Updated At",
+            "type": "string"
+          },
+          "year_level": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Year Level"
+          }
+        },
+        "required": [
+          "display_name",
+          "student_number_masked",
+          "lifecycle_status",
+          "updated_at",
+          "student_selection_token"
+        ],
+        "title": "StaffDirectoryStudentSchema",
+        "type": "object"
+      },
+      "StaffDirectoryYearLevelOptionSchema": {
+        "properties": {
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "value": {
+            "title": "Value",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "value",
+          "label"
+        ],
+        "title": "StaffDirectoryYearLevelOptionSchema",
         "type": "object"
       },
       "StaffStudentOptionPageSchema": {
@@ -107572,6 +108600,537 @@
         ]
       }
     },
+    "/api/v1/profiles/staff-directory/": {
+      "get": {
+        "operationId": "profiles_staff_student_directory",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "default": "",
+              "title": "Q",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "default": "",
+              "title": "Status",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "campus",
+            "required": false,
+            "schema": {
+              "default": "",
+              "title": "Campus",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "college",
+            "required": false,
+            "schema": {
+              "default": "",
+              "title": "College",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "department",
+            "required": false,
+            "schema": {
+              "default": "",
+              "title": "Department",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "program",
+            "required": false,
+            "schema": {
+              "default": "",
+              "title": "Program",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "year_level",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "integer"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Year Level"
+            }
+          },
+          {
+            "in": "query",
+            "name": "order",
+            "required": false,
+            "schema": {
+              "default": "name",
+              "title": "Order",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "minimum": 1,
+              "title": "Page",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_size",
+            "required": false,
+            "schema": {
+              "default": 25,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Page Size",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StaffDirectoryPageSchema"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "405": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Method Not Allowed"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Payload Too Large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "security": [
+          {
+            "CompassBearerAuthentication": []
+          }
+        ],
+        "summary": "Profiles Staff Student Directory",
+        "tags": [
+          "profiles"
+        ]
+      }
+    },
+    "/api/v1/profiles/staff-directory/context/": {
+      "post": {
+        "operationId": "profiles_staff_student_context",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StaffDirectoryContextRequestSchema"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StaffDirectoryContextSchema"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "405": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Method Not Allowed"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Payload Too Large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "security": [
+          {
+            "CompassBearerAuthentication": []
+          }
+        ],
+        "summary": "Profiles Staff Student Context",
+        "tags": [
+          "profiles"
+        ]
+      }
+    },
+    "/api/v1/profiles/staff-directory/options/": {
+      "get": {
+        "operationId": "profiles_staff_student_directory_options",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StaffDirectoryOptionsSchema"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "405": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Method Not Allowed"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Payload Too Large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "security": [
+          {
+            "CompassBearerAuthentication": []
+          }
+        ],
+        "summary": "Profiles Staff Student Directory Options",
+        "tags": [
+          "profiles"
+        ]
+      }
+    },
     "/api/v1/profiles/staff-students/": {
       "get": {
         "description": "Scoped staff student search for supported workflow creation.",
@@ -111370,6 +112929,143 @@
         ]
       }
     },
+    "/api/v1/reports/csm/preview/": {
+      "get": {
+        "operationId": "reports_csm_preview",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AggregateReportPreviewSchema"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "405": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Method Not Allowed"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Payload Too Large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "security": [
+          {
+            "CompassBearerAuthentication": []
+          }
+        ],
+        "summary": "Csm Preview",
+        "tags": [
+          "reports"
+        ]
+      }
+    },
     "/api/v1/reports/definitions/": {
       "get": {
         "operationId": "reports_definitions",
@@ -112944,6 +114640,740 @@
           }
         ],
         "summary": "Generate Export",
+        "tags": [
+          "reports"
+        ]
+      }
+    },
+    "/api/v1/reports/graduate-tracer/options/": {
+      "get": {
+        "operationId": "reports_graduate_tracer_options",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GraduateTracerReportOptionsSchema"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "405": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Method Not Allowed"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Payload Too Large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "security": [
+          {
+            "CompassBearerAuthentication": []
+          }
+        ],
+        "summary": "Graduate Tracer Options",
+        "tags": [
+          "reports"
+        ]
+      }
+    },
+    "/api/v1/reports/graduate-tracer/preview/": {
+      "get": {
+        "operationId": "reports_graduate_tracer_preview",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "graduation_year",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 100,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Graduation Year"
+            }
+          },
+          {
+            "in": "query",
+            "name": "college",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 100,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "College"
+            }
+          },
+          {
+            "in": "query",
+            "name": "program",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 100,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Program"
+            }
+          },
+          {
+            "in": "query",
+            "name": "employment_status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 40,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Employment Status"
+            }
+          },
+          {
+            "in": "query",
+            "name": "present_employment_category",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 100,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Present Employment Category"
+            }
+          },
+          {
+            "in": "query",
+            "name": "presently_employed",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 40,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Presently Employed"
+            }
+          },
+          {
+            "in": "query",
+            "name": "first_job_related",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 10,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "First Job Related"
+            }
+          },
+          {
+            "in": "query",
+            "name": "first_job_search_duration",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 100,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "First Job Search Duration"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AggregateReportPreviewSchema"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "405": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Method Not Allowed"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Payload Too Large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "security": [
+          {
+            "CompassBearerAuthentication": []
+          }
+        ],
+        "summary": "Graduate Tracer Preview",
+        "tags": [
+          "reports"
+        ]
+      }
+    },
+    "/api/v1/reports/profiling/options/": {
+      "get": {
+        "operationId": "reports_profiling_options",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfilingOptionsSchema"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "405": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Method Not Allowed"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Payload Too Large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "security": [
+          {
+            "CompassBearerAuthentication": []
+          }
+        ],
+        "summary": "Profiling Options",
+        "tags": [
+          "reports"
+        ]
+      }
+    },
+    "/api/v1/reports/profiling/preview/": {
+      "get": {
+        "operationId": "reports_profiling_preview",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "academic_year",
+            "required": true,
+            "schema": {
+              "maxLength": 50,
+              "title": "Academic Year",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "college",
+            "required": true,
+            "schema": {
+              "maxLength": 100,
+              "title": "College",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "year_level",
+            "required": true,
+            "schema": {
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Year Level",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "campus",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "maxLength": 100,
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Campus"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProfilingPreviewSchema"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "405": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Method Not Allowed"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Payload Too Large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          },
+          "500": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Internal Server Error"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiErrorSchema"
+                }
+              }
+            },
+            "description": "Service Unavailable"
+          }
+        },
+        "security": [
+          {
+            "CompassBearerAuthentication": []
+          }
+        ],
+        "summary": "Profiling Preview",
         "tags": [
           "reports"
         ]
