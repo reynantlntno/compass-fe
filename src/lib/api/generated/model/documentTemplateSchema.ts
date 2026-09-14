@@ -6,15 +6,15 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export interface DocumentTemplateProjectionSchema {
-  default_output_format: string;
+export interface DocumentTemplateSchema {
+  default_output_format?: string;
   description?: string;
   display_name: string;
   document_kind: string;
-  id: string;
-  owner_office_label?: string;
-  related_form_family_label?: string;
-  retention_classification: string;
+  expected_updated_at?: string | null;
+  owner_office_id?: number | null;
+  related_form_family_id?: number | null;
+  retention_classification?: string;
+  source_notes?: string;
   stable_key: string;
-  status: string;
 }

@@ -9,6 +9,8 @@ import type {
   ApiErrorSchema,
   AuthorityAccountGrantsParams,
   AuthorityCapabilitiesParams,
+  AuthorityCoverageListParams,
+  AuthorityCoverageOptionsParams,
   AuthorityGrantRevokeParams,
   AuthorityGranteesParams,
   AuthorityMeCoverageParams,
@@ -17,13 +19,25 @@ import type {
   BulkGrantResultSchema,
   BulkGrantSchema,
   CapabilityPageSchema,
+  CounselorCoverageManagementPageSchema,
+  CounselorCoverageManagementProjectionSchema,
+  CounselorCoverageOptionPageSchema,
   CounselorCoveragePageSchema,
+  CoverageCreateSchema,
+  CoverageDeactivateSchema,
+  CoverageUpdateSchema,
   EffectiveAuthorityProjectionSchema,
   GrantCreateSchema,
   GrantPageSchema,
   GrantProjectionSchema,
   GranteePageSchema,
-  ScopeOptionPageSchema
+  ScopeOptionPageSchema,
+  WorkflowAccessCreateSchema,
+  WorkflowAccessListParams,
+  WorkflowAccessOptionsSchema,
+  WorkflowAccessPageSchema,
+  WorkflowAccessProjectionSchema,
+  WorkflowAccessRevokeSchema
 } from '../model';
 
 import { compassFetch } from '../../client';
@@ -316,6 +330,500 @@ export const authorityCapabilities = async (params?: AuthorityCapabilitiesParams
     method: 'GET'
 
 
+  }
+);}
+
+
+export type authorityCoverageListResponse200 = {
+  data: CounselorCoverageManagementPageSchema
+  status: 200
+}
+
+export type authorityCoverageListResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type authorityCoverageListResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type authorityCoverageListResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type authorityCoverageListResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type authorityCoverageListResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type authorityCoverageListResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type authorityCoverageListResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type authorityCoverageListResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type authorityCoverageListResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type authorityCoverageListResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type authorityCoverageListResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type authorityCoverageListResponseSuccess = (authorityCoverageListResponse200) & {
+  headers: Record<string, string>;
+};
+export type authorityCoverageListResponseError = (authorityCoverageListResponse400 | authorityCoverageListResponse401 | authorityCoverageListResponse403 | authorityCoverageListResponse404 | authorityCoverageListResponse405 | authorityCoverageListResponse409 | authorityCoverageListResponse413 | authorityCoverageListResponse422 | authorityCoverageListResponse429 | authorityCoverageListResponse500 | authorityCoverageListResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type authorityCoverageListResponse = (authorityCoverageListResponseSuccess | authorityCoverageListResponseError)
+
+export const getAuthorityCoverageListUrl = (params?: AuthorityCoverageListParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/authority/coverage/?${stringifiedParams}` : `/api/v1/authority/coverage/`
+}
+
+/**
+ * @summary Coverage List
+ */
+export const authorityCoverageList = async (params?: AuthorityCoverageListParams, options?: Parameters<typeof compassFetch>[1]): Promise<authorityCoverageListResponse> => {
+
+  return compassFetch<authorityCoverageListResponse>(getAuthorityCoverageListUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+export type authorityCoverageCreateResponse200 = {
+  data: CounselorCoverageManagementProjectionSchema
+  status: 200
+}
+
+export type authorityCoverageCreateResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type authorityCoverageCreateResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type authorityCoverageCreateResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type authorityCoverageCreateResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type authorityCoverageCreateResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type authorityCoverageCreateResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type authorityCoverageCreateResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type authorityCoverageCreateResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type authorityCoverageCreateResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type authorityCoverageCreateResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type authorityCoverageCreateResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type authorityCoverageCreateResponseSuccess = (authorityCoverageCreateResponse200) & {
+  headers: Record<string, string>;
+};
+export type authorityCoverageCreateResponseError = (authorityCoverageCreateResponse400 | authorityCoverageCreateResponse401 | authorityCoverageCreateResponse403 | authorityCoverageCreateResponse404 | authorityCoverageCreateResponse405 | authorityCoverageCreateResponse409 | authorityCoverageCreateResponse413 | authorityCoverageCreateResponse422 | authorityCoverageCreateResponse429 | authorityCoverageCreateResponse500 | authorityCoverageCreateResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type authorityCoverageCreateResponse = (authorityCoverageCreateResponseSuccess | authorityCoverageCreateResponseError)
+
+export const getAuthorityCoverageCreateUrl = () => {
+
+
+
+
+  return `/api/v1/authority/coverage/`
+}
+
+/**
+ * @summary Coverage Create
+ */
+export const authorityCoverageCreate = async (coverageCreateSchema: CoverageCreateSchema, options?: Parameters<typeof compassFetch>[1]): Promise<authorityCoverageCreateResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return compassFetch<authorityCoverageCreateResponse>(getAuthorityCoverageCreateUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(coverageCreateSchema)
+  }
+);}
+
+
+export type authorityCoverageOptionsResponse200 = {
+  data: CounselorCoverageOptionPageSchema
+  status: 200
+}
+
+export type authorityCoverageOptionsResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type authorityCoverageOptionsResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type authorityCoverageOptionsResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type authorityCoverageOptionsResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type authorityCoverageOptionsResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type authorityCoverageOptionsResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type authorityCoverageOptionsResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type authorityCoverageOptionsResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type authorityCoverageOptionsResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type authorityCoverageOptionsResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type authorityCoverageOptionsResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type authorityCoverageOptionsResponseSuccess = (authorityCoverageOptionsResponse200) & {
+  headers: Record<string, string>;
+};
+export type authorityCoverageOptionsResponseError = (authorityCoverageOptionsResponse400 | authorityCoverageOptionsResponse401 | authorityCoverageOptionsResponse403 | authorityCoverageOptionsResponse404 | authorityCoverageOptionsResponse405 | authorityCoverageOptionsResponse409 | authorityCoverageOptionsResponse413 | authorityCoverageOptionsResponse422 | authorityCoverageOptionsResponse429 | authorityCoverageOptionsResponse500 | authorityCoverageOptionsResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type authorityCoverageOptionsResponse = (authorityCoverageOptionsResponseSuccess | authorityCoverageOptionsResponseError)
+
+export const getAuthorityCoverageOptionsUrl = (params?: AuthorityCoverageOptionsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/authority/coverage/options/?${stringifiedParams}` : `/api/v1/authority/coverage/options/`
+}
+
+/**
+ * @summary Coverage Options
+ */
+export const authorityCoverageOptions = async (params?: AuthorityCoverageOptionsParams, options?: Parameters<typeof compassFetch>[1]): Promise<authorityCoverageOptionsResponse> => {
+
+  return compassFetch<authorityCoverageOptionsResponse>(getAuthorityCoverageOptionsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+export type authorityCoverageDeactivateResponse200 = {
+  data: CounselorCoverageManagementProjectionSchema
+  status: 200
+}
+
+export type authorityCoverageDeactivateResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type authorityCoverageDeactivateResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type authorityCoverageDeactivateResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type authorityCoverageDeactivateResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type authorityCoverageDeactivateResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type authorityCoverageDeactivateResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type authorityCoverageDeactivateResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type authorityCoverageDeactivateResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type authorityCoverageDeactivateResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type authorityCoverageDeactivateResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type authorityCoverageDeactivateResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type authorityCoverageDeactivateResponseSuccess = (authorityCoverageDeactivateResponse200) & {
+  headers: Record<string, string>;
+};
+export type authorityCoverageDeactivateResponseError = (authorityCoverageDeactivateResponse400 | authorityCoverageDeactivateResponse401 | authorityCoverageDeactivateResponse403 | authorityCoverageDeactivateResponse404 | authorityCoverageDeactivateResponse405 | authorityCoverageDeactivateResponse409 | authorityCoverageDeactivateResponse413 | authorityCoverageDeactivateResponse422 | authorityCoverageDeactivateResponse429 | authorityCoverageDeactivateResponse500 | authorityCoverageDeactivateResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type authorityCoverageDeactivateResponse = (authorityCoverageDeactivateResponseSuccess | authorityCoverageDeactivateResponseError)
+
+export const getAuthorityCoverageDeactivateUrl = (coverageId: number,) => {
+
+
+
+
+  return `/api/v1/authority/coverage/${coverageId}/deactivate/`
+}
+
+/**
+ * @summary Coverage Deactivate
+ */
+export const authorityCoverageDeactivate = async (coverageId: number,
+    coverageDeactivateSchema: CoverageDeactivateSchema, options?: Parameters<typeof compassFetch>[1]): Promise<authorityCoverageDeactivateResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return compassFetch<authorityCoverageDeactivateResponse>(getAuthorityCoverageDeactivateUrl(coverageId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(coverageDeactivateSchema)
+  }
+);}
+
+
+export type authorityCoverageUpdateResponse200 = {
+  data: CounselorCoverageManagementProjectionSchema
+  status: 200
+}
+
+export type authorityCoverageUpdateResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type authorityCoverageUpdateResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type authorityCoverageUpdateResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type authorityCoverageUpdateResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type authorityCoverageUpdateResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type authorityCoverageUpdateResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type authorityCoverageUpdateResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type authorityCoverageUpdateResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type authorityCoverageUpdateResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type authorityCoverageUpdateResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type authorityCoverageUpdateResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type authorityCoverageUpdateResponseSuccess = (authorityCoverageUpdateResponse200) & {
+  headers: Record<string, string>;
+};
+export type authorityCoverageUpdateResponseError = (authorityCoverageUpdateResponse400 | authorityCoverageUpdateResponse401 | authorityCoverageUpdateResponse403 | authorityCoverageUpdateResponse404 | authorityCoverageUpdateResponse405 | authorityCoverageUpdateResponse409 | authorityCoverageUpdateResponse413 | authorityCoverageUpdateResponse422 | authorityCoverageUpdateResponse429 | authorityCoverageUpdateResponse500 | authorityCoverageUpdateResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type authorityCoverageUpdateResponse = (authorityCoverageUpdateResponseSuccess | authorityCoverageUpdateResponseError)
+
+export const getAuthorityCoverageUpdateUrl = (coverageId: number,) => {
+
+
+
+
+  return `/api/v1/authority/coverage/${coverageId}/update/`
+}
+
+/**
+ * @summary Coverage Update
+ */
+export const authorityCoverageUpdate = async (coverageId: number,
+    coverageUpdateSchema: CoverageUpdateSchema, options?: Parameters<typeof compassFetch>[1]): Promise<authorityCoverageUpdateResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return compassFetch<authorityCoverageUpdateResponse>(getAuthorityCoverageUpdateUrl(coverageId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(coverageUpdateSchema)
   }
 );}
 
@@ -1002,5 +1510,485 @@ export const authorityScopeOptions = async (params?: AuthorityScopeOptionsParams
     method: 'GET'
 
 
+  }
+);}
+
+
+export type workflowAccessListResponse200 = {
+  data: WorkflowAccessPageSchema
+  status: 200
+}
+
+export type workflowAccessListResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type workflowAccessListResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type workflowAccessListResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type workflowAccessListResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type workflowAccessListResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type workflowAccessListResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type workflowAccessListResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type workflowAccessListResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type workflowAccessListResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type workflowAccessListResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type workflowAccessListResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type workflowAccessListResponseSuccess = (workflowAccessListResponse200) & {
+  headers: Record<string, string>;
+};
+export type workflowAccessListResponseError = (workflowAccessListResponse400 | workflowAccessListResponse401 | workflowAccessListResponse403 | workflowAccessListResponse404 | workflowAccessListResponse405 | workflowAccessListResponse409 | workflowAccessListResponse413 | workflowAccessListResponse422 | workflowAccessListResponse429 | workflowAccessListResponse500 | workflowAccessListResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type workflowAccessListResponse = (workflowAccessListResponseSuccess | workflowAccessListResponseError)
+
+export const getWorkflowAccessListUrl = (params?: WorkflowAccessListParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/authority/workflow-access/?${stringifiedParams}` : `/api/v1/authority/workflow-access/`
+}
+
+/**
+ * @summary Workflow Access List
+ */
+export const workflowAccessList = async (params?: WorkflowAccessListParams, options?: Parameters<typeof compassFetch>[1]): Promise<workflowAccessListResponse> => {
+
+  return compassFetch<workflowAccessListResponse>(getWorkflowAccessListUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+export type workflowAccessCreateResponse200 = {
+  data: WorkflowAccessProjectionSchema
+  status: 200
+}
+
+export type workflowAccessCreateResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type workflowAccessCreateResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type workflowAccessCreateResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type workflowAccessCreateResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type workflowAccessCreateResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type workflowAccessCreateResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type workflowAccessCreateResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type workflowAccessCreateResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type workflowAccessCreateResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type workflowAccessCreateResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type workflowAccessCreateResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type workflowAccessCreateResponseSuccess = (workflowAccessCreateResponse200) & {
+  headers: Record<string, string>;
+};
+export type workflowAccessCreateResponseError = (workflowAccessCreateResponse400 | workflowAccessCreateResponse401 | workflowAccessCreateResponse403 | workflowAccessCreateResponse404 | workflowAccessCreateResponse405 | workflowAccessCreateResponse409 | workflowAccessCreateResponse413 | workflowAccessCreateResponse422 | workflowAccessCreateResponse429 | workflowAccessCreateResponse500 | workflowAccessCreateResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type workflowAccessCreateResponse = (workflowAccessCreateResponseSuccess | workflowAccessCreateResponseError)
+
+export const getWorkflowAccessCreateUrl = () => {
+
+
+
+
+  return `/api/v1/authority/workflow-access/`
+}
+
+/**
+ * @summary Workflow Access Create
+ */
+export const workflowAccessCreate = async (workflowAccessCreateSchema: WorkflowAccessCreateSchema, options?: Parameters<typeof compassFetch>[1]): Promise<workflowAccessCreateResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return compassFetch<workflowAccessCreateResponse>(getWorkflowAccessCreateUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(workflowAccessCreateSchema)
+  }
+);}
+
+
+export type workflowAccessOptionsResponse200 = {
+  data: WorkflowAccessOptionsSchema
+  status: 200
+}
+
+export type workflowAccessOptionsResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type workflowAccessOptionsResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type workflowAccessOptionsResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type workflowAccessOptionsResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type workflowAccessOptionsResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type workflowAccessOptionsResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type workflowAccessOptionsResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type workflowAccessOptionsResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type workflowAccessOptionsResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type workflowAccessOptionsResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type workflowAccessOptionsResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type workflowAccessOptionsResponseSuccess = (workflowAccessOptionsResponse200) & {
+  headers: Record<string, string>;
+};
+export type workflowAccessOptionsResponseError = (workflowAccessOptionsResponse400 | workflowAccessOptionsResponse401 | workflowAccessOptionsResponse403 | workflowAccessOptionsResponse404 | workflowAccessOptionsResponse405 | workflowAccessOptionsResponse409 | workflowAccessOptionsResponse413 | workflowAccessOptionsResponse422 | workflowAccessOptionsResponse429 | workflowAccessOptionsResponse500 | workflowAccessOptionsResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type workflowAccessOptionsResponse = (workflowAccessOptionsResponseSuccess | workflowAccessOptionsResponseError)
+
+export const getWorkflowAccessOptionsUrl = () => {
+
+
+
+
+  return `/api/v1/authority/workflow-access/options/`
+}
+
+/**
+ * @summary Workflow Access Options
+ */
+export const workflowAccessOptions = async ( options?: Parameters<typeof compassFetch>[1]): Promise<workflowAccessOptionsResponse> => {
+
+  return compassFetch<workflowAccessOptionsResponse>(getWorkflowAccessOptionsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+export type workflowAccessDetailResponse200 = {
+  data: WorkflowAccessProjectionSchema
+  status: 200
+}
+
+export type workflowAccessDetailResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type workflowAccessDetailResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type workflowAccessDetailResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type workflowAccessDetailResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type workflowAccessDetailResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type workflowAccessDetailResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type workflowAccessDetailResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type workflowAccessDetailResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type workflowAccessDetailResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type workflowAccessDetailResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type workflowAccessDetailResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type workflowAccessDetailResponseSuccess = (workflowAccessDetailResponse200) & {
+  headers: Record<string, string>;
+};
+export type workflowAccessDetailResponseError = (workflowAccessDetailResponse400 | workflowAccessDetailResponse401 | workflowAccessDetailResponse403 | workflowAccessDetailResponse404 | workflowAccessDetailResponse405 | workflowAccessDetailResponse409 | workflowAccessDetailResponse413 | workflowAccessDetailResponse422 | workflowAccessDetailResponse429 | workflowAccessDetailResponse500 | workflowAccessDetailResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type workflowAccessDetailResponse = (workflowAccessDetailResponseSuccess | workflowAccessDetailResponseError)
+
+export const getWorkflowAccessDetailUrl = (grantReference: string,) => {
+
+
+
+
+  return `/api/v1/authority/workflow-access/${grantReference}/`
+}
+
+/**
+ * @summary Workflow Access Detail
+ */
+export const workflowAccessDetail = async (grantReference: string, options?: Parameters<typeof compassFetch>[1]): Promise<workflowAccessDetailResponse> => {
+
+  return compassFetch<workflowAccessDetailResponse>(getWorkflowAccessDetailUrl(grantReference),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+export type workflowAccessRevokeResponse200 = {
+  data: WorkflowAccessProjectionSchema
+  status: 200
+}
+
+export type workflowAccessRevokeResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type workflowAccessRevokeResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type workflowAccessRevokeResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type workflowAccessRevokeResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type workflowAccessRevokeResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type workflowAccessRevokeResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type workflowAccessRevokeResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type workflowAccessRevokeResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type workflowAccessRevokeResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type workflowAccessRevokeResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type workflowAccessRevokeResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type workflowAccessRevokeResponseSuccess = (workflowAccessRevokeResponse200) & {
+  headers: Record<string, string>;
+};
+export type workflowAccessRevokeResponseError = (workflowAccessRevokeResponse400 | workflowAccessRevokeResponse401 | workflowAccessRevokeResponse403 | workflowAccessRevokeResponse404 | workflowAccessRevokeResponse405 | workflowAccessRevokeResponse409 | workflowAccessRevokeResponse413 | workflowAccessRevokeResponse422 | workflowAccessRevokeResponse429 | workflowAccessRevokeResponse500 | workflowAccessRevokeResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type workflowAccessRevokeResponse = (workflowAccessRevokeResponseSuccess | workflowAccessRevokeResponseError)
+
+export const getWorkflowAccessRevokeUrl = (grantReference: string,) => {
+
+
+
+
+  return `/api/v1/authority/workflow-access/${grantReference}/revoke/`
+}
+
+/**
+ * @summary Workflow Access Revoke
+ */
+export const workflowAccessRevoke = async (grantReference: string,
+    workflowAccessRevokeSchema: WorkflowAccessRevokeSchema, options?: Parameters<typeof compassFetch>[1]): Promise<workflowAccessRevokeResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return compassFetch<workflowAccessRevokeResponse>(getWorkflowAccessRevokeUrl(grantReference),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(workflowAccessRevokeSchema)
   }
 );}

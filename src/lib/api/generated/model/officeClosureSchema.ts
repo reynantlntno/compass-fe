@@ -9,7 +9,12 @@
 export interface OfficeClosureSchema {
   date: string;
   end_time?: string | null;
+  is_active?: boolean;
   is_all_day: boolean;
   public_reference: string;
+  reason?: string;
   start_time?: string | null;
+  state?: string;
+  state_label?: string;
+  updated_at?: string | null;
 }

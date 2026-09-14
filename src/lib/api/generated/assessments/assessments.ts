@@ -8,6 +8,11 @@
 import type {
   ApiErrorSchema,
   AssessmentFileMetadataSchema,
+  AssessmentInstrumentGovernanceCreateSchema,
+  AssessmentInstrumentGovernanceLifecycleSchema,
+  AssessmentInstrumentGovernancePageSchema,
+  AssessmentInstrumentGovernanceSchema,
+  AssessmentInstrumentGovernanceUpdateSchema,
   AssessmentInstrumentPageSchema,
   AssessmentPageSchema,
   AssessmentSensitiveProjectionSchema,
@@ -15,6 +20,7 @@ import type {
   AssessmentStudentSummaryPageSchema,
   AssessmentStudentSummarySchema,
   AssessmentsFileAttachBody,
+  AssessmentsGovernanceInstrumentsListParams,
   AssessmentsInstrumentsParams,
   AssessmentsListParams,
   AssessmentsReplacementOptionsParams,
@@ -223,6 +229,592 @@ return compassFetch<assessmentsCreateResponse>(getAssessmentsCreateUrl(),
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
     body: JSON.stringify(createSchema)
+  }
+);}
+
+
+export type assessmentsGovernanceInstrumentsListResponse200 = {
+  data: AssessmentInstrumentGovernancePageSchema
+  status: 200
+}
+
+export type assessmentsGovernanceInstrumentsListResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type assessmentsGovernanceInstrumentsListResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type assessmentsGovernanceInstrumentsListResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type assessmentsGovernanceInstrumentsListResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type assessmentsGovernanceInstrumentsListResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type assessmentsGovernanceInstrumentsListResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type assessmentsGovernanceInstrumentsListResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type assessmentsGovernanceInstrumentsListResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type assessmentsGovernanceInstrumentsListResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type assessmentsGovernanceInstrumentsListResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type assessmentsGovernanceInstrumentsListResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type assessmentsGovernanceInstrumentsListResponseSuccess = (assessmentsGovernanceInstrumentsListResponse200) & {
+  headers: Record<string, string>;
+};
+export type assessmentsGovernanceInstrumentsListResponseError = (assessmentsGovernanceInstrumentsListResponse400 | assessmentsGovernanceInstrumentsListResponse401 | assessmentsGovernanceInstrumentsListResponse403 | assessmentsGovernanceInstrumentsListResponse404 | assessmentsGovernanceInstrumentsListResponse405 | assessmentsGovernanceInstrumentsListResponse409 | assessmentsGovernanceInstrumentsListResponse413 | assessmentsGovernanceInstrumentsListResponse422 | assessmentsGovernanceInstrumentsListResponse429 | assessmentsGovernanceInstrumentsListResponse500 | assessmentsGovernanceInstrumentsListResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type assessmentsGovernanceInstrumentsListResponse = (assessmentsGovernanceInstrumentsListResponseSuccess | assessmentsGovernanceInstrumentsListResponseError)
+
+export const getAssessmentsGovernanceInstrumentsListUrl = (params?: AssessmentsGovernanceInstrumentsListParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/assessments/governance/instruments/?${stringifiedParams}` : `/api/v1/assessments/governance/instruments/`
+}
+
+/**
+ * @summary Governance Instruments
+ */
+export const assessmentsGovernanceInstrumentsList = async (params?: AssessmentsGovernanceInstrumentsListParams, options?: Parameters<typeof compassFetch>[1]): Promise<assessmentsGovernanceInstrumentsListResponse> => {
+
+  return compassFetch<assessmentsGovernanceInstrumentsListResponse>(getAssessmentsGovernanceInstrumentsListUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+export type assessmentsGovernanceInstrumentCreateResponse200 = {
+  data: AssessmentInstrumentGovernanceSchema
+  status: 200
+}
+
+export type assessmentsGovernanceInstrumentCreateResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type assessmentsGovernanceInstrumentCreateResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type assessmentsGovernanceInstrumentCreateResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type assessmentsGovernanceInstrumentCreateResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type assessmentsGovernanceInstrumentCreateResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type assessmentsGovernanceInstrumentCreateResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type assessmentsGovernanceInstrumentCreateResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type assessmentsGovernanceInstrumentCreateResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type assessmentsGovernanceInstrumentCreateResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type assessmentsGovernanceInstrumentCreateResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type assessmentsGovernanceInstrumentCreateResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type assessmentsGovernanceInstrumentCreateResponseSuccess = (assessmentsGovernanceInstrumentCreateResponse200) & {
+  headers: Record<string, string>;
+};
+export type assessmentsGovernanceInstrumentCreateResponseError = (assessmentsGovernanceInstrumentCreateResponse400 | assessmentsGovernanceInstrumentCreateResponse401 | assessmentsGovernanceInstrumentCreateResponse403 | assessmentsGovernanceInstrumentCreateResponse404 | assessmentsGovernanceInstrumentCreateResponse405 | assessmentsGovernanceInstrumentCreateResponse409 | assessmentsGovernanceInstrumentCreateResponse413 | assessmentsGovernanceInstrumentCreateResponse422 | assessmentsGovernanceInstrumentCreateResponse429 | assessmentsGovernanceInstrumentCreateResponse500 | assessmentsGovernanceInstrumentCreateResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type assessmentsGovernanceInstrumentCreateResponse = (assessmentsGovernanceInstrumentCreateResponseSuccess | assessmentsGovernanceInstrumentCreateResponseError)
+
+export const getAssessmentsGovernanceInstrumentCreateUrl = () => {
+
+
+
+
+  return `/api/v1/assessments/governance/instruments/`
+}
+
+/**
+ * @summary Governance Instrument Create
+ */
+export const assessmentsGovernanceInstrumentCreate = async (assessmentInstrumentGovernanceCreateSchema: AssessmentInstrumentGovernanceCreateSchema, options?: Parameters<typeof compassFetch>[1]): Promise<assessmentsGovernanceInstrumentCreateResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return compassFetch<assessmentsGovernanceInstrumentCreateResponse>(getAssessmentsGovernanceInstrumentCreateUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(assessmentInstrumentGovernanceCreateSchema)
+  }
+);}
+
+
+export type assessmentsGovernanceInstrumentDetailResponse200 = {
+  data: AssessmentInstrumentGovernanceSchema
+  status: 200
+}
+
+export type assessmentsGovernanceInstrumentDetailResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type assessmentsGovernanceInstrumentDetailResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type assessmentsGovernanceInstrumentDetailResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type assessmentsGovernanceInstrumentDetailResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type assessmentsGovernanceInstrumentDetailResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type assessmentsGovernanceInstrumentDetailResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type assessmentsGovernanceInstrumentDetailResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type assessmentsGovernanceInstrumentDetailResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type assessmentsGovernanceInstrumentDetailResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type assessmentsGovernanceInstrumentDetailResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type assessmentsGovernanceInstrumentDetailResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type assessmentsGovernanceInstrumentDetailResponseSuccess = (assessmentsGovernanceInstrumentDetailResponse200) & {
+  headers: Record<string, string>;
+};
+export type assessmentsGovernanceInstrumentDetailResponseError = (assessmentsGovernanceInstrumentDetailResponse400 | assessmentsGovernanceInstrumentDetailResponse401 | assessmentsGovernanceInstrumentDetailResponse403 | assessmentsGovernanceInstrumentDetailResponse404 | assessmentsGovernanceInstrumentDetailResponse405 | assessmentsGovernanceInstrumentDetailResponse409 | assessmentsGovernanceInstrumentDetailResponse413 | assessmentsGovernanceInstrumentDetailResponse422 | assessmentsGovernanceInstrumentDetailResponse429 | assessmentsGovernanceInstrumentDetailResponse500 | assessmentsGovernanceInstrumentDetailResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type assessmentsGovernanceInstrumentDetailResponse = (assessmentsGovernanceInstrumentDetailResponseSuccess | assessmentsGovernanceInstrumentDetailResponseError)
+
+export const getAssessmentsGovernanceInstrumentDetailUrl = (instrumentKey: string,) => {
+
+
+
+
+  return `/api/v1/assessments/governance/instruments/${instrumentKey}/`
+}
+
+/**
+ * @summary Governance Instrument Detail
+ */
+export const assessmentsGovernanceInstrumentDetail = async (instrumentKey: string, options?: Parameters<typeof compassFetch>[1]): Promise<assessmentsGovernanceInstrumentDetailResponse> => {
+
+  return compassFetch<assessmentsGovernanceInstrumentDetailResponse>(getAssessmentsGovernanceInstrumentDetailUrl(instrumentKey),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+export type assessmentsGovernanceInstrumentActivateResponse200 = {
+  data: AssessmentInstrumentGovernanceSchema
+  status: 200
+}
+
+export type assessmentsGovernanceInstrumentActivateResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type assessmentsGovernanceInstrumentActivateResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type assessmentsGovernanceInstrumentActivateResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type assessmentsGovernanceInstrumentActivateResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type assessmentsGovernanceInstrumentActivateResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type assessmentsGovernanceInstrumentActivateResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type assessmentsGovernanceInstrumentActivateResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type assessmentsGovernanceInstrumentActivateResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type assessmentsGovernanceInstrumentActivateResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type assessmentsGovernanceInstrumentActivateResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type assessmentsGovernanceInstrumentActivateResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type assessmentsGovernanceInstrumentActivateResponseSuccess = (assessmentsGovernanceInstrumentActivateResponse200) & {
+  headers: Record<string, string>;
+};
+export type assessmentsGovernanceInstrumentActivateResponseError = (assessmentsGovernanceInstrumentActivateResponse400 | assessmentsGovernanceInstrumentActivateResponse401 | assessmentsGovernanceInstrumentActivateResponse403 | assessmentsGovernanceInstrumentActivateResponse404 | assessmentsGovernanceInstrumentActivateResponse405 | assessmentsGovernanceInstrumentActivateResponse409 | assessmentsGovernanceInstrumentActivateResponse413 | assessmentsGovernanceInstrumentActivateResponse422 | assessmentsGovernanceInstrumentActivateResponse429 | assessmentsGovernanceInstrumentActivateResponse500 | assessmentsGovernanceInstrumentActivateResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type assessmentsGovernanceInstrumentActivateResponse = (assessmentsGovernanceInstrumentActivateResponseSuccess | assessmentsGovernanceInstrumentActivateResponseError)
+
+export const getAssessmentsGovernanceInstrumentActivateUrl = (instrumentKey: string,) => {
+
+
+
+
+  return `/api/v1/assessments/governance/instruments/${instrumentKey}/activate/`
+}
+
+/**
+ * @summary Governance Instrument Activate
+ */
+export const assessmentsGovernanceInstrumentActivate = async (instrumentKey: string,
+    assessmentInstrumentGovernanceLifecycleSchema: AssessmentInstrumentGovernanceLifecycleSchema, options?: Parameters<typeof compassFetch>[1]): Promise<assessmentsGovernanceInstrumentActivateResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return compassFetch<assessmentsGovernanceInstrumentActivateResponse>(getAssessmentsGovernanceInstrumentActivateUrl(instrumentKey),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(assessmentInstrumentGovernanceLifecycleSchema)
+  }
+);}
+
+
+export type assessmentsGovernanceInstrumentDeactivateResponse200 = {
+  data: AssessmentInstrumentGovernanceSchema
+  status: 200
+}
+
+export type assessmentsGovernanceInstrumentDeactivateResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type assessmentsGovernanceInstrumentDeactivateResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type assessmentsGovernanceInstrumentDeactivateResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type assessmentsGovernanceInstrumentDeactivateResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type assessmentsGovernanceInstrumentDeactivateResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type assessmentsGovernanceInstrumentDeactivateResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type assessmentsGovernanceInstrumentDeactivateResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type assessmentsGovernanceInstrumentDeactivateResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type assessmentsGovernanceInstrumentDeactivateResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type assessmentsGovernanceInstrumentDeactivateResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type assessmentsGovernanceInstrumentDeactivateResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type assessmentsGovernanceInstrumentDeactivateResponseSuccess = (assessmentsGovernanceInstrumentDeactivateResponse200) & {
+  headers: Record<string, string>;
+};
+export type assessmentsGovernanceInstrumentDeactivateResponseError = (assessmentsGovernanceInstrumentDeactivateResponse400 | assessmentsGovernanceInstrumentDeactivateResponse401 | assessmentsGovernanceInstrumentDeactivateResponse403 | assessmentsGovernanceInstrumentDeactivateResponse404 | assessmentsGovernanceInstrumentDeactivateResponse405 | assessmentsGovernanceInstrumentDeactivateResponse409 | assessmentsGovernanceInstrumentDeactivateResponse413 | assessmentsGovernanceInstrumentDeactivateResponse422 | assessmentsGovernanceInstrumentDeactivateResponse429 | assessmentsGovernanceInstrumentDeactivateResponse500 | assessmentsGovernanceInstrumentDeactivateResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type assessmentsGovernanceInstrumentDeactivateResponse = (assessmentsGovernanceInstrumentDeactivateResponseSuccess | assessmentsGovernanceInstrumentDeactivateResponseError)
+
+export const getAssessmentsGovernanceInstrumentDeactivateUrl = (instrumentKey: string,) => {
+
+
+
+
+  return `/api/v1/assessments/governance/instruments/${instrumentKey}/deactivate/`
+}
+
+/**
+ * @summary Governance Instrument Deactivate
+ */
+export const assessmentsGovernanceInstrumentDeactivate = async (instrumentKey: string,
+    assessmentInstrumentGovernanceLifecycleSchema: AssessmentInstrumentGovernanceLifecycleSchema, options?: Parameters<typeof compassFetch>[1]): Promise<assessmentsGovernanceInstrumentDeactivateResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return compassFetch<assessmentsGovernanceInstrumentDeactivateResponse>(getAssessmentsGovernanceInstrumentDeactivateUrl(instrumentKey),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(assessmentInstrumentGovernanceLifecycleSchema)
+  }
+);}
+
+
+export type assessmentsGovernanceInstrumentUpdateResponse200 = {
+  data: AssessmentInstrumentGovernanceSchema
+  status: 200
+}
+
+export type assessmentsGovernanceInstrumentUpdateResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type assessmentsGovernanceInstrumentUpdateResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type assessmentsGovernanceInstrumentUpdateResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type assessmentsGovernanceInstrumentUpdateResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type assessmentsGovernanceInstrumentUpdateResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type assessmentsGovernanceInstrumentUpdateResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type assessmentsGovernanceInstrumentUpdateResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type assessmentsGovernanceInstrumentUpdateResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type assessmentsGovernanceInstrumentUpdateResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type assessmentsGovernanceInstrumentUpdateResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type assessmentsGovernanceInstrumentUpdateResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type assessmentsGovernanceInstrumentUpdateResponseSuccess = (assessmentsGovernanceInstrumentUpdateResponse200) & {
+  headers: Record<string, string>;
+};
+export type assessmentsGovernanceInstrumentUpdateResponseError = (assessmentsGovernanceInstrumentUpdateResponse400 | assessmentsGovernanceInstrumentUpdateResponse401 | assessmentsGovernanceInstrumentUpdateResponse403 | assessmentsGovernanceInstrumentUpdateResponse404 | assessmentsGovernanceInstrumentUpdateResponse405 | assessmentsGovernanceInstrumentUpdateResponse409 | assessmentsGovernanceInstrumentUpdateResponse413 | assessmentsGovernanceInstrumentUpdateResponse422 | assessmentsGovernanceInstrumentUpdateResponse429 | assessmentsGovernanceInstrumentUpdateResponse500 | assessmentsGovernanceInstrumentUpdateResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type assessmentsGovernanceInstrumentUpdateResponse = (assessmentsGovernanceInstrumentUpdateResponseSuccess | assessmentsGovernanceInstrumentUpdateResponseError)
+
+export const getAssessmentsGovernanceInstrumentUpdateUrl = (instrumentKey: string,) => {
+
+
+
+
+  return `/api/v1/assessments/governance/instruments/${instrumentKey}/update/`
+}
+
+/**
+ * @summary Governance Instrument Update
+ */
+export const assessmentsGovernanceInstrumentUpdate = async (instrumentKey: string,
+    assessmentInstrumentGovernanceUpdateSchema: AssessmentInstrumentGovernanceUpdateSchema, options?: Parameters<typeof compassFetch>[1]): Promise<assessmentsGovernanceInstrumentUpdateResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return compassFetch<assessmentsGovernanceInstrumentUpdateResponse>(getAssessmentsGovernanceInstrumentUpdateUrl(instrumentKey),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(assessmentInstrumentGovernanceUpdateSchema)
   }
 );}
 

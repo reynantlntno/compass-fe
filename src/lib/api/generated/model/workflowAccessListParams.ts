@@ -6,7 +6,13 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export type AppointmentsOfficeClosuresParams = {
+export type WorkflowAccessListParams = {
+q?: string | null;
+capability?: string | null;
+scope_mode?: string | null;
+status?: string | null;
+role?: string | null;
+order?: string;
 /**
  * @minimum 1
  */
@@ -16,8 +22,4 @@ page?: number;
  * @maximum 100
  */
 page_size?: number;
-state?: string | null;
-date_from?: string | null;
-date_to?: string | null;
-order?: string;
 };

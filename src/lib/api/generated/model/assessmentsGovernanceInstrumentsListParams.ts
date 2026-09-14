@@ -6,7 +6,7 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export type AppointmentsOfficeClosuresParams = {
+export type AssessmentsGovernanceInstrumentsListParams = {
 /**
  * @minimum 1
  */
@@ -16,8 +16,4 @@ page?: number;
  * @maximum 100
  */
 page_size?: number;
-state?: string | null;
-date_from?: string | null;
-date_to?: string | null;
-order?: string;
 };

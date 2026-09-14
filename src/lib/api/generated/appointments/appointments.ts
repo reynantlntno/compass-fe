@@ -12,6 +12,7 @@ import type {
   AppointmentProjectionSchema,
   AppointmentReasonSchema,
   AppointmentRequestSchema,
+  AppointmentsAvailabilityListParams,
   AppointmentsAvailableSlotsParams,
   AppointmentsListParams,
   AppointmentsOfficeClosuresParams,
@@ -21,8 +22,11 @@ import type {
   DecisionSchema,
   OfficeClosurePageResultSchema,
   ReviewDecisionSchema,
+  ScheduleChangePreviewSchema,
   ScheduleChangeResponseSchema,
   ScheduleChangeSchema,
+  ScheduleOptionsSchema,
+  ScheduleRecordPageResultSchema,
   ScheduleSchema
 } from '../model';
 
@@ -225,6 +229,105 @@ return compassFetch<appointmentsCreateResponse>(getAppointmentsCreateUrl(),
 );}
 
 
+export type appointmentsAvailabilityListResponse200 = {
+  data: ScheduleRecordPageResultSchema
+  status: 200
+}
+
+export type appointmentsAvailabilityListResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type appointmentsAvailabilityListResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type appointmentsAvailabilityListResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type appointmentsAvailabilityListResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type appointmentsAvailabilityListResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type appointmentsAvailabilityListResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type appointmentsAvailabilityListResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type appointmentsAvailabilityListResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type appointmentsAvailabilityListResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type appointmentsAvailabilityListResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type appointmentsAvailabilityListResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type appointmentsAvailabilityListResponseSuccess = (appointmentsAvailabilityListResponse200) & {
+  headers: Record<string, string>;
+};
+export type appointmentsAvailabilityListResponseError = (appointmentsAvailabilityListResponse400 | appointmentsAvailabilityListResponse401 | appointmentsAvailabilityListResponse403 | appointmentsAvailabilityListResponse404 | appointmentsAvailabilityListResponse405 | appointmentsAvailabilityListResponse409 | appointmentsAvailabilityListResponse413 | appointmentsAvailabilityListResponse422 | appointmentsAvailabilityListResponse429 | appointmentsAvailabilityListResponse500 | appointmentsAvailabilityListResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type appointmentsAvailabilityListResponse = (appointmentsAvailabilityListResponseSuccess | appointmentsAvailabilityListResponseError)
+
+export const getAppointmentsAvailabilityListUrl = (params?: AppointmentsAvailabilityListParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/appointments/availability/?${stringifiedParams}` : `/api/v1/appointments/availability/`
+}
+
+/**
+ * @summary List Availability
+ */
+export const appointmentsAvailabilityList = async (params?: AppointmentsAvailabilityListParams, options?: Parameters<typeof compassFetch>[1]): Promise<appointmentsAvailabilityListResponse> => {
+
+  return compassFetch<appointmentsAvailabilityListResponse>(getAppointmentsAvailabilityListUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
 export type appointmentsAvailabilityCreateResponse200 = {
   data: ScheduleChangeResponseSchema
   status: 200
@@ -319,6 +422,98 @@ return compassFetch<appointmentsAvailabilityCreateResponse>(getAppointmentsAvail
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
     body: JSON.stringify(scheduleChangeSchema)
+  }
+);}
+
+
+export type appointmentsAvailabilityOptionsResponse200 = {
+  data: ScheduleOptionsSchema
+  status: 200
+}
+
+export type appointmentsAvailabilityOptionsResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type appointmentsAvailabilityOptionsResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type appointmentsAvailabilityOptionsResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type appointmentsAvailabilityOptionsResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type appointmentsAvailabilityOptionsResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type appointmentsAvailabilityOptionsResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type appointmentsAvailabilityOptionsResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type appointmentsAvailabilityOptionsResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type appointmentsAvailabilityOptionsResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type appointmentsAvailabilityOptionsResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type appointmentsAvailabilityOptionsResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type appointmentsAvailabilityOptionsResponseSuccess = (appointmentsAvailabilityOptionsResponse200) & {
+  headers: Record<string, string>;
+};
+export type appointmentsAvailabilityOptionsResponseError = (appointmentsAvailabilityOptionsResponse400 | appointmentsAvailabilityOptionsResponse401 | appointmentsAvailabilityOptionsResponse403 | appointmentsAvailabilityOptionsResponse404 | appointmentsAvailabilityOptionsResponse405 | appointmentsAvailabilityOptionsResponse409 | appointmentsAvailabilityOptionsResponse413 | appointmentsAvailabilityOptionsResponse422 | appointmentsAvailabilityOptionsResponse429 | appointmentsAvailabilityOptionsResponse500 | appointmentsAvailabilityOptionsResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type appointmentsAvailabilityOptionsResponse = (appointmentsAvailabilityOptionsResponseSuccess | appointmentsAvailabilityOptionsResponseError)
+
+export const getAppointmentsAvailabilityOptionsUrl = () => {
+
+
+
+
+  return `/api/v1/appointments/availability/options/`
+}
+
+/**
+ * @summary Availability Options
+ */
+export const appointmentsAvailabilityOptions = async ( options?: Parameters<typeof compassFetch>[1]): Promise<appointmentsAvailabilityOptionsResponse> => {
+
+  return compassFetch<appointmentsAvailabilityOptionsResponse>(getAppointmentsAvailabilityOptionsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
   }
 );}
 
@@ -1005,6 +1200,104 @@ export const appointmentsScheduleChange = async (scheduleChangeSchema: ScheduleC
     return h;
   };
 return compassFetch<appointmentsScheduleChangeResponse>(getAppointmentsScheduleChangeUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(scheduleChangeSchema)
+  }
+);}
+
+
+export type appointmentsScheduleChangePreviewResponse200 = {
+  data: ScheduleChangePreviewSchema
+  status: 200
+}
+
+export type appointmentsScheduleChangePreviewResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type appointmentsScheduleChangePreviewResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type appointmentsScheduleChangePreviewResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type appointmentsScheduleChangePreviewResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type appointmentsScheduleChangePreviewResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type appointmentsScheduleChangePreviewResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type appointmentsScheduleChangePreviewResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type appointmentsScheduleChangePreviewResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type appointmentsScheduleChangePreviewResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type appointmentsScheduleChangePreviewResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type appointmentsScheduleChangePreviewResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type appointmentsScheduleChangePreviewResponseSuccess = (appointmentsScheduleChangePreviewResponse200) & {
+  headers: Record<string, string>;
+};
+export type appointmentsScheduleChangePreviewResponseError = (appointmentsScheduleChangePreviewResponse400 | appointmentsScheduleChangePreviewResponse401 | appointmentsScheduleChangePreviewResponse403 | appointmentsScheduleChangePreviewResponse404 | appointmentsScheduleChangePreviewResponse405 | appointmentsScheduleChangePreviewResponse409 | appointmentsScheduleChangePreviewResponse413 | appointmentsScheduleChangePreviewResponse422 | appointmentsScheduleChangePreviewResponse429 | appointmentsScheduleChangePreviewResponse500 | appointmentsScheduleChangePreviewResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type appointmentsScheduleChangePreviewResponse = (appointmentsScheduleChangePreviewResponseSuccess | appointmentsScheduleChangePreviewResponseError)
+
+export const getAppointmentsScheduleChangePreviewUrl = () => {
+
+
+
+
+  return `/api/v1/appointments/schedule-changes/preview/`
+}
+
+/**
+ * @summary Schedule Change Preview
+ */
+export const appointmentsScheduleChangePreview = async (scheduleChangeSchema: ScheduleChangeSchema, options?: Parameters<typeof compassFetch>[1]): Promise<appointmentsScheduleChangePreviewResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return compassFetch<appointmentsScheduleChangePreviewResponse>(getAppointmentsScheduleChangePreviewUrl(),
   {
     ...options,
     method: 'POST',

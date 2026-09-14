@@ -6,27 +6,24 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export interface ScheduleChangeSchema {
-  block_date?: string | null;
-  confirm?: boolean;
-  counselor?: string | null;
-  counselor_selection_token?: string | null;
+export interface ScheduleRecordProjectionSchema {
+  counselor_display_name: string;
+  date?: string | null;
+  day_label?: string | null;
   day_of_week?: number | null;
   effective_from?: string | null;
   effective_until?: string | null;
   end_time?: string | null;
-  expected_fingerprint?: string;
-  handoff_action?: string;
-  is_all_day?: boolean;
+  is_active: boolean;
+  is_all_day?: boolean | null;
   kind: string;
-  location?: string;
+  location?: string | null;
   max_appointments_per_slot?: number | null;
-  mode?: string;
-  operation?: string;
-  reason: string;
-  request_key: string;
-  scope_reason?: string;
+  mode?: string | null;
+  public_reference: string;
   slot_duration_minutes?: number | null;
   start_time?: string | null;
-  target_reference?: string | null;
+  state: string;
+  state_label: string;
+  updated_at: string;
 }

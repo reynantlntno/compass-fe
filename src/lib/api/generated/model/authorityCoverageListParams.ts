@@ -6,7 +6,14 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export type AppointmentsOfficeClosuresParams = {
+export type AuthorityCoverageListParams = {
+q?: string | null;
+state?: string | null;
+campus?: string | null;
+college?: string | null;
+department?: string | null;
+program?: string | null;
+order?: string;
 /**
  * @minimum 1
  */
@@ -16,8 +23,4 @@ page?: number;
  * @maximum 100
  */
 page_size?: number;
-state?: string | null;
-date_from?: string | null;
-date_to?: string | null;
-order?: string;
 };

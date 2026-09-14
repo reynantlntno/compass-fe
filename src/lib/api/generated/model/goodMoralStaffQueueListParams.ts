@@ -6,7 +6,7 @@
  * OpenAPI spec version: 1.0.0
  */
 
-export type AppointmentsOfficeClosuresParams = {
+export type GoodMoralStaffQueueListParams = {
 /**
  * @minimum 1
  */
@@ -16,8 +16,16 @@ page?: number;
  * @maximum 100
  */
 page_size?: number;
-state?: string | null;
-date_from?: string | null;
-date_to?: string | null;
+q?: string;
+status?: string;
+request_type?: string;
+receipt_status?: string;
+ossd_status?: string;
+dry_seal_status?: string;
+academic_year?: string;
+campus?: string;
+college?: string;
+department?: string;
+program?: string;
 order?: string;
 };

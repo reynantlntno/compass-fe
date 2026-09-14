@@ -15,6 +15,13 @@ import type {
   GoodMoralMutationResponseSchema,
   GoodMoralPageResultSchema,
   GoodMoralRequestSchema,
+  GoodMoralReviewerOptionSchema,
+  GoodMoralReviewerSelectionSchema,
+  GoodMoralStaffCreateSchema,
+  GoodMoralStaffQueueItemSchema,
+  GoodMoralStaffQueueListParams,
+  GoodMoralStaffQueueOptionsSchema,
+  GoodMoralStaffQueuePageSchema,
   OssdSchema,
   ReasonSchema,
   ReceiptEncodeSchema,
@@ -217,6 +224,578 @@ return compassFetch<goodMoralCreateResponse>(getGoodMoralCreateUrl(),
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
     body: JSON.stringify(draftSchema)
+  }
+);}
+
+
+export type goodMoralStaffQueueListResponse200 = {
+  data: GoodMoralStaffQueuePageSchema
+  status: 200
+}
+
+export type goodMoralStaffQueueListResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type goodMoralStaffQueueListResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type goodMoralStaffQueueListResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type goodMoralStaffQueueListResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type goodMoralStaffQueueListResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type goodMoralStaffQueueListResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type goodMoralStaffQueueListResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type goodMoralStaffQueueListResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type goodMoralStaffQueueListResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type goodMoralStaffQueueListResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type goodMoralStaffQueueListResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type goodMoralStaffQueueListResponseSuccess = (goodMoralStaffQueueListResponse200) & {
+  headers: Record<string, string>;
+};
+export type goodMoralStaffQueueListResponseError = (goodMoralStaffQueueListResponse400 | goodMoralStaffQueueListResponse401 | goodMoralStaffQueueListResponse403 | goodMoralStaffQueueListResponse404 | goodMoralStaffQueueListResponse405 | goodMoralStaffQueueListResponse409 | goodMoralStaffQueueListResponse413 | goodMoralStaffQueueListResponse422 | goodMoralStaffQueueListResponse429 | goodMoralStaffQueueListResponse500 | goodMoralStaffQueueListResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type goodMoralStaffQueueListResponse = (goodMoralStaffQueueListResponseSuccess | goodMoralStaffQueueListResponseError)
+
+export const getGoodMoralStaffQueueListUrl = (params?: GoodMoralStaffQueueListParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/good-moral/staff-queue/?${stringifiedParams}` : `/api/v1/good-moral/staff-queue/`
+}
+
+/**
+ * @summary Staff Queue List
+ */
+export const goodMoralStaffQueueList = async (params?: GoodMoralStaffQueueListParams, options?: Parameters<typeof compassFetch>[1]): Promise<goodMoralStaffQueueListResponse> => {
+
+  return compassFetch<goodMoralStaffQueueListResponse>(getGoodMoralStaffQueueListUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+export type goodMoralStaffQueueCreateResponse200 = {
+  data: GoodMoralStaffQueueItemSchema
+  status: 200
+}
+
+export type goodMoralStaffQueueCreateResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type goodMoralStaffQueueCreateResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type goodMoralStaffQueueCreateResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type goodMoralStaffQueueCreateResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type goodMoralStaffQueueCreateResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type goodMoralStaffQueueCreateResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type goodMoralStaffQueueCreateResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type goodMoralStaffQueueCreateResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type goodMoralStaffQueueCreateResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type goodMoralStaffQueueCreateResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type goodMoralStaffQueueCreateResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type goodMoralStaffQueueCreateResponseSuccess = (goodMoralStaffQueueCreateResponse200) & {
+  headers: Record<string, string>;
+};
+export type goodMoralStaffQueueCreateResponseError = (goodMoralStaffQueueCreateResponse400 | goodMoralStaffQueueCreateResponse401 | goodMoralStaffQueueCreateResponse403 | goodMoralStaffQueueCreateResponse404 | goodMoralStaffQueueCreateResponse405 | goodMoralStaffQueueCreateResponse409 | goodMoralStaffQueueCreateResponse413 | goodMoralStaffQueueCreateResponse422 | goodMoralStaffQueueCreateResponse429 | goodMoralStaffQueueCreateResponse500 | goodMoralStaffQueueCreateResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type goodMoralStaffQueueCreateResponse = (goodMoralStaffQueueCreateResponseSuccess | goodMoralStaffQueueCreateResponseError)
+
+export const getGoodMoralStaffQueueCreateUrl = () => {
+
+
+
+
+  return `/api/v1/good-moral/staff-queue/`
+}
+
+/**
+ * @summary Staff Queue Create
+ */
+export const goodMoralStaffQueueCreate = async (goodMoralStaffCreateSchema: GoodMoralStaffCreateSchema, options?: Parameters<typeof compassFetch>[1]): Promise<goodMoralStaffQueueCreateResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return compassFetch<goodMoralStaffQueueCreateResponse>(getGoodMoralStaffQueueCreateUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(goodMoralStaffCreateSchema)
+  }
+);}
+
+
+export type goodMoralStaffQueueOptionsResponse200 = {
+  data: GoodMoralStaffQueueOptionsSchema
+  status: 200
+}
+
+export type goodMoralStaffQueueOptionsResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type goodMoralStaffQueueOptionsResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type goodMoralStaffQueueOptionsResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type goodMoralStaffQueueOptionsResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type goodMoralStaffQueueOptionsResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type goodMoralStaffQueueOptionsResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type goodMoralStaffQueueOptionsResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type goodMoralStaffQueueOptionsResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type goodMoralStaffQueueOptionsResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type goodMoralStaffQueueOptionsResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type goodMoralStaffQueueOptionsResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type goodMoralStaffQueueOptionsResponseSuccess = (goodMoralStaffQueueOptionsResponse200) & {
+  headers: Record<string, string>;
+};
+export type goodMoralStaffQueueOptionsResponseError = (goodMoralStaffQueueOptionsResponse400 | goodMoralStaffQueueOptionsResponse401 | goodMoralStaffQueueOptionsResponse403 | goodMoralStaffQueueOptionsResponse404 | goodMoralStaffQueueOptionsResponse405 | goodMoralStaffQueueOptionsResponse409 | goodMoralStaffQueueOptionsResponse413 | goodMoralStaffQueueOptionsResponse422 | goodMoralStaffQueueOptionsResponse429 | goodMoralStaffQueueOptionsResponse500 | goodMoralStaffQueueOptionsResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type goodMoralStaffQueueOptionsResponse = (goodMoralStaffQueueOptionsResponseSuccess | goodMoralStaffQueueOptionsResponseError)
+
+export const getGoodMoralStaffQueueOptionsUrl = () => {
+
+
+
+
+  return `/api/v1/good-moral/staff-queue/options/`
+}
+
+/**
+ * @summary Staff Queue Options
+ */
+export const goodMoralStaffQueueOptions = async ( options?: Parameters<typeof compassFetch>[1]): Promise<goodMoralStaffQueueOptionsResponse> => {
+
+  return compassFetch<goodMoralStaffQueueOptionsResponse>(getGoodMoralStaffQueueOptionsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+export type goodMoralStaffQueueDetailResponse200 = {
+  data: GoodMoralStaffQueueItemSchema
+  status: 200
+}
+
+export type goodMoralStaffQueueDetailResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type goodMoralStaffQueueDetailResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type goodMoralStaffQueueDetailResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type goodMoralStaffQueueDetailResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type goodMoralStaffQueueDetailResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type goodMoralStaffQueueDetailResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type goodMoralStaffQueueDetailResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type goodMoralStaffQueueDetailResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type goodMoralStaffQueueDetailResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type goodMoralStaffQueueDetailResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type goodMoralStaffQueueDetailResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type goodMoralStaffQueueDetailResponseSuccess = (goodMoralStaffQueueDetailResponse200) & {
+  headers: Record<string, string>;
+};
+export type goodMoralStaffQueueDetailResponseError = (goodMoralStaffQueueDetailResponse400 | goodMoralStaffQueueDetailResponse401 | goodMoralStaffQueueDetailResponse403 | goodMoralStaffQueueDetailResponse404 | goodMoralStaffQueueDetailResponse405 | goodMoralStaffQueueDetailResponse409 | goodMoralStaffQueueDetailResponse413 | goodMoralStaffQueueDetailResponse422 | goodMoralStaffQueueDetailResponse429 | goodMoralStaffQueueDetailResponse500 | goodMoralStaffQueueDetailResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type goodMoralStaffQueueDetailResponse = (goodMoralStaffQueueDetailResponseSuccess | goodMoralStaffQueueDetailResponseError)
+
+export const getGoodMoralStaffQueueDetailUrl = (referenceCode: string,) => {
+
+
+
+
+  return `/api/v1/good-moral/staff-queue/${referenceCode}/`
+}
+
+/**
+ * @summary Staff Queue Detail
+ */
+export const goodMoralStaffQueueDetail = async (referenceCode: string, options?: Parameters<typeof compassFetch>[1]): Promise<goodMoralStaffQueueDetailResponse> => {
+
+  return compassFetch<goodMoralStaffQueueDetailResponse>(getGoodMoralStaffQueueDetailUrl(referenceCode),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+export type goodMoralStaffQueueReviewerOptionsResponse200 = {
+  data: GoodMoralReviewerOptionSchema[]
+  status: 200
+}
+
+export type goodMoralStaffQueueReviewerOptionsResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type goodMoralStaffQueueReviewerOptionsResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type goodMoralStaffQueueReviewerOptionsResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type goodMoralStaffQueueReviewerOptionsResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type goodMoralStaffQueueReviewerOptionsResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type goodMoralStaffQueueReviewerOptionsResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type goodMoralStaffQueueReviewerOptionsResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type goodMoralStaffQueueReviewerOptionsResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type goodMoralStaffQueueReviewerOptionsResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type goodMoralStaffQueueReviewerOptionsResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type goodMoralStaffQueueReviewerOptionsResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type goodMoralStaffQueueReviewerOptionsResponseSuccess = (goodMoralStaffQueueReviewerOptionsResponse200) & {
+  headers: Record<string, string>;
+};
+export type goodMoralStaffQueueReviewerOptionsResponseError = (goodMoralStaffQueueReviewerOptionsResponse400 | goodMoralStaffQueueReviewerOptionsResponse401 | goodMoralStaffQueueReviewerOptionsResponse403 | goodMoralStaffQueueReviewerOptionsResponse404 | goodMoralStaffQueueReviewerOptionsResponse405 | goodMoralStaffQueueReviewerOptionsResponse409 | goodMoralStaffQueueReviewerOptionsResponse413 | goodMoralStaffQueueReviewerOptionsResponse422 | goodMoralStaffQueueReviewerOptionsResponse429 | goodMoralStaffQueueReviewerOptionsResponse500 | goodMoralStaffQueueReviewerOptionsResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type goodMoralStaffQueueReviewerOptionsResponse = (goodMoralStaffQueueReviewerOptionsResponseSuccess | goodMoralStaffQueueReviewerOptionsResponseError)
+
+export const getGoodMoralStaffQueueReviewerOptionsUrl = (referenceCode: string,) => {
+
+
+
+
+  return `/api/v1/good-moral/staff-queue/${referenceCode}/reviewer-options/`
+}
+
+/**
+ * @summary Staff Queue Reviewer Options
+ */
+export const goodMoralStaffQueueReviewerOptions = async (referenceCode: string, options?: Parameters<typeof compassFetch>[1]): Promise<goodMoralStaffQueueReviewerOptionsResponse> => {
+
+  return compassFetch<goodMoralStaffQueueReviewerOptionsResponse>(getGoodMoralStaffQueueReviewerOptionsUrl(referenceCode),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+export type goodMoralStaffQueueReviewerAssignResponse200 = {
+  data: GoodMoralStaffQueueItemSchema
+  status: 200
+}
+
+export type goodMoralStaffQueueReviewerAssignResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type goodMoralStaffQueueReviewerAssignResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type goodMoralStaffQueueReviewerAssignResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type goodMoralStaffQueueReviewerAssignResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type goodMoralStaffQueueReviewerAssignResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type goodMoralStaffQueueReviewerAssignResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type goodMoralStaffQueueReviewerAssignResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type goodMoralStaffQueueReviewerAssignResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type goodMoralStaffQueueReviewerAssignResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type goodMoralStaffQueueReviewerAssignResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type goodMoralStaffQueueReviewerAssignResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type goodMoralStaffQueueReviewerAssignResponseSuccess = (goodMoralStaffQueueReviewerAssignResponse200) & {
+  headers: Record<string, string>;
+};
+export type goodMoralStaffQueueReviewerAssignResponseError = (goodMoralStaffQueueReviewerAssignResponse400 | goodMoralStaffQueueReviewerAssignResponse401 | goodMoralStaffQueueReviewerAssignResponse403 | goodMoralStaffQueueReviewerAssignResponse404 | goodMoralStaffQueueReviewerAssignResponse405 | goodMoralStaffQueueReviewerAssignResponse409 | goodMoralStaffQueueReviewerAssignResponse413 | goodMoralStaffQueueReviewerAssignResponse422 | goodMoralStaffQueueReviewerAssignResponse429 | goodMoralStaffQueueReviewerAssignResponse500 | goodMoralStaffQueueReviewerAssignResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type goodMoralStaffQueueReviewerAssignResponse = (goodMoralStaffQueueReviewerAssignResponseSuccess | goodMoralStaffQueueReviewerAssignResponseError)
+
+export const getGoodMoralStaffQueueReviewerAssignUrl = (referenceCode: string,) => {
+
+
+
+
+  return `/api/v1/good-moral/staff-queue/${referenceCode}/reviewer/`
+}
+
+/**
+ * @summary Staff Queue Reviewer Assign
+ */
+export const goodMoralStaffQueueReviewerAssign = async (referenceCode: string,
+    goodMoralReviewerSelectionSchema: GoodMoralReviewerSelectionSchema, options?: Parameters<typeof compassFetch>[1]): Promise<goodMoralStaffQueueReviewerAssignResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return compassFetch<goodMoralStaffQueueReviewerAssignResponse>(getGoodMoralStaffQueueReviewerAssignUrl(referenceCode),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(goodMoralReviewerSelectionSchema)
   }
 );}
 
