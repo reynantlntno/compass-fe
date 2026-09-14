@@ -12,6 +12,7 @@ import {
   LifeBuoy,
   Mail,
   ScrollText,
+  ShieldCheck,
   Settings2,
   UsersRound,
 } from "lucide-react";
@@ -264,6 +265,15 @@ export const PORTAL_NAVIGATION: readonly PortalNavigationItem[] = [
   },
   {
     kind: "link",
+    id: "privacy-governance",
+    href: "/portal/privacy-governance?section=dpo-appointment",
+    label: "Privacy & Governance",
+    icon: ShieldCheck,
+    keywords: ["privacy", "dpo", "data protection", "governance"],
+    requiredCapability: PORTAL_CAPABILITIES.organizationGovernanceManage,
+  },
+  {
+    kind: "link",
     id: "referrals",
     href: "/portal/referrals?section=referrals",
     label: "Referrals & Call Slips",
@@ -499,6 +509,15 @@ const PORTAL_SEARCH_ADDITIONS: readonly PortalSearchItem[] = [
       PORTAL_CAPABILITIES.appointmentsAvailabilityManage,
       PORTAL_CAPABILITIES.officeClosuresManage,
     ],
+  },
+  {
+    group: "section",
+    href: "/portal/privacy-governance?section=dpo-appointment",
+    id: "privacy-governance-dpo-appointment",
+    keywords: ["privacy", "dpo", "appointment", "data protection"],
+    label: "DPO appointment",
+    parentLabel: "Privacy & Governance",
+    requiredCapability: PORTAL_CAPABILITIES.organizationGovernanceManage,
   },
   {
     group: "section",

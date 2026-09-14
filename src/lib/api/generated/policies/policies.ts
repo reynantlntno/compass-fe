@@ -10,8 +10,14 @@ import type {
   CurrentDPOAppointmentSchema,
   DPOAppointmentCreateSchema,
   DPOAppointmentSchema,
+  DPOAppointmentStaffCreateSchema,
+  DPOAppointmentStaffOptionsSchema,
+  DPOAppointmentStaffPageSchema,
+  DPOAppointmentStaffProjectionSchema,
+  DPOAppointmentStaffRetireSchema,
   GovernanceReasonSchema,
   PoliciesCatalogParams,
+  PoliciesDpoStaffAppointmentsParams,
   PoliciesEffectiveParams,
   PoliciesViewParams,
   PolicyDraftSchema,
@@ -400,6 +406,486 @@ export const policiesDpoAppointmentMe = async ( options?: Parameters<typeof comp
     method: 'GET'
 
 
+  }
+);}
+
+
+export type policiesDpoStaffAppointmentsResponse200 = {
+  data: DPOAppointmentStaffPageSchema
+  status: 200
+}
+
+export type policiesDpoStaffAppointmentsResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type policiesDpoStaffAppointmentsResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type policiesDpoStaffAppointmentsResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type policiesDpoStaffAppointmentsResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type policiesDpoStaffAppointmentsResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type policiesDpoStaffAppointmentsResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type policiesDpoStaffAppointmentsResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type policiesDpoStaffAppointmentsResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type policiesDpoStaffAppointmentsResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type policiesDpoStaffAppointmentsResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type policiesDpoStaffAppointmentsResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type policiesDpoStaffAppointmentsResponseSuccess = (policiesDpoStaffAppointmentsResponse200) & {
+  headers: Record<string, string>;
+};
+export type policiesDpoStaffAppointmentsResponseError = (policiesDpoStaffAppointmentsResponse400 | policiesDpoStaffAppointmentsResponse401 | policiesDpoStaffAppointmentsResponse403 | policiesDpoStaffAppointmentsResponse404 | policiesDpoStaffAppointmentsResponse405 | policiesDpoStaffAppointmentsResponse409 | policiesDpoStaffAppointmentsResponse413 | policiesDpoStaffAppointmentsResponse422 | policiesDpoStaffAppointmentsResponse429 | policiesDpoStaffAppointmentsResponse500 | policiesDpoStaffAppointmentsResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type policiesDpoStaffAppointmentsResponse = (policiesDpoStaffAppointmentsResponseSuccess | policiesDpoStaffAppointmentsResponseError)
+
+export const getPoliciesDpoStaffAppointmentsUrl = (params?: PoliciesDpoStaffAppointmentsParams,) => {
+  const normalizedParams = new URLSearchParams();
+
+  Object.entries(params || {}).forEach(([key, value]) => {
+
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
+    }
+  });
+
+  const stringifiedParams = normalizedParams.toString();
+
+  return stringifiedParams.length > 0 ? `/api/v1/policies/dpo-appointment/staff/?${stringifiedParams}` : `/api/v1/policies/dpo-appointment/staff/`
+}
+
+/**
+ * @summary Dpo Staff Appointments
+ */
+export const policiesDpoStaffAppointments = async (params?: PoliciesDpoStaffAppointmentsParams, options?: Parameters<typeof compassFetch>[1]): Promise<policiesDpoStaffAppointmentsResponse> => {
+
+  return compassFetch<policiesDpoStaffAppointmentsResponse>(getPoliciesDpoStaffAppointmentsUrl(params),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+export type policiesDpoStaffAppointmentCreateResponse200 = {
+  data: DPOAppointmentStaffProjectionSchema
+  status: 200
+}
+
+export type policiesDpoStaffAppointmentCreateResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type policiesDpoStaffAppointmentCreateResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type policiesDpoStaffAppointmentCreateResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type policiesDpoStaffAppointmentCreateResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type policiesDpoStaffAppointmentCreateResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type policiesDpoStaffAppointmentCreateResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type policiesDpoStaffAppointmentCreateResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type policiesDpoStaffAppointmentCreateResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type policiesDpoStaffAppointmentCreateResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type policiesDpoStaffAppointmentCreateResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type policiesDpoStaffAppointmentCreateResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type policiesDpoStaffAppointmentCreateResponseSuccess = (policiesDpoStaffAppointmentCreateResponse200) & {
+  headers: Record<string, string>;
+};
+export type policiesDpoStaffAppointmentCreateResponseError = (policiesDpoStaffAppointmentCreateResponse400 | policiesDpoStaffAppointmentCreateResponse401 | policiesDpoStaffAppointmentCreateResponse403 | policiesDpoStaffAppointmentCreateResponse404 | policiesDpoStaffAppointmentCreateResponse405 | policiesDpoStaffAppointmentCreateResponse409 | policiesDpoStaffAppointmentCreateResponse413 | policiesDpoStaffAppointmentCreateResponse422 | policiesDpoStaffAppointmentCreateResponse429 | policiesDpoStaffAppointmentCreateResponse500 | policiesDpoStaffAppointmentCreateResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type policiesDpoStaffAppointmentCreateResponse = (policiesDpoStaffAppointmentCreateResponseSuccess | policiesDpoStaffAppointmentCreateResponseError)
+
+export const getPoliciesDpoStaffAppointmentCreateUrl = () => {
+
+
+
+
+  return `/api/v1/policies/dpo-appointment/staff/`
+}
+
+/**
+ * @summary Dpo Staff Appointment Create
+ */
+export const policiesDpoStaffAppointmentCreate = async (dPOAppointmentStaffCreateSchema: DPOAppointmentStaffCreateSchema, options?: Parameters<typeof compassFetch>[1]): Promise<policiesDpoStaffAppointmentCreateResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return compassFetch<policiesDpoStaffAppointmentCreateResponse>(getPoliciesDpoStaffAppointmentCreateUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(dPOAppointmentStaffCreateSchema)
+  }
+);}
+
+
+export type policiesDpoStaffAppointmentOptionsResponse200 = {
+  data: DPOAppointmentStaffOptionsSchema
+  status: 200
+}
+
+export type policiesDpoStaffAppointmentOptionsResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type policiesDpoStaffAppointmentOptionsResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type policiesDpoStaffAppointmentOptionsResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type policiesDpoStaffAppointmentOptionsResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type policiesDpoStaffAppointmentOptionsResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type policiesDpoStaffAppointmentOptionsResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type policiesDpoStaffAppointmentOptionsResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type policiesDpoStaffAppointmentOptionsResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type policiesDpoStaffAppointmentOptionsResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type policiesDpoStaffAppointmentOptionsResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type policiesDpoStaffAppointmentOptionsResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type policiesDpoStaffAppointmentOptionsResponseSuccess = (policiesDpoStaffAppointmentOptionsResponse200) & {
+  headers: Record<string, string>;
+};
+export type policiesDpoStaffAppointmentOptionsResponseError = (policiesDpoStaffAppointmentOptionsResponse400 | policiesDpoStaffAppointmentOptionsResponse401 | policiesDpoStaffAppointmentOptionsResponse403 | policiesDpoStaffAppointmentOptionsResponse404 | policiesDpoStaffAppointmentOptionsResponse405 | policiesDpoStaffAppointmentOptionsResponse409 | policiesDpoStaffAppointmentOptionsResponse413 | policiesDpoStaffAppointmentOptionsResponse422 | policiesDpoStaffAppointmentOptionsResponse429 | policiesDpoStaffAppointmentOptionsResponse500 | policiesDpoStaffAppointmentOptionsResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type policiesDpoStaffAppointmentOptionsResponse = (policiesDpoStaffAppointmentOptionsResponseSuccess | policiesDpoStaffAppointmentOptionsResponseError)
+
+export const getPoliciesDpoStaffAppointmentOptionsUrl = () => {
+
+
+
+
+  return `/api/v1/policies/dpo-appointment/staff/options/`
+}
+
+/**
+ * @summary Dpo Staff Appointment Options
+ */
+export const policiesDpoStaffAppointmentOptions = async ( options?: Parameters<typeof compassFetch>[1]): Promise<policiesDpoStaffAppointmentOptionsResponse> => {
+
+  return compassFetch<policiesDpoStaffAppointmentOptionsResponse>(getPoliciesDpoStaffAppointmentOptionsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+export type policiesDpoStaffAppointmentDetailResponse200 = {
+  data: DPOAppointmentStaffProjectionSchema
+  status: 200
+}
+
+export type policiesDpoStaffAppointmentDetailResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type policiesDpoStaffAppointmentDetailResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type policiesDpoStaffAppointmentDetailResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type policiesDpoStaffAppointmentDetailResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type policiesDpoStaffAppointmentDetailResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type policiesDpoStaffAppointmentDetailResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type policiesDpoStaffAppointmentDetailResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type policiesDpoStaffAppointmentDetailResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type policiesDpoStaffAppointmentDetailResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type policiesDpoStaffAppointmentDetailResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type policiesDpoStaffAppointmentDetailResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type policiesDpoStaffAppointmentDetailResponseSuccess = (policiesDpoStaffAppointmentDetailResponse200) & {
+  headers: Record<string, string>;
+};
+export type policiesDpoStaffAppointmentDetailResponseError = (policiesDpoStaffAppointmentDetailResponse400 | policiesDpoStaffAppointmentDetailResponse401 | policiesDpoStaffAppointmentDetailResponse403 | policiesDpoStaffAppointmentDetailResponse404 | policiesDpoStaffAppointmentDetailResponse405 | policiesDpoStaffAppointmentDetailResponse409 | policiesDpoStaffAppointmentDetailResponse413 | policiesDpoStaffAppointmentDetailResponse422 | policiesDpoStaffAppointmentDetailResponse429 | policiesDpoStaffAppointmentDetailResponse500 | policiesDpoStaffAppointmentDetailResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type policiesDpoStaffAppointmentDetailResponse = (policiesDpoStaffAppointmentDetailResponseSuccess | policiesDpoStaffAppointmentDetailResponseError)
+
+export const getPoliciesDpoStaffAppointmentDetailUrl = (referenceCode: string,) => {
+
+
+
+
+  return `/api/v1/policies/dpo-appointment/staff/${referenceCode}/`
+}
+
+/**
+ * @summary Dpo Staff Appointment Detail
+ */
+export const policiesDpoStaffAppointmentDetail = async (referenceCode: string, options?: Parameters<typeof compassFetch>[1]): Promise<policiesDpoStaffAppointmentDetailResponse> => {
+
+  return compassFetch<policiesDpoStaffAppointmentDetailResponse>(getPoliciesDpoStaffAppointmentDetailUrl(referenceCode),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+export type policiesDpoStaffAppointmentRetireResponse200 = {
+  data: DPOAppointmentStaffProjectionSchema
+  status: 200
+}
+
+export type policiesDpoStaffAppointmentRetireResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type policiesDpoStaffAppointmentRetireResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type policiesDpoStaffAppointmentRetireResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type policiesDpoStaffAppointmentRetireResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type policiesDpoStaffAppointmentRetireResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type policiesDpoStaffAppointmentRetireResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type policiesDpoStaffAppointmentRetireResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type policiesDpoStaffAppointmentRetireResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type policiesDpoStaffAppointmentRetireResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type policiesDpoStaffAppointmentRetireResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type policiesDpoStaffAppointmentRetireResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type policiesDpoStaffAppointmentRetireResponseSuccess = (policiesDpoStaffAppointmentRetireResponse200) & {
+  headers: Record<string, string>;
+};
+export type policiesDpoStaffAppointmentRetireResponseError = (policiesDpoStaffAppointmentRetireResponse400 | policiesDpoStaffAppointmentRetireResponse401 | policiesDpoStaffAppointmentRetireResponse403 | policiesDpoStaffAppointmentRetireResponse404 | policiesDpoStaffAppointmentRetireResponse405 | policiesDpoStaffAppointmentRetireResponse409 | policiesDpoStaffAppointmentRetireResponse413 | policiesDpoStaffAppointmentRetireResponse422 | policiesDpoStaffAppointmentRetireResponse429 | policiesDpoStaffAppointmentRetireResponse500 | policiesDpoStaffAppointmentRetireResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type policiesDpoStaffAppointmentRetireResponse = (policiesDpoStaffAppointmentRetireResponseSuccess | policiesDpoStaffAppointmentRetireResponseError)
+
+export const getPoliciesDpoStaffAppointmentRetireUrl = (referenceCode: string,) => {
+
+
+
+
+  return `/api/v1/policies/dpo-appointment/staff/${referenceCode}/retire/`
+}
+
+/**
+ * @summary Dpo Staff Appointment Retire
+ */
+export const policiesDpoStaffAppointmentRetire = async (referenceCode: string,
+    dPOAppointmentStaffRetireSchemaNull?: DPOAppointmentStaffRetireSchema | null, options?: Parameters<typeof compassFetch>[1]): Promise<policiesDpoStaffAppointmentRetireResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return compassFetch<policiesDpoStaffAppointmentRetireResponse>(getPoliciesDpoStaffAppointmentRetireUrl(referenceCode),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(dPOAppointmentStaffRetireSchemaNull)
   }
 );}
 

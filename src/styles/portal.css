@@ -4109,7 +4109,7 @@
     box-shadow: 0 1rem 2.5rem rgba(34, 42, 45, 0.16);
   }
 
-  @media (max-width: 48rem) {
+@media (max-width: 48rem) {
     .portal-settings {
       padding-top: 3rem;
     }
@@ -4238,6 +4238,88 @@
     .portal-settings__badge {
       border-color: CanvasText;
     }
+  }
+}
+
+.portal-privacy-governance__compact-field {
+  display: grid;
+  gap: 0.2rem;
+  color: var(--muted-foreground);
+  font-size: 0.72rem;
+  font-weight: var(--compass-weight-bold);
+}
+
+.portal-privacy-governance__compact-field select {
+  min-height: 2rem;
+  border: 1px solid var(--compass-border);
+  border-radius: 0.35rem;
+  background: var(--compass-surface);
+  color: var(--foreground);
+  font-size: 0.78rem;
+  padding: 0.35rem 0.5rem;
+}
+
+.portal-privacy-governance__compact-field select:focus-visible {
+  outline: 2px solid var(--compass-brand-gold);
+  outline-offset: 2px;
+}
+
+.portal-privacy-governance__detail-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem 1rem;
+  margin: 0;
+  padding: 0.85rem 0.8rem 0.9rem 1rem;
+  border-left: 0.25rem solid var(--compass-brand-gold);
+}
+
+.portal-privacy-governance__detail-grid dt {
+  color: var(--compass-brand-maroon-strong);
+  font-size: 0.64rem;
+  font-weight: var(--compass-weight-bold);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.portal-privacy-governance__detail-grid dd {
+  margin: 0.2rem 0 0;
+  overflow-wrap: anywhere;
+}
+
+.portal-privacy-governance__compact-field + [data-slot="button"] {
+  align-self: end;
+}
+
+.portal-privacy-governance .portal-counseling__table-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.portal-privacy-governance .portal-counseling__muted {
+  display: block;
+  margin-top: 0.2rem;
+  color: var(--muted-foreground);
+  font-size: 0.75rem;
+}
+
+.portal-privacy-governance .portal-counseling__inline-note {
+  margin: 0 0 0.85rem;
+  color: var(--muted-foreground);
+  font-size: 0.82rem;
+}
+
+@media (max-width: 48rem) {
+  .portal-privacy-governance__compact-field {
+    width: 100%;
+  }
+
+  .portal-privacy-governance__detail-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .portal-privacy-governance .portal-counseling__table-actions {
+    justify-content: flex-start;
   }
 }
 
