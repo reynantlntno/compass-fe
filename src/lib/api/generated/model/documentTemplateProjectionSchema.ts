@@ -12,8 +12,8 @@ export interface DocumentTemplateProjectionSchema {
   display_name: string;
   document_kind: string;
   id: string;
-  owner_office_label?: string;
   related_form_family_label?: string;
+  resource_version: string;
   retention_classification: string;
   stable_key: string;
   status: string;

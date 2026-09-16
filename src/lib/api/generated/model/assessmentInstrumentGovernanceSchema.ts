@@ -16,6 +16,7 @@ export interface AssessmentInstrumentGovernanceSchema {
   key: string;
   notes: string;
   official_source_reference: string;
+  resource_version: string;
   title: string;
   updated_at: string;
 }

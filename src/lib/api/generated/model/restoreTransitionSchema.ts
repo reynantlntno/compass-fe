@@ -8,6 +8,6 @@
 
 export interface RestoreTransitionSchema {
   confirmation_phrase?: string;
-  expected_updated_at?: string | null;
+  expected_resource_version?: string | null;
   reason: string;
 }

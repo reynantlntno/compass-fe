@@ -20,6 +20,7 @@ import type {
   RoutineInterviewSensitiveDetailSchema,
   RoutineDocumentGenerateSchema,
 } from "@/lib/api/generated/model";
+import { isOptionalResourceVersion } from "@/lib/api/resource-version";
 import { cookieSessionMutationOptions, cookieSessionReadOptions } from "@/lib/api/auth";
 import { withIdempotencyKey, type IdempotencyKey } from "@/lib/api/idempotency";
 import { CounselingApiError } from "@/lib/api/counseling";
@@ -70,6 +71,7 @@ export type PortalRoutineInterview = {
   locked_at: string | null;
   reopened_at: string | null;
   updated_at: string | null;
+  resource_version: string | null;
 };
 
 export type PortalRoutineInterviewPage = {
@@ -92,6 +94,7 @@ export type PortalRoutineInterviewDetail = {
   finalized_at: string | null;
   locked_at: string | null;
   reopened_at: string | null;
+  resource_version: string | null;
 };
 
 export type PortalRoutineInterviewSensitiveDetail = {
@@ -143,6 +146,7 @@ export type PortalRoutineInterviewSensitiveDetail = {
   career_goals: string | null;
   special_concern: string | null;
   recommendations: string | null;
+  resource_version: string | null;
 };
 
 export type PortalGeneratedRoutineDocument = {
@@ -208,7 +212,7 @@ function isQueueProjection(value: unknown): value is RoutineInterviewQueueProjec
     optionalString(value.nature_of_visit, 80) &&
     optionalTimestamp(value.submitted_at) && optionalTimestamp(value.evaluated_at) && optionalTimestamp(value.completed_at) &&
     optionalTimestamp(value.finalized_at) && optionalTimestamp(value.locked_at) && optionalTimestamp(value.reopened_at) &&
-    optionalTimestamp(value.updated_at)
+    optionalTimestamp(value.updated_at) && isOptionalResourceVersion(value.resource_version)
   );
 }
 
@@ -231,6 +235,7 @@ function parseQueueProjection(value: unknown): PortalRoutineInterview | null {
     locked_at: value.locked_at ?? null,
     reopened_at: value.reopened_at ?? null,
     updated_at: value.updated_at ?? null,
+    resource_version: value.resource_version ?? null,
   };
 }
 
@@ -258,6 +263,7 @@ function isSafeDetail(value: unknown): value is RoutineInterviewProjectionSchema
     isStatus(value.status) && optionalString(value.visit_date, 20) && optionalString(value.visit_time, 20) && optionalInteger(value.duration_minutes) &&
     optionalString(value.nature_of_visit, 80) && optionalTimestamp(value.submitted_at) && optionalTimestamp(value.evaluated_at) &&
     optionalTimestamp(value.completed_at) && optionalTimestamp(value.finalized_at) && optionalTimestamp(value.locked_at) && optionalTimestamp(value.reopened_at)
+    && isOptionalResourceVersion(value.resource_version)
   );
 }
 
@@ -276,6 +282,7 @@ function parseDetail(value: unknown): PortalRoutineInterviewDetail | null {
     finalized_at: value.finalized_at ?? null,
     locked_at: value.locked_at ?? null,
     reopened_at: value.reopened_at ?? null,
+    resource_version: value.resource_version ?? null,
   };
 }
 
@@ -296,6 +303,7 @@ function parseSensitiveDetail(value: unknown): PortalRoutineInterviewSensitiveDe
     "duration_minutes", "rating_emotionally", "rating_academically", "rating_physically", "rating_socially", "rating_spiritually", "rating_financially", "rating_others",
   ] as const;
   if (!optionalString(value.session_reference_code, MAX_REFERENCE_LENGTH) || value.session_reference_code.length === 0) return null;
+  if (!isOptionalResourceVersion(value.resource_version)) return null;
   if (!stringFields.every((field) => optionalString(value[field]))) return null;
   if (!booleanFields.every((field) => optionalBoolean(value[field]))) return null;
   if (!numberFields.every((field) => optionalInteger(value[field]))) return null;
@@ -304,6 +312,7 @@ function parseSensitiveDetail(value: unknown): PortalRoutineInterviewSensitiveDe
   for (const field of stringFields) mutable[field] = (value[field] as string | null | undefined) ?? null;
   for (const field of booleanFields) mutable[field] = (value[field] as boolean | null | undefined) ?? null;
   for (const field of numberFields) mutable[field] = (value[field] as number | null | undefined) ?? null;
+  mutable.resource_version = value.resource_version ?? null;
   return detail;
 }
 
@@ -390,8 +399,8 @@ export function downloadPortalRoutineInterviewDocument(referenceCode: string, si
   return readBlobRequest(counselingRoutineInterviewsDocumentDownload(safeReference(referenceCode), cookieSessionReadOptions(signal)));
 }
 
-export async function generatePortalRoutineInterviewDocument(referenceCode: string, expectedUpdatedAt: string | null, key: IdempotencyKey, signal?: AbortSignal) {
-  const payload: RoutineDocumentGenerateSchema = expectedUpdatedAt ? { expected_updated_at: expectedUpdatedAt } : {};
+export async function generatePortalRoutineInterviewDocument(referenceCode: string, expectedResourceVersion: string | null, key: IdempotencyKey, signal?: AbortSignal) {
+  const payload: RoutineDocumentGenerateSchema = expectedResourceVersion ? { expected_resource_version: expectedResourceVersion } : {};
   const options = withIdempotencyKey(key, await cookieSessionMutationOptions(signal));
   return readRequest(counselingRoutineInterviewsDocumentGenerate(safeReference(referenceCode), payload, options), parseGeneratedDocument);
 }

@@ -7,6 +7,6 @@
  */
 
 export interface ReviewSchema {
-  expected_updated_at?: string | null;
+  expected_resource_version?: string | null;
   notes?: string | null;
 }

@@ -5,31 +5,28 @@ import {
   PublicPrivacyUnavailable,
 } from "@/components/public/public-privacy-page";
 import { ExternalLink } from "@/components/public/external-link";
-import { isExternalUrl } from "@/components/public/public-link";
-import { getPublicBranding } from "@/lib/branding";
+import { getPublicIdentity } from "@/lib/public-identity";
 import { formatPublicDate } from "@/lib/public-date";
 import { getPublicPrivacyNotice } from "@/lib/public-privacy-notice";
 
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const branding = await getPublicBranding();
-  const title = `${branding.productName} Privacy Notice — ${branding.officeName}`;
+  const identity = await getPublicIdentity();
+  const title = `${identity.productName} Privacy Notice — ${identity.officeName}`;
 
   return {
     title,
-    description: `How ${branding.productName} handles personal information for the ${branding.officeName}.`,
+    description: `How ${identity.productName} handles personal information for the ${identity.officeName}.`,
   };
 }
 
 export default async function PrivacyPage() {
-  const [branding, privacy] = await Promise.all([
-    getPublicBranding(),
+  const [identity, privacy] = await Promise.all([
+    getPublicIdentity(),
     getPublicPrivacyNotice(),
   ]);
-  const institutionalPrivacyLink = branding.privacyLinks.find((link) =>
-    isExternalUrl(link.url),
-  );
+  const institutionalPrivacyLink = identity.privacyLinks[0];
   const effectiveDate =
     privacy.state === "ready"
       ? formatPublicDate(privacy.data.effective_at)
@@ -39,9 +36,9 @@ export default async function PrivacyPage() {
     <article className="public-section public-content-page public-content-detail public-privacy-page">
       <div className="public-shell public-reading-width">
         <header className="public-content-detail__header">
-          <h1>{branding.productName} Privacy Notice — {branding.officeName}</h1>
+          <h1>{identity.productName} Privacy Notice — {identity.officeName}</h1>
           <p>
-            How {branding.productName} handles personal information for the {branding.officeName}.
+            How {identity.productName} handles personal information for the {identity.officeName}.
           </p>
           {privacy.state === "ready" ? (
             <p className="public-item__meta public-privacy-page__meta">
@@ -67,7 +64,7 @@ export default async function PrivacyPage() {
             <p className="public-eyebrow">Institutional notice</p>
             <h2 id="institutional-privacy-heading">{institutionalPrivacyLink.label}</h2>
             <p>
-              {branding.productName} operates under {branding.institutionName}. Read the
+              {identity.productName} operates under {identity.institutionName}. Read the
               institutional notice for broader privacy information.
             </p>
             <ExternalLink href={institutionalPrivacyLink.url}>

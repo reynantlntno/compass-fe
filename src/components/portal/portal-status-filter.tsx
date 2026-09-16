@@ -80,6 +80,7 @@ export function PortalStatusFilter<T extends string>({
 
   return (
     <div className="portal-status-filter__control">
+      <span className="portal-status-filter__label" id={`${id}-label`}>{title}</span>
       <Popover modal="trap-focus">
         <PopoverTrigger
           aria-label={ariaLabel}

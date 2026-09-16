@@ -7,5 +7,5 @@
  */
 
 export interface RoutineDocumentGenerateSchema {
-  expected_updated_at?: string;
+  expected_resource_version?: string;
 }

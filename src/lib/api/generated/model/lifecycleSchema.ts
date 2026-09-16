@@ -7,7 +7,7 @@
  */
 
 export interface LifecycleSchema {
+  expected_resource_version?: string | null;
   expected_status?: string | null;
-  expected_updated_at?: string | null;
   reason_code?: string;
 }

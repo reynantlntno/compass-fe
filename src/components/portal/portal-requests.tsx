@@ -289,9 +289,9 @@ function Filters({ filters, options, onSubmit }: { filters: GoodMoralFilters; op
             </div>
           );
         })}
-        <div className="portal-counseling__filter-actions">
-          <Button type="submit">Apply filters</Button>
-        </div>
+      </div>
+      <div className="portal-counseling__filter-actions">
+        <Button type="submit">Apply filters</Button>
       </div>
     </PortalFilterPanel>
   );
@@ -563,7 +563,7 @@ export function PortalGoodMoralPage() {
     if (kind === "assign-reviewer" && !reviewerToken) { setActionError("Choose an eligible reviewer to continue."); return; }
     if (kind === "receipt-encode" && (!receiptNumber.trim() || !receiptDate || !receiptAmount.trim())) { setActionError("Enter the receipt number, date, and amount."); return; }
     if (kind === "approve" && (!signatoryName.trim() || !signatoryTitle.trim())) { setActionError("Enter the approval signatory details."); return; }
-    const payload = JSON.stringify({ kind, reason: actionReason, receiptNumber, receiptDate, receiptAmount, receiptApproved, rejectionCode, signatoryName, signatoryTitle, reviewerToken, ossdStatus });
+    const payload = JSON.stringify({ kind, resourceVersion: item.resource_version, reason: actionReason, receiptNumber, receiptDate, receiptAmount, receiptApproved, rejectionCode, signatoryName, signatoryTitle, reviewerToken, ossdStatus });
     const key = mutationKey(`action:${item.reference_code}:${kind}`, payload);
     setMutation({ state: "pending", message: `${ACTION_LABELS[kind]}…` });
     setActionError(null);

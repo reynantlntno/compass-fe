@@ -9,5 +9,5 @@
 export interface RestoreAuthorizationSchema {
   authorization_reference: string;
   authorization_type: string;
-  expected_updated_at?: string | null;
+  expected_resource_version?: string | null;
 }

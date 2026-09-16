@@ -400,7 +400,7 @@ export function UrgentSupportView({ hasCapability, navItems }: { hasCapability: 
       : action === "grant"
         ? grantPayload
         : action === "review" ? { review_status: reviewStatus } : action === "close" ? { closure_reason_code: closureReason } : { grant_selection_token: grantToken, reason_code: "" };
-    const fingerprint = JSON.stringify({ action, referenceCode: request.reference_code, payload });
+    const fingerprint = JSON.stringify({ action, referenceCode: request.reference_code, resourceVersion: request.resource_version, payload });
     const scope = `urgent-support:${action}:${request.reference_code}:${grantToken ?? ""}`;
     const key = getMutationKey(scope, fingerprint);
     setMutation({ referenceCode: request.reference_code, state: "pending", message: "Saving urgent-support change…" });
@@ -426,7 +426,7 @@ export function UrgentSupportView({ hasCapability, navItems }: { hasCapability: 
     const { request, kind } = linkTarget;
     const payload = { kind, selectedLinkReference, intent: kind === "session" ? linkIntent : null };
     const scope = `urgent-support-link:${kind}:${request.reference_code}`;
-    const key = getMutationKey(scope, JSON.stringify(payload));
+    const key = getMutationKey(scope, JSON.stringify({ ...payload, resourceVersion: request.resource_version }));
     setMutation({ referenceCode: request.reference_code, state: "pending", message: "Linking related record…" });
     try {
       if (kind === "session") await linkPortalUrgentSupportToSession(request.reference_code, selectedLinkReference, linkIntent, key);

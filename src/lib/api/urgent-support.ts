@@ -29,6 +29,7 @@ import type {
 import { cookieSessionMutationOptions, cookieSessionReadOptions } from "@/lib/api/auth";
 import { CounselingApiError } from "@/lib/api/counseling";
 import { withIdempotencyKey, type IdempotencyKey } from "@/lib/api/idempotency";
+import { isOptionalResourceVersion } from "@/lib/api/resource-version";
 
 export const URGENT_SUPPORT_PAGE_SIZE = 20;
 
@@ -95,6 +96,7 @@ export type PortalUrgentSupport = {
   assignment_state: "Assigned to you" | "Assigned" | "Unassigned" | null;
   created_at: string | null;
   updated_at: string | null;
+  resource_version: string | null;
   reviewed_at: string | null;
   closed_at: string | null;
   expires_at: string | null;
@@ -231,6 +233,7 @@ function isQueueProjection(value: unknown): value is UrgentSupportQueueProjectio
     typeof value.documentation_status === "string" && value.documentation_status.length <= MAX_TEXT_LENGTH &&
     isAssignmentState(value.assignment_state) &&
     optionalTimestamp(value.created_at) && optionalTimestamp(value.updated_at) && optionalTimestamp(value.reviewed_at) &&
+    isOptionalResourceVersion(value.resource_version) &&
     optionalTimestamp(value.closed_at) && optionalTimestamp(value.expires_at) &&
     optionalString(value.counseling_case_reference, MAX_REFERENCE_LENGTH);
 }
@@ -249,6 +252,7 @@ function parseQueueProjection(value: unknown): PortalUrgentSupport | null {
     assignment_state: (value.assignment_state as PortalUrgentSupport["assignment_state"]) ?? null,
     created_at: value.created_at as string | null | undefined ?? null,
     updated_at: value.updated_at as string | null | undefined ?? null,
+    resource_version: value.resource_version ?? null,
     reviewed_at: value.reviewed_at as string | null | undefined ?? null,
     closed_at: value.closed_at as string | null | undefined ?? null,
     expires_at: value.expires_at as string | null | undefined ?? null,

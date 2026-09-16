@@ -5,7 +5,10 @@
  * The canonical backend API for COMPASS clients.
  * OpenAPI spec version: 1.0.0
  */
+import type { ContactStatusSchemaResolutionCode } from './contactStatusSchemaResolutionCode';
+import type { ContactStatusSchemaStatus } from './contactStatusSchemaStatus';
 
 export interface ContactStatusSchema {
-  status: string;
+  resolution_code?: ContactStatusSchemaResolutionCode;
+  status: ContactStatusSchemaStatus;
 }

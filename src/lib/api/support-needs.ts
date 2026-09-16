@@ -25,6 +25,7 @@ import {
   cookieSessionReadOptions,
 } from "@/lib/api/auth";
 import { withIdempotencyKey, type IdempotencyKey } from "@/lib/api/idempotency";
+import { isResourceVersion } from "@/lib/api/resource-version";
 
 export const SUPPORT_NEEDS_PAGE_SIZE = 20;
 
@@ -89,6 +90,7 @@ export type PortalSupportNeed = {
   review_due_at: string | null;
   created_at: string;
   updated_at: string;
+  resource_version: string;
   verified_at: string | null;
   reviewed_at: string | null;
   disputed_at: string | null;
@@ -266,6 +268,7 @@ function parseProjection(value: unknown): PortalSupportNeed | null {
     !optionalTimestamp(value.review_due_at) ||
     !requiredTimestamp(value.created_at) ||
     !requiredTimestamp(value.updated_at) ||
+    !isResourceVersion(value.resource_version) ||
     !optionalTimestamp(value.verified_at) ||
     !optionalTimestamp(value.reviewed_at) ||
     !optionalTimestamp(value.disputed_at) ||
@@ -287,6 +290,7 @@ function parseProjection(value: unknown): PortalSupportNeed | null {
     review_due_at: value.review_due_at ?? null,
     created_at: value.created_at,
     updated_at: value.updated_at,
+    resource_version: value.resource_version,
     verified_at: value.verified_at ?? null,
     reviewed_at: value.reviewed_at ?? null,
     disputed_at: value.disputed_at ?? null,

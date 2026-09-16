@@ -18,6 +18,7 @@ export interface InvitationMetadataSchema {
   invitation_batch_id?: string | null;
   linked_student: boolean;
   max_uses: number;
+  resource_version: string;
   selector: string;
   status: string;
   submitted_at?: string | null;

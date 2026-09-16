@@ -23,9 +23,11 @@ export interface ReferralDetailSchema {
   reason_text: string;
   reference_code: string;
   referrer_display_snapshot?: string | null;
+  resource_version?: string | null;
   source_signed_on: string | null;
   source_type: string;
   status: string;
   student_label: string;
+  updated_at?: string | null;
   year_level_snapshot: string;
 }

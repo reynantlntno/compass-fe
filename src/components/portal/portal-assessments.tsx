@@ -542,7 +542,7 @@ export function PortalAssessmentsPage() {
     setReplacementOptions([]);
     setReplacementIndex("");
     if (action === "submit") {
-      const fingerprint = `submit:${item.status}:${item.updated_at ?? ""}`;
+      const fingerprint = `submit:${item.status}:${item.resource_version ?? ""}`;
       let itemKeys = mutationKeys.current.get(item);
       if (!itemKeys) {
         itemKeys = new Map();
@@ -606,7 +606,7 @@ export function PortalAssessmentsPage() {
     event.preventDefault();
     if (!dialogIntent) return;
     const item = dialogIntent.item;
-    let fingerprint = `${dialogIntent.kind}:${item.status}:${item.updated_at ?? ""}`;
+    let fingerprint = `${dialogIntent.kind}:${item.status}:${item.resource_version ?? ""}`;
     if (dialogIntent.kind === "result" || dialogIntent.kind === "save") fingerprint += `:${JSON.stringify(resultFields)}`;
     if (dialogIntent.kind === "review") fingerprint += `:${reviewNotes}`;
     if (dialogIntent.kind === "void" || dialogIntent.kind === "archive") fingerprint += `:${reasonCode}`;
@@ -624,7 +624,7 @@ export function PortalAssessmentsPage() {
     try {
       let updated: PortalAssessment;
       if (dialogIntent.kind === "result" || dialogIntent.kind === "save") {
-        const common = { expected_updated_at: item.updated_at, ...(item.instrument.allows_scores ? { raw_score: resultFields.rawScore || null, scaled_score: resultFields.scaledScore || null, score_label: resultFields.scoreLabel || null } : {}), ...(item.instrument.allows_interpretation ? { interpretation_text: resultFields.interpretation || null, interpretation_visibility: resultFields.visibility } : {}) };
+        const common = { expected_resource_version: item.resource_version, ...(item.instrument.allows_scores ? { raw_score: resultFields.rawScore || null, scaled_score: resultFields.scaledScore || null, score_label: resultFields.scoreLabel || null } : {}), ...(item.instrument.allows_interpretation ? { interpretation_text: resultFields.interpretation || null, interpretation_visibility: resultFields.visibility } : {}) };
         updated = dialogIntent.kind === "result" && item.status === "draft" ? await recordPortalAssessment(item, common, entry.key) : await updatePortalAssessment(item, common, entry.key);
       } else if (dialogIntent.kind === "review") updated = await reviewPortalAssessment(item, reviewNotes, entry.key);
       else if (dialogIntent.kind === "release") updated = await releasePortalAssessment(item, entry.key);

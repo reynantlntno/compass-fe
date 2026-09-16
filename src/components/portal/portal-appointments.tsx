@@ -68,6 +68,7 @@ import {
   type PortalAppointmentPage,
 } from "@/lib/api/appointments";
 import { createIdempotencyKey, type IdempotencyKey } from "@/lib/api/idempotency";
+import { createPortalCallSlipFromAppointment } from "@/lib/api/call-slips";
 
 type ParsedAppointmentFilters = AppointmentListFilters & {
   statuses: AppointmentStatus[];
@@ -90,7 +91,8 @@ type AppointmentAction =
   | "late-cancellation"
   | "no-show"
   | "review"
-  | "schedule";
+  | "schedule"
+  | "prepare-call-slip";
 
 type ActionIntent = {
   action: AppointmentAction;
@@ -547,6 +549,76 @@ function AppointmentDetails({
   );
 }
 
+function PrepareCallSlipDialog({
+  appointment,
+  open,
+  pending,
+  error,
+  onClose,
+  onCreated,
+  onError,
+  onPendingChange,
+}: {
+  appointment: PortalAppointment | null;
+  open: boolean;
+  pending: boolean;
+  error: string | null;
+  onClose: () => void;
+  onCreated: (referenceCode: string) => void;
+  onError: (error: unknown) => void;
+  onPendingChange: (pending: boolean) => void;
+}) {
+  const [destination, setDestination] = useState("GUIDANCE_OFFICE");
+  const [mode, setMode] = useState("ONSITE");
+  const [reportTo, setReportTo] = useState("");
+  const [location, setLocation] = useState("");
+  const [instructions, setInstructions] = useState("");
+  const [remarks, setRemarks] = useState("");
+  const keyRef = useRef<{ fingerprint: string; key: IdempotencyKey } | null>(null);
+
+  useEffect(() => {
+    if (!open) keyRef.current = null;
+  }, [open]);
+
+  const confirm = () => {
+    if (!appointment || pending) return;
+    const fingerprint = JSON.stringify({ appointment: appointment.reference_code, destination, mode, reportTo, location, instructions, remarks });
+    if (!keyRef.current || keyRef.current.fingerprint !== fingerprint) keyRef.current = { fingerprint, key: createIdempotencyKey() };
+    onPendingChange(true);
+    void createPortalCallSlipFromAppointment({
+      appointment_reference: appointment.reference_code,
+      destination_code: destination,
+      mode,
+      report_to_destination: reportTo.trim().slice(0, 255),
+      student_safe_location: location.trim().slice(0, 500),
+      student_safe_instructions: instructions.trim().slice(0, 2_000),
+      office_only_remarks: remarks.trim().slice(0, 2_000),
+    }, keyRef.current.key).then((reference) => {
+      keyRef.current = null;
+      onCreated(reference);
+    }).catch(onError).finally(() => onPendingChange(false));
+  };
+
+  return (
+    <AlertDialog onOpenChange={(value) => { if (!value && !pending) onClose(); }} open={open}>
+      <AlertDialogContent className="portal-appointments__dialog" size="sm">
+        <AlertDialogHeader>
+          <AlertDialogTitle>Prepare call slip</AlertDialogTitle>
+          <AlertDialogDescription>Create a Call Slip from the authorized scheduled appointment.</AlertDialogDescription>
+        </AlertDialogHeader>
+        <div className="portal-appointments__dialog-field"><Label htmlFor="portal-appointment-call-slip-destination">Destination</Label><select id="portal-appointment-call-slip-destination" onChange={(event) => setDestination(event.target.value)} value={destination}><option value="GUIDANCE_OFFICE">Guidance office</option><option value="ASSIGNED_COUNSELOR">Assigned counselor</option><option value="APPROVED_OFFICE_LOCATION">Approved office location</option><option value="AUTHENTICATED_ONLINE_ARRANGEMENT">Authenticated online arrangement</option></select></div>
+        <div className="portal-appointments__dialog-field"><Label htmlFor="portal-appointment-call-slip-mode">Mode</Label><select id="portal-appointment-call-slip-mode" onChange={(event) => setMode(event.target.value)} value={mode}><option value="ONSITE">On-site</option><option value="ONLINE">Online</option></select></div>
+        <div className="portal-appointments__dialog-field"><Label htmlFor="portal-appointment-call-slip-report">Report to</Label><Input id="portal-appointment-call-slip-report" maxLength={255} onChange={(event) => setReportTo(event.target.value)} value={reportTo} /></div>
+        <div className="portal-appointments__dialog-field"><Label htmlFor="portal-appointment-call-slip-location">Student-safe location</Label><Input id="portal-appointment-call-slip-location" maxLength={500} onChange={(event) => setLocation(event.target.value)} value={location} /></div>
+        <div className="portal-appointments__dialog-field"><Label htmlFor="portal-appointment-call-slip-instructions">Student-safe instructions</Label><Input id="portal-appointment-call-slip-instructions" maxLength={2_000} onChange={(event) => setInstructions(event.target.value)} value={instructions} /></div>
+        <div className="portal-appointments__dialog-field"><Label htmlFor="portal-appointment-call-slip-remarks">Office remarks</Label><Input id="portal-appointment-call-slip-remarks" maxLength={2_000} onChange={(event) => setRemarks(event.target.value)} value={remarks} /></div>
+        {error ? <p className="portal-appointments__dialog-error" role="alert">{error}</p> : null}
+        <AlertDialogFooter><AlertDialogCancel disabled={pending} onClick={onClose}>Cancel</AlertDialogCancel><AlertDialogAction disabled={pending} onClick={confirm}>{pending ? "Saving…" : "Prepare call slip"}</AlertDialogAction></AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
+}
+
 function AppointmentActions({
   appointment,
   hasCapability,
@@ -559,7 +631,8 @@ function AppointmentActions({
   const actions: AppointmentAction[] = ["review", "late-cancellation", "schedule", "cancel", "complete", "no-show"].filter(
     (action): action is AppointmentAction => canAction(action as AppointmentAction, appointment, hasCapability),
   );
-  if (!actions.length) return null;
+  const canPrepareCallSlip = appointment.status === "SCHEDULED" && hasCapability(PORTAL_CAPABILITIES.callSlipsQueueView);
+  if (!actions.length && !canPrepareCallSlip) return null;
   return (
     <div className="portal-appointments__row-actions" aria-label={`Actions for ${appointment.reference_code}`}>
       {actions.map((action) => (
@@ -567,6 +640,7 @@ function AppointmentActions({
           {actionLabel(action)}
         </Button>
       ))}
+      {canPrepareCallSlip ? <Button onClick={() => onAction("prepare-call-slip", appointment)} size="xs" type="button" variant="ghost">Prepare call slip</Button> : null}
     </div>
   );
 }
@@ -700,6 +774,9 @@ export function PortalAppointmentsPage() {
   const [scheduleEnd, setScheduleEnd] = useState("");
   const [actionError, setActionError] = useState<string | null>(null);
   const [mutation, setMutation] = useState<MutationState | null>(null);
+  const [prepareAppointment, setPrepareAppointment] = useState<PortalAppointment | null>(null);
+  const [preparePending, setPreparePending] = useState(false);
+  const [prepareError, setPrepareError] = useState<string | null>(null);
   const mutationKeysRef = useRef<Map<string, MutationKeyEntry>>(new Map());
   const canQueue = accessStatus === "ready" && hasCapability(PORTAL_CAPABILITIES.appointmentsQueueView);
   const queryKey = `${rawQuery}:${reloadKey}:${canQueue}`;
@@ -745,6 +822,11 @@ export function PortalAppointmentsPage() {
   }, [canQueue, filters, pageNumber, queryKey]);
 
   const openAction = (action: AppointmentAction, appointment: PortalAppointment) => {
+    if (action === "prepare-call-slip") {
+      setPrepareAppointment(appointment);
+      setPrepareError(null);
+      return;
+    }
     setActionIntent({ action, appointment });
     setActionReason("");
     setActionError(null);
@@ -784,7 +866,7 @@ export function PortalAppointmentsPage() {
       setActionError("Add a date and start and end times before scheduling.");
       return;
     }
-    const fingerprint = JSON.stringify({ action, referenceCode: appointment.reference_code, reason, reviewDecision, scheduleDate, scheduleStart, scheduleEnd });
+    const fingerprint = JSON.stringify({ action, referenceCode: appointment.reference_code, resourceVersion: appointment.resource_version, reason, reviewDecision, scheduleDate, scheduleStart, scheduleEnd });
     const scope = `appointment:${action}:${appointment.reference_code}`;
     const key = getMutationKey(scope, fingerprint);
     setMutation({ referenceCode: appointment.reference_code, message: "Saving appointment change…", state: "pending" });
@@ -830,7 +912,7 @@ export function PortalAppointmentsPage() {
   };
 
   const openSession = async (appointment: PortalAppointment) => {
-    const fingerprint = JSON.stringify({ appointment: appointment.reference_code, action: "open-session" });
+    const fingerprint = JSON.stringify({ appointment: appointment.reference_code, resourceVersion: appointment.resource_version, action: "open-session" });
     const scope = `appointment:open-session:${appointment.reference_code}`;
     const key = getMutationKey(scope, fingerprint);
     setMutation({ referenceCode: appointment.reference_code, message: "Opening counseling session…", state: "pending" });
@@ -917,6 +999,21 @@ export function PortalAppointmentsPage() {
         ) : <EmptyState />}
         <AppointmentsPagination filters={filters} page={page} />
       </PortalCollectionFrame>
+
+      <PrepareCallSlipDialog
+        appointment={prepareAppointment}
+        error={prepareError}
+        onClose={() => { if (!preparePending) { setPrepareAppointment(null); setPrepareError(null); } }}
+        onCreated={(referenceCode) => {
+          setPrepareAppointment(null);
+          setPrepareError(null);
+          setMutation({ referenceCode, message: "Call slip prepared.", state: "success" });
+        }}
+        onError={() => setPrepareError("This call slip could not be prepared. Refresh and try again.")}
+        onPendingChange={setPreparePending}
+        open={prepareAppointment !== null}
+        pending={preparePending}
+      />
 
       <AlertDialog onOpenChange={closeAction} open={actionIntent !== null}>
         <AlertDialogContent size="sm" className="portal-appointments__dialog">

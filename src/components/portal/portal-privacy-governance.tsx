@@ -175,9 +175,16 @@ export function PortalPrivacyGovernanceLoading() {
   return (
     <section aria-busy="true" aria-labelledby="portal-privacy-governance-loading-heading" className="portal-counseling portal-privacy-governance" role="status">
       <DpoHeader headingId="portal-privacy-governance-loading-heading" />
-      <PortalCollectionFrame className="portal-counseling__frame">
-        <Skeleton as="span" /><Skeleton as="span" /><Skeleton as="span" />
-      </PortalCollectionFrame>
+      <div className="portal-counseling__workspace">
+        <div aria-hidden="true" className="compass-surface portal-workspace-nav portal-counseling__nav-skeleton" data-tone="subtle">
+          <Skeleton className="portal-counseling__nav-skeleton-line" />
+        </div>
+        <div className="portal-counseling__active-content">
+          <PortalCollectionFrame className="portal-counseling__frame">
+            <Skeleton as="span" /><Skeleton as="span" /><Skeleton as="span" />
+          </PortalCollectionFrame>
+        </div>
+      </div>
     </section>
   );
 }
@@ -360,29 +367,33 @@ export function PortalPrivacyGovernancePage() {
   return (
     <section aria-labelledby="portal-privacy-governance-heading" className="portal-counseling portal-privacy-governance">
       <DpoHeader />
-      <PortalWorkspaceNav activeValue="dpo-appointment" ariaLabel="Privacy and Governance sections" items={NAV_ITEMS} />
-      {loadState.kind === "loading" ? <PortalCollectionFrame className="portal-counseling__frame"><div className="portal-counseling__table-skeleton">{Array.from({ length: 4 }, (_, row) => <div className="portal-counseling__table-skeleton-row" key={row}>{Array.from({ length: 6 }, (_, cell) => <Skeleton as="span" key={cell} />)}</div>)}</div></PortalCollectionFrame> : null}
-      {loadState.kind === "forbidden" ? <StateFrame description="Return to your workspace to continue." title="DPO appointment information isn’t available for this account." /> : null}
-      {loadState.kind === "unavailable" ? <StateFrame description="Try again when the connection is ready." retry={() => setReloadKey((value) => value + 1)} title="DPO appointments are temporarily unavailable." /> : null}
-      {loadState.kind === "ready" ? (
-        <PortalCollectionFrame aria-labelledby="portal-dpo-appointments-heading" className="portal-counseling__frame">
-          <div className="portal-counseling__frame-heading">
-            <div><p className="portal-counseling__kicker">Privacy & Governance</p><h2 id="portal-dpo-appointments-heading">DPO appointments</h2></div>
-            <div className="portal-counseling__frame-actions">
-              <label className="portal-privacy-governance__compact-field"><span>Status</span><select aria-label="Filter DPO appointments by status" onChange={(event) => updateQuery({ status: event.target.value || null, page: "1" })} value={statusFilter?.join(",") ?? ""}><option value="">All history</option>{DPO_APPOINTMENT_STATUSES.map((value) => <option key={value} value={value}>{STATUS_LABELS[value]}</option>)}</select></label>
-              <label className="portal-privacy-governance__compact-field"><span>Order</span><select aria-label="Order DPO appointments" onChange={(event) => updateQuery({ order: event.target.value === "recent" ? null : event.target.value, page: "1" })} value={order}>{DPO_APPOINTMENT_ORDERS.map((value) => <option key={value} value={value}>{ORDER_LABELS[value]}</option>)}</select></label>
-              <Button disabled={Boolean(activeAppointment)} onClick={() => setCreateOpen(true)} size="sm" type="button">Appoint DPO</Button>
-            </div>
-          </div>
-          {activeAppointment ? <p className="portal-counseling__inline-note">An active DPO appointment already exists. Retire it before appointing a replacement.</p> : null}
-          {loadState.page.items.length === 0 ? <div className="portal-counseling__empty"><h3>No DPO appointments found.</h3><p>Historical and current appointments will appear here after they are governed.</p></div> : (
-            <div className="portal-counseling__table-wrap">
-              <table className="portal-counseling__table"><caption className="sr-only">Current and historical DPO appointments</caption><thead><tr><th scope="col">Holder</th><th scope="col">Status</th><th scope="col">Validity</th><th scope="col">Appointment reference</th><th scope="col">Updated</th><th scope="col">Details</th></tr></thead><tbody>{loadState.page.items.map((appointment) => <AppointmentRow appointment={appointment} detail={details[appointment.reference_code]} expanded={expanded === appointment.reference_code} key={appointment.reference_code} onRetire={setRetireTarget} onToggle={toggleDetails} />)}</tbody></table>
-            </div>
-          )}
-          {loadState.page.total > DPO_APPOINTMENT_PAGE_SIZE ? <div className="portal-counseling__pagination"><Button disabled={loadState.page.page <= 1} onClick={() => updateQuery({ page: String(loadState.page.page - 1) })} type="button" variant="outline">Previous</Button><span>Page {loadState.page.page}</span><Button disabled={loadState.page.page * loadState.page.page_size >= loadState.page.total} onClick={() => updateQuery({ page: String(loadState.page.page + 1) })} type="button" variant="outline">Next</Button></div> : null}
-        </PortalCollectionFrame>
-      ) : null}
+      <div className="portal-counseling__workspace">
+        <PortalWorkspaceNav activeValue="dpo-appointment" ariaLabel="Privacy and Governance sections" items={NAV_ITEMS} />
+        <div className="portal-counseling__active-content">
+          {loadState.kind === "loading" ? <PortalCollectionFrame className="portal-counseling__frame"><div className="portal-counseling__table-skeleton">{Array.from({ length: 4 }, (_, row) => <div className="portal-counseling__table-skeleton-row" key={row}>{Array.from({ length: 6 }, (_, cell) => <Skeleton as="span" key={cell} />)}</div>)}</div></PortalCollectionFrame> : null}
+          {loadState.kind === "forbidden" ? <StateFrame description="Return to your workspace to continue." title="DPO appointment information isn’t available for this account." /> : null}
+          {loadState.kind === "unavailable" ? <StateFrame description="Try again when the connection is ready." retry={() => setReloadKey((value) => value + 1)} title="DPO appointments are temporarily unavailable." /> : null}
+          {loadState.kind === "ready" ? (
+            <PortalCollectionFrame aria-labelledby="portal-dpo-appointments-heading" className="portal-counseling__frame">
+              <div className="portal-counseling__frame-heading">
+                <div><p className="portal-counseling__kicker">Privacy & Governance</p><h2 id="portal-dpo-appointments-heading">DPO appointments</h2></div>
+                <div className="portal-counseling__frame-actions">
+                  <label className="portal-privacy-governance__compact-field"><span>Status</span><select aria-label="Filter DPO appointments by status" onChange={(event) => updateQuery({ status: event.target.value || null, page: "1" })} value={statusFilter?.join(",") ?? ""}><option value="">All history</option>{DPO_APPOINTMENT_STATUSES.map((value) => <option key={value} value={value}>{STATUS_LABELS[value]}</option>)}</select></label>
+                  <label className="portal-privacy-governance__compact-field"><span>Order</span><select aria-label="Order DPO appointments" onChange={(event) => updateQuery({ order: event.target.value === "recent" ? null : event.target.value, page: "1" })} value={order}>{DPO_APPOINTMENT_ORDERS.map((value) => <option key={value} value={value}>{ORDER_LABELS[value]}</option>)}</select></label>
+                  <Button disabled={Boolean(activeAppointment)} onClick={() => setCreateOpen(true)} size="sm" type="button">Appoint DPO</Button>
+                </div>
+              </div>
+              {activeAppointment ? <p className="portal-counseling__inline-note">An active DPO appointment already exists. Retire it before appointing a replacement.</p> : null}
+              {loadState.page.items.length === 0 ? <div className="portal-counseling__empty"><h3>No DPO appointments found.</h3><p>Historical and current appointments will appear here after they are governed.</p></div> : (
+                <div className="portal-counseling__table-wrap">
+                  <table className="portal-counseling__table"><caption className="sr-only">Current and historical DPO appointments</caption><thead><tr><th scope="col">Holder</th><th scope="col">Status</th><th scope="col">Validity</th><th scope="col">Appointment reference</th><th scope="col">Updated</th><th scope="col">Details</th></tr></thead><tbody>{loadState.page.items.map((appointment) => <AppointmentRow appointment={appointment} detail={details[appointment.reference_code]} expanded={expanded === appointment.reference_code} key={appointment.reference_code} onRetire={setRetireTarget} onToggle={toggleDetails} />)}</tbody></table>
+                </div>
+              )}
+              {loadState.page.total > DPO_APPOINTMENT_PAGE_SIZE ? <div className="portal-counseling__pagination"><Button disabled={loadState.page.page <= 1} onClick={() => updateQuery({ page: String(loadState.page.page - 1) })} type="button" variant="outline">Previous</Button><span>Page {loadState.page.page}</span><Button disabled={loadState.page.page * loadState.page.page_size >= loadState.page.total} onClick={() => updateQuery({ page: String(loadState.page.page + 1) })} type="button" variant="outline">Next</Button></div> : null}
+            </PortalCollectionFrame>
+          ) : null}
+        </div>
+      </div>
 
       <AlertDialog open={createOpen} onOpenChange={(open) => { if (!open) closeCreate(); }}>
         <AlertDialogContent className="portal-counseling__dialog">

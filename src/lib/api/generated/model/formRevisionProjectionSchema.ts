@@ -5,27 +5,24 @@
  * The canonical backend API for COMPASS clients.
  * OpenAPI spec version: 1.0.0
  */
-import type { FormRevisionActivationPreflightSchema } from './formRevisionActivationPreflightSchema';
+import type { FormRevisionPublicationPreflightSchema } from './formRevisionPublicationPreflightSchema';
 
 export interface FormRevisionProjectionSchema {
-  activated_at?: string | null;
-  activation_preflight?: FormRevisionActivationPreflightSchema | null;
-  approved_at?: string | null;
+  archived_at?: string | null;
   display_title: string;
   effective_from?: string | null;
   effective_until?: string | null;
   form_family_id: string;
   form_family_key: string;
   id: string;
-  institution_profile_id?: string | null;
   internal_schema_version: string;
   internal_template_version: string;
   is_used: boolean;
-  office_profile_id?: string | null;
   official_form_code: string;
   official_revision: string;
-  retired_at?: string | null;
+  publication_preflight?: FormRevisionPublicationPreflightSchema | null;
+  published_at?: string | null;
+  resource_version: string;
   source_label: string;
   status: string;
-  submitted_at?: string | null;
 }

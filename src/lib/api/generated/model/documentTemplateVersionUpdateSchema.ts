@@ -7,7 +7,7 @@
  */
 
 export interface DocumentTemplateVersionUpdateSchema {
-  expected_updated_at?: string | null;
+  expected_resource_version?: string | null;
   output_format?: string;
   page_orientation?: string;
   page_size?: string;

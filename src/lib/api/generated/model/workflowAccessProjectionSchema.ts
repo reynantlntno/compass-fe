@@ -15,6 +15,7 @@ export interface WorkflowAccessProjectionSchema {
   grant_reference: string;
   grantee_display_name: string;
   grantee_role: string;
+  resource_version: string;
   revoked_at?: string | null;
   scope_label: string;
   scope_mode: string;

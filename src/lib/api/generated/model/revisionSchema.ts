@@ -11,12 +11,10 @@ export interface RevisionSchema {
   display_title: string;
   effective_from?: string | null;
   effective_until?: string | null;
-  expected_updated_at?: string | null;
+  expected_resource_version?: string | null;
   form_family_id: number;
-  institution_profile_id?: number | null;
   internal_schema_version: string;
   internal_template_version: string;
-  office_profile_id?: number | null;
   official_form_code: string;
   official_revision: string;
   printable_template_path?: string;

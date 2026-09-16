@@ -7,7 +7,7 @@ import {
   contentPublicResources,
 } from "@/lib/api/generated/content/content";
 import type {
-  ContentPageResultSchema,
+  ContentListResultSchema,
   PublicContentSchema,
 } from "@/lib/api/generated/model";
 
@@ -59,7 +59,7 @@ export function parsePublicPage(value: string | string[] | undefined) {
   return Number.isSafeInteger(page) && page > 0 ? page : 1;
 }
 
-function isPageResult(value: unknown): value is ContentPageResultSchema {
+function isPageResult(value: unknown): value is ContentListResultSchema {
   if (!value || typeof value !== "object") return false;
 
   const candidate = value as Record<string, unknown>;

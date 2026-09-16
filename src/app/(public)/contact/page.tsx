@@ -1,21 +1,21 @@
 import type { Metadata } from "next";
 
 import { PublicContactContent } from "@/components/public/public-contact-page";
-import { getPublicBranding } from "@/lib/branding";
+import { getPublicIdentity } from "@/lib/public-identity";
 
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const branding = await getPublicBranding();
+  const identity = await getPublicIdentity();
 
   return {
-    title: `Contact ${branding.officeName} | ${branding.institutionName}`,
-    description: `Send a message to ${branding.officeName}.`,
+    title: `Contact ${identity.officeName} | ${identity.institutionName}`,
+    description: `Send a message to ${identity.officeName}.`,
   };
 }
 
 export default async function ContactPage() {
-  const branding = await getPublicBranding();
+  const identity = await getPublicIdentity();
 
   return (
     <article
@@ -23,7 +23,7 @@ export default async function ContactPage() {
       className="public-section public-content-page public-contact-page"
     >
       <div className="public-shell public-reading-width">
-        <PublicContactContent branding={branding} />
+        <PublicContactContent identity={identity} />
       </div>
     </article>
   );

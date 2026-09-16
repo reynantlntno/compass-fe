@@ -26,6 +26,7 @@ export interface CallSlipDetailSchema {
   reference_code: string;
   referral_reference?: string | null;
   report_to_destination?: string | null;
+  resource_version?: string | null;
   safe_destination?: string | null;
   scheduled_end_at: string | null;
   scheduled_start_at: string | null;

@@ -12,7 +12,7 @@ export interface RowCorrectionSchema {
   control_number?: string | null;
   department?: string | null;
   email?: string | null;
-  expected_updated_at?: string | null;
+  expected_resource_version?: string | null;
   first_name?: string | null;
   last_name?: string | null;
   lifecycle_status?: string | null;

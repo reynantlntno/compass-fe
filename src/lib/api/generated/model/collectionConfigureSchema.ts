@@ -12,7 +12,7 @@ export interface CollectionConfigureSchema {
   default_token_expiry_days?: number | null;
   description?: string | null;
   end_at?: string | null;
-  expected_updated_at?: string | null;
+  expected_resource_version?: string | null;
   form_family_id?: number | null;
   form_revision_id?: number | null;
   identity_verification_policy?: string | null;

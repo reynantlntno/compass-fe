@@ -10,7 +10,7 @@ export interface TermSchema {
   academic_year: string;
   configuration_identifier: string;
   end_date: string;
-  expected_updated_at?: string | null;
+  expected_resource_version?: string | null;
   semester: string;
   source_note?: string;
   source_reference?: string;

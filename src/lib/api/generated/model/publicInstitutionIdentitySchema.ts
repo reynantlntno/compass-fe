@@ -10,5 +10,9 @@ export interface PublicInstitutionIdentitySchema {
   address?: string | null;
   campus?: string | null;
   display_name?: string | null;
+  facebook_url?: string | null;
   former_name?: string | null;
+  institutional_email?: string | null;
+  official_website?: string | null;
+  short_name?: string | null;
 }

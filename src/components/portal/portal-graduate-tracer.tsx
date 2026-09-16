@@ -454,14 +454,14 @@ export function PortalGraduateTracerSection({ filters, hasCapability, pageNumber
       return;
     }
     const scope = `graduate-tracer-${item.reference_code}`;
-    const fingerprint = `${action}:${reason}:${item.updated_at ?? ""}`;
+    const fingerprint = `${action}:${reason}:${item.resource_version ?? ""}`;
     const key = getMutationKey(scope, fingerprint);
     setMutation({ scope, state: "pending", message: "Saving change…" });
     setActionError(null);
     try {
-      if (action === "reopen") await reopenPortalGraduateTracer(item.reference_code, reason, item.updated_at, key);
-      else if (action === "void") await voidPortalGraduateTracer(item.reference_code, reason, item.updated_at, key);
-      else await archivePortalGraduateTracer(item.reference_code, item.updated_at, key);
+      if (action === "reopen") await reopenPortalGraduateTracer(item.reference_code, reason, item.resource_version, key);
+      else if (action === "void") await voidPortalGraduateTracer(item.reference_code, reason, item.resource_version, key);
+      else await archivePortalGraduateTracer(item.reference_code, item.resource_version, key);
       clearMutationKey(scope);
       setMutation({ scope, state: "success", message: "Change saved." });
       setActionIntent(null);
@@ -484,8 +484,8 @@ export function PortalGraduateTracerSection({ filters, hasCapability, pageNumber
       } else if (action === "download") {
         downloadPortalBlob(await downloadPortalGraduateTracerDocument(item.reference_code), `graduate-tracer-${item.reference_code}.pdf`);
       } else {
-        const key = getMutationKey(scope, `generate:${item.updated_at ?? ""}`);
-        await generatePortalGraduateTracerDocument(item.reference_code, item.updated_at, key);
+        const key = getMutationKey(scope, `generate:${item.resource_version ?? ""}`);
+        await generatePortalGraduateTracerDocument(item.reference_code, item.resource_version, key);
         clearMutationKey(scope);
         setReloadKey((value) => value + 1);
       }

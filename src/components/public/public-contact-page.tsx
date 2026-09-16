@@ -5,7 +5,7 @@ import { PublicContactForm } from "@/components/public/public-contact-form";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
-import type { BrandingConfig } from "@/lib/branding";
+import type { PublicIdentityConfig } from "@/lib/public-identity";
 
 function phoneHref(value: string | null) {
   if (!value) return null;
@@ -14,36 +14,36 @@ function phoneHref(value: string | null) {
   return normalized ? `tel:${normalized}` : null;
 }
 
-function officeLocation(branding: BrandingConfig) {
-  return branding.officeLocation || branding.address;
+function officeLocation(identity: PublicIdentityConfig) {
+  return identity.officeLocation || identity.address;
 }
 
-function hasOfficeDetails(branding: BrandingConfig) {
+function hasOfficeDetails(identity: PublicIdentityConfig) {
   return Boolean(
-    branding.campus ||
-      officeLocation(branding) ||
-      branding.officeHours ||
-      branding.email ||
-      branding.phone,
+    identity.campus ||
+      officeLocation(identity) ||
+      identity.officeHours ||
+      identity.email ||
+      identity.phone,
   );
 }
 
-function OfficeDetails({ branding }: { branding: BrandingConfig }) {
-  const location = officeLocation(branding);
-  const phone = phoneHref(branding.phone);
+function OfficeDetails({ identity }: { identity: PublicIdentityConfig }) {
+  const location = officeLocation(identity);
+  const phone = phoneHref(identity.phone);
 
-  if (!hasOfficeDetails(branding)) return null;
+  if (!hasOfficeDetails(identity)) return null;
 
   return (
     <aside aria-labelledby="contact-office-details-heading" className="public-contact-page__office">
       <p className="public-eyebrow">Office details</p>
       <h2 id="contact-office-details-heading">Where to find the office</h2>
       <p className="public-contact-page__office-name">
-        {branding.officeName}
+        {identity.officeName}
         <br />
         <span>
-          {branding.institutionName}
-          {branding.campus ? ` · ${branding.campus}` : ""}
+          {identity.institutionName}
+          {identity.campus ? ` · ${identity.campus}` : ""}
         </span>
       </p>
 
@@ -57,34 +57,34 @@ function OfficeDetails({ branding }: { branding: BrandingConfig }) {
             <dd>{location}</dd>
           </div>
         ) : null}
-        {branding.officeHours ? (
+        {identity.officeHours ? (
           <div>
             <dt>
               <Clock3 aria-hidden="true" />
               Office hours
             </dt>
-            <dd>{branding.officeHours}</dd>
+            <dd>{identity.officeHours}</dd>
           </div>
         ) : null}
-        {branding.email ? (
+        {identity.email ? (
           <div>
             <dt>
               <Mail aria-hidden="true" />
               Email
             </dt>
             <dd>
-              <a href={`mailto:${branding.email}`}>{branding.email}</a>
+              <a href={`mailto:${identity.email}`}>{identity.email}</a>
             </dd>
           </div>
         ) : null}
-        {branding.phone && phone ? (
+        {identity.phone && phone ? (
           <div>
             <dt>
               <Phone aria-hidden="true" />
               Phone
             </dt>
             <dd>
-              <a href={phone}>{branding.phone}</a>
+              <a href={phone}>{identity.phone}</a>
             </dd>
           </div>
         ) : null}
@@ -93,13 +93,13 @@ function OfficeDetails({ branding }: { branding: BrandingConfig }) {
   );
 }
 
-export function PublicContactContent({ branding }: { branding: BrandingConfig }) {
+export function PublicContactContent({ identity }: { identity: PublicIdentityConfig }) {
   return (
     <div className="public-contact-page__layout">
       <div className="public-contact-page__main">
         <header className="public-content-detail__header public-contact-page__header">
           <p className="public-eyebrow">Contact the office</p>
-          <h1 id="contact-heading">Send a message to {branding.officeName}.</h1>
+          <h1 id="contact-heading">Send a message to {identity.officeName}.</h1>
           <p>
             Use this form for a question, suggestion, feedback, or concern. Share only what the
             office needs to understand your message.
@@ -108,7 +108,7 @@ export function PublicContactContent({ branding }: { branding: BrandingConfig })
         <PublicContactForm />
       </div>
 
-      <OfficeDetails branding={branding} />
+      <OfficeDetails identity={identity} />
     </div>
   );
 }

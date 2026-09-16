@@ -1,22 +1,30 @@
 import {
   referralsActionRequired,
+  referralsAction,
   referralsAssign,
   referralsCancel,
   referralsClose,
   referralsCounselorOptions,
   referralsCreate,
   referralsDetail,
+  referralsDocumentDownload,
+  referralsDocumentGenerate,
+  referralsDocumentPreview,
   referralsEscalate,
   referralsQueueList,
   referralsReassign,
   referralsReceive,
   referralsReopen,
   referralsReview,
+  referralsReassignmentCurrent,
+  referralsReassignmentReferenceDecision,
   referralsSubmit,
 } from "@/lib/api/generated/referrals/referrals";
 import { profilesStaffStudents } from "@/lib/api/generated/profiles/profiles";
 import type {
   ReferralAssignmentSchema,
+  ReferralActionSchema,
+  ReferralDecisionSchema,
   ReferralDraftSchema,
   ReferralStaffQueueItemSchema,
   ReferralSubmitSchema,
@@ -28,6 +36,8 @@ import {
   cookieSessionReadOptions,
 } from "@/lib/api/auth";
 import { withIdempotencyKey, type IdempotencyKey } from "@/lib/api/idempotency";
+import type { PortalGeneratedDocumentMetadata } from "@/lib/api/forms";
+import { isOptionalResourceVersion, isResourceVersion } from "@/lib/api/resource-version";
 
 export const REFERRALS_PAGE_SIZE = 20;
 
@@ -91,6 +101,7 @@ export type ReferralStaffQueueItem = {
   received_at: string | null;
   created_at: string;
   updated_at: string;
+  resource_version: string;
   has_active_call_slip: boolean;
   active_call_slip_reference: string | null;
   can_prepare_call_slip: boolean;
@@ -101,6 +112,22 @@ export type PortalReferralLinkedCallSlip = {
   reference_code: string;
   status_code: string;
   status_label: string;
+  resource_version: string;
+};
+
+export type PortalReferralAction = {
+  action_code: string;
+  outcome_code: string;
+  remarks: string;
+  performed_at: string;
+};
+
+export type PortalReferralReassignment = {
+  reference_code: string;
+  status: string;
+  request_reason_code: string;
+  has_proposed_counselor: boolean;
+  created_at: string;
 };
 
 export type PortalReferralDetail = {
@@ -111,6 +138,8 @@ export type PortalReferralDetail = {
   reason_category: string;
   assignment_state: string;
   updated_at: string | null;
+  resource_version: string | null;
+  actions: PortalReferralAction[];
   linked_call_slips: PortalReferralLinkedCallSlip[];
 };
 
@@ -202,6 +231,7 @@ function isReferralProjection(value: unknown): value is ReferralStaffQueueItemSc
     optionalTimestamp(value.received_at) &&
     requiredTimestamp(value.created_at) &&
     requiredTimestamp(value.updated_at) &&
+    isResourceVersion(value.resource_version) &&
     typeof value.has_active_call_slip === "boolean" &&
     typeof value.can_prepare_call_slip === "boolean" &&
     typeof value.is_terminal === "boolean" &&
@@ -227,6 +257,7 @@ function parseReferralItem(value: unknown): ReferralStaffQueueItem | null {
     received_at: value.received_at ?? null,
     created_at: value.created_at,
     updated_at: value.updated_at,
+    resource_version: value.resource_version,
     has_active_call_slip: value.has_active_call_slip,
     active_call_slip_reference: value.active_call_slip_reference ?? null,
     can_prepare_call_slip: value.can_prepare_call_slip,
@@ -378,8 +409,29 @@ function parseReferralDetail(value: unknown): PortalReferralDetail | null {
     !boundedString(value.reason_category, 40) || !CATEGORY_SET.has(value.reason_category) ||
     !boundedString(value.assignment_state, 40) || !ASSIGNMENT_STATE_SET.has(value.assignment_state) ||
     !optionalTimestamp(value.updated_at) ||
-    !Array.isArray(value.linked_call_slips)
+    !isOptionalResourceVersion(value.resource_version) ||
+    !Array.isArray(value.linked_call_slips) ||
+    !Array.isArray(value.actions)
   ) return null;
+
+  const actions = value.actions
+    .map((entry): PortalReferralAction | null => {
+      if (!isRecord(entry)) return null;
+      if (
+        !boundedString(entry.action_code, 80) ||
+        !boundedString(entry.outcome_code, 80, true) ||
+        !boundedString(entry.remarks, 2_000, true) ||
+        !requiredTimestamp(entry.performed_at)
+      ) return null;
+      return {
+        action_code: entry.action_code,
+        outcome_code: entry.outcome_code,
+        remarks: entry.remarks,
+        performed_at: entry.performed_at,
+      };
+    })
+    .filter((entry): entry is PortalReferralAction => entry !== null)
+    .slice(0, 50);
 
   const linkedCallSlips = value.linked_call_slips
     .map((entry): PortalReferralLinkedCallSlip | null => {
@@ -387,12 +439,14 @@ function parseReferralDetail(value: unknown): PortalReferralDetail | null {
       if (
         !boundedString(entry.reference_code, MAX_REFERENCE_LENGTH) ||
         !boundedString(entry.status_code, 40) ||
-        !boundedString(entry.status_label, 80)
+        !boundedString(entry.status_label, 80) ||
+        !isResourceVersion(entry.resource_version)
       ) return null;
       return {
         reference_code: entry.reference_code,
         status_code: entry.status_code,
         status_label: entry.status_label,
+        resource_version: entry.resource_version,
       };
     })
     .filter((entry): entry is PortalReferralLinkedCallSlip => entry !== null)
@@ -406,6 +460,8 @@ function parseReferralDetail(value: unknown): PortalReferralDetail | null {
     reason_category: value.reason_category,
     assignment_state: value.assignment_state,
     updated_at: value.updated_at ?? null,
+    resource_version: value.resource_version ?? null,
+    actions,
     linked_call_slips: linkedCallSlips,
   };
 }
@@ -524,6 +580,98 @@ export function reassignPortalReferral(
 ) {
   const payload = { counselor_selection_token: selectionToken, reason_code: reasonCode.trim().slice(0, 50) } as unknown as ReferralAssignmentSchema;
   return runMutation((options) => referralsReassign(safeReference(referenceCode), payload, options), key, signal);
+}
+
+function readDocumentMetadata(value: unknown): PortalGeneratedDocumentMetadata | null {
+  if (!isRecord(value)) return null;
+  if (
+    !boundedString(value.content_type, 120) ||
+    !boundedString(value.document_status, 60) ||
+    !optionalTimestamp(value.generated_at) ||
+    !boundedString(value.output_format, 30) ||
+    !boundedString(value.reference_code, MAX_REFERENCE_LENGTH) ||
+    !optionalTimestamp(value.released_at) ||
+    !boundedString(value.template_key, 120) ||
+    !boundedString(value.template_version, 60)
+  ) return null;
+  return {
+    content_type: value.content_type,
+    document_status: value.document_status,
+    generated_at: value.generated_at ?? null,
+    output_format: value.output_format,
+    reference_code: value.reference_code,
+    released_at: value.released_at ?? null,
+    template_key: value.template_key,
+    template_version: value.template_version,
+  };
+}
+
+async function readBlobRequest(request: Promise<GeneratedResponse>) {
+  try {
+    const response = await request;
+    if (response.status === 200 && typeof Blob !== "undefined" && response.data instanceof Blob) return response.data;
+    throw new ReferralsApiError(errorKind(response.status));
+  } catch (error) {
+    if (isAbortError(error)) throw error;
+    if (error instanceof ReferralsApiError) throw error;
+    throw new ReferralsApiError("unavailable");
+  }
+}
+
+export function previewPortalReferralDocument(referenceCode: string, signal?: AbortSignal) {
+  return readBlobRequest(referralsDocumentPreview(safeReference(referenceCode), cookieSessionReadOptions(signal)));
+}
+
+export function downloadPortalReferralDocument(referenceCode: string, signal?: AbortSignal) {
+  return readBlobRequest(referralsDocumentDownload(safeReference(referenceCode), cookieSessionReadOptions(signal)));
+}
+
+export async function generatePortalReferralDocument(referenceCode: string, expectedResourceVersion: string | null, key: IdempotencyKey, signal?: AbortSignal) {
+  try {
+    const response = await referralsDocumentGenerate(
+      safeReference(referenceCode),
+      { expected_resource_version: expectedResourceVersion ?? "" },
+      withIdempotencyKey(key, await cookieSessionMutationOptions(signal)),
+    );
+    if (response.status === 200) {
+      const value = readDocumentMetadata(response.data);
+      if (value) return value;
+    }
+    throw new ReferralsApiError(errorKind(response.status));
+  } catch (error) {
+    if (isAbortError(error)) throw error;
+    if (error instanceof ReferralsApiError) throw error;
+    throw new ReferralsApiError("unavailable");
+  }
+}
+
+export async function addPortalReferralAction(referenceCode: string, payload: ReferralActionSchema, key: IdempotencyKey, signal?: AbortSignal) {
+  return runMutation((options) => referralsAction(safeReference(referenceCode), payload, options), key, signal);
+}
+
+export function getPortalReferralReassignment(referenceCode: string, signal?: AbortSignal) {
+  return readRequest(
+    referralsReassignmentCurrent(safeReference(referenceCode), cookieSessionReadOptions(signal)),
+    (value): PortalReferralReassignment | null => {
+      if (!isRecord(value) || !boundedString(value.reference_code, MAX_REFERENCE_LENGTH) || !boundedString(value.status, 40) ||
+        !boundedString(value.request_reason_code, 80) || typeof value.has_proposed_counselor !== "boolean" || !requiredTimestamp(value.created_at)) return null;
+      return {
+        reference_code: value.reference_code,
+        status: value.status,
+        request_reason_code: value.request_reason_code,
+        has_proposed_counselor: value.has_proposed_counselor,
+        created_at: value.created_at,
+      };
+    },
+  );
+}
+
+export function decidePortalReferralReassignment(referenceCode: string, payload: ReferralDecisionSchema, key: IdempotencyKey, signal?: AbortSignal) {
+  return runMutation(
+    (options) => referralsReassignmentReferenceDecision(safeReference(referenceCode), payload, options),
+    key,
+    signal,
+  );
 }
 
 export function rememberReferralOptions(item: ReferralStaffQueueItem, referenceCode: string) {

@@ -10,7 +10,7 @@ export interface AssessmentInstrumentGovernanceUpdateSchema {
   allows_interpretation?: boolean;
   allows_scores?: boolean;
   category: string;
-  expected_updated_at?: string | null;
+  expected_resource_version?: string | null;
   has_official_scoring_guide?: boolean;
   notes?: string;
   official_source_reference?: string;

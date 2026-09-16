@@ -3,13 +3,13 @@ import type { ReactNode } from "react";
 
 import { AuthBrand } from "@/components/auth/auth-brand";
 import { AuthCard } from "@/components/auth/auth-card";
-import type { BrandingConfig } from "@/lib/branding";
+import type { PublicIdentityConfig } from "@/lib/public-identity";
 
 export function AuthShell({
-  branding,
+  identity,
   children,
 }: {
-  branding: BrandingConfig;
+  identity: PublicIdentityConfig;
   children: ReactNode;
 }) {
   return (
@@ -19,22 +19,22 @@ export function AuthShell({
       </a>
       <main className="auth-shell">
         <Link className="auth-back-link" href="/">
-          Back to {branding.productName}
+          Back to {identity.productName}
         </Link>
 
         <section
-          aria-label={`${branding.productName} account access`}
+          aria-label={`${identity.productName} account access`}
           className="auth-card-stack"
         >
           <AuthCard as="header" variant="identity">
-            <AuthBrand branding={branding} />
+            <AuthBrand identity={identity} />
           </AuthCard>
           <AuthCard as="section" id="auth-panel-content" variant="content">
             {children}
           </AuthCard>
           <AuthCard as="footer" variant="notice">
             <p>
-              {branding.productName} handles account information as described in the{" "}
+              {identity.productName} handles account information as described in the{" "}
               <Link href="/privacy">COMPASS Privacy Notice</Link>.
             </p>
           </AuthCard>

@@ -12,13 +12,13 @@ import { PortalShell } from "@/components/portal/portal-shell";
 import { PageLoader } from "@/components/feedback/page-loader";
 import { Button } from "@/components/ui/button";
 import { useAuthSession } from "@/components/auth/auth-session-provider";
-import type { BrandingConfig } from "@/lib/branding";
+import type { PublicIdentityConfig } from "@/lib/public-identity";
 
 export function PortalGate({
-  branding,
+  identity,
   children,
 }: {
-  branding: BrandingConfig;
+  identity: PublicIdentityConfig;
   children: ReactNode;
 }) {
   const router = useRouter();
@@ -40,13 +40,13 @@ export function PortalGate({
   }, [router, signOut]);
 
   if (status === "unknown") {
-    return <PageLoader label={`Checking your ${branding.productName} session…`} />;
+    return <PageLoader label={`Checking your ${identity.productName} session…`} />;
   }
 
   if (status === "unauthenticated") {
     return (
       <main className="portal-gate portal-gate--redirect" role="status" aria-live="polite">
-        Taking you to {branding.productName} sign in…
+        Taking you to {identity.productName} sign in…
       </main>
     );
   }
@@ -55,11 +55,11 @@ export function PortalGate({
     return (
       <main className="portal-gate" aria-labelledby="portal-unavailable-heading">
         <section
-          aria-label={`${branding.productName} session access`}
+          aria-label={`${identity.productName} session access`}
           className="portal-gate__stack"
         >
           <AuthCard as="header" variant="identity">
-            <AuthBrand branding={branding} />
+            <AuthBrand identity={identity} />
           </AuthCard>
           <AuthCard as="section" className="portal-gate__state" variant="state">
             <h1 id="portal-unavailable-heading">We couldn’t check your session.</h1>
@@ -68,12 +68,12 @@ export function PortalGate({
               Try again
             </Button>
             <Link className="portal-gate__back-link" href="/">
-              Back to {branding.productName}
+              Back to {identity.productName}
             </Link>
           </AuthCard>
           <AuthCard as="footer" variant="notice">
             <p>
-              {branding.productName} handles account information as described in the{" "}
+              {identity.productName} handles account information as described in the{" "}
               <Link href="/privacy">COMPASS Privacy Notice</Link>.
             </p>
           </AuthCard>
@@ -86,7 +86,7 @@ export function PortalGate({
     <PortalAccessProvider>
       <PortalNotificationsProvider>
         <PortalShell
-          branding={branding}
+          identity={identity}
           isSigningOut={isSigningOut}
           onSignOut={handleSignOut}
         >

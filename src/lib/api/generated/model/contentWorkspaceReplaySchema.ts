@@ -11,9 +11,7 @@
  */
 export interface ContentWorkspaceReplaySchema {
   content_type: string;
-  guide_key?: string | null;
   id: string;
-  page_key?: string | null;
   slug?: string | null;
   status: string;
   title: string;

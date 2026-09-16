@@ -20,7 +20,9 @@ export interface GraduateTracerResponseSchema {
   lifecycle_snapshot: string;
   program_snapshot: string;
   reference_code: string;
+  resource_version?: string | null;
   status: string;
   student_id?: string | null;
   submitted_at?: string | null;
+  updated_at?: string | null;
 }

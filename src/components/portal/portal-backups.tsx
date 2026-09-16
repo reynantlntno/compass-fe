@@ -1301,7 +1301,7 @@ function BackupsWorkspace() {
     const action = jobAction;
     if (!action) return;
     const scope = `backup-job:${action.kind}:${action.job.id}`;
-    const fingerprint = JSON.stringify({ expectedUpdatedAt: action.job.resource_version });
+    const fingerprint = JSON.stringify({ expectedResourceVersion: action.job.resource_version });
     const key = getMutationKey(scope, fingerprint);
     setJobMutation("pending");
     setJobMutationMessage(null);
@@ -1364,7 +1364,7 @@ function BackupsWorkspace() {
       authorizationType,
       cancelPhrase,
       cancelReason: reason,
-      expectedUpdatedAt: action.restore.updated_at,
+      expectedResourceVersion: action.restore.resource_version,
     });
     const key = getMutationKey(scope, fingerprint);
     setRestoreMutation("pending");
@@ -1374,17 +1374,17 @@ function BackupsWorkspace() {
         const payload: RestoreAuthorizationSchema = {
           authorization_reference: reference,
           authorization_type: authorizationType,
-          expected_updated_at: action.restore.updated_at ?? null,
+          expected_resource_version: action.restore.resource_version ?? null,
         };
         await authorizeBackupRestore(action.restore.id, payload, key);
       }
       if (action.kind === "dry-run") {
-        await dryRunBackupRestore(action.restore.id, { expected_updated_at: action.restore.updated_at ?? null }, key);
+        await dryRunBackupRestore(action.restore.id, { expected_resource_version: action.restore.resource_version ?? null }, key);
       }
       if (action.kind === "cancel") {
         const payload: RestoreTransitionSchema = {
           confirmation_phrase: cancelPhrase,
-          expected_updated_at: action.restore.updated_at ?? null,
+          expected_resource_version: action.restore.resource_version ?? null,
           reason,
         };
         await cancelBackupRestore(action.restore.id, payload, key);

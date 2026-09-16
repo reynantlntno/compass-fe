@@ -14,6 +14,7 @@ export interface InventorySnapshotSchema {
   academic_year: string;
   answers?: InventorySnapshotSchemaAnswers;
   reopened_at?: string | null;
+  resource_version?: string | null;
   schema_key?: string | null;
   schema_version: string;
   snapshot_id: string;

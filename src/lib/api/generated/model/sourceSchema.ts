@@ -7,7 +7,7 @@
  */
 
 export interface SourceSchema {
-  expected_updated_at?: string | null;
+  expected_resource_version?: string | null;
   source_label?: string;
   upload_receipt_id: string;
 }

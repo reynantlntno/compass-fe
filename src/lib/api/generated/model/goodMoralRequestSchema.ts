@@ -33,6 +33,7 @@ export interface GoodMoralRequestSchema {
   reference_code: string;
   released_at?: string | null;
   request_type: string;
+  resource_version: string;
   status: string;
   updated_at: string;
 }

@@ -10,11 +10,9 @@ import type {
   AcademicTermProjectionSchema,
   AcademicTermRolloverPreviewSchema,
   ApiErrorSchema,
-  BrandAssetPageSchema,
-  BrandAssetProjectionSchema,
-  DocumentTemplateActivationPreflightSchema,
   DocumentTemplatePageSchema,
   DocumentTemplateProjectionSchema,
+  DocumentTemplatePublicationPreflightSchema,
   DocumentTemplateSchema,
   DocumentTemplateVersionPageSchema,
   DocumentTemplateVersionProjectionSchema,
@@ -22,42 +20,23 @@ import type {
   FamilySchema,
   FormFamilyPageSchema,
   FormFamilyProjectionSchema,
-  FormRevisionActivationPreflightSchema,
   FormRevisionPageSchema,
   FormRevisionProjectionSchema,
-  InstitutionProfilePageSchema,
-  InstitutionProfileProjectionSchema,
-  InstitutionSchema,
+  FormRevisionPublicationPreflightSchema,
+  InstitutionalIdentityProjectionSchema,
+  InstitutionalIdentityUpdateSchema,
   LifecycleSchema,
-  OfficeProfilePageSchema,
-  OfficeProfileProjectionSchema,
-  OfficeSchema,
-  OrganizationsAcademicTermRolloverPreviewParams,
   OrganizationsAcademicTermsListParams,
-  OrganizationsBrandAssetCreateBody,
-  OrganizationsBrandAssetUpdateBody,
-  OrganizationsBrandAssetsListParams,
   OrganizationsDocumentTemplateVersionsListParams,
   OrganizationsDocumentTemplatesListParams,
   OrganizationsFormFamiliesListParams,
   OrganizationsFormRevisionSourceUploadBody,
   OrganizationsFormRevisionsListParams,
-  OrganizationsInstitutionProfilesListParams,
-  OrganizationsOfficesListParams,
-  OrganizationsPublicBrandingAssetContentParams,
-  OrganizationsPublicLinksListParams,
   PublicAcademicTermSchema,
-  PublicBrandAssetDeliverySchema,
-  PublicBrandingSchema,
   PublicDocumentTemplatesSchema,
   PublicFormRevisionSchema,
   PublicIdentitySchema,
-  PublicLinkPageSchema,
-  PublicLinkProjectionSchema,
-  PublicLinkSchema,
-  PublicLinksSchema,
   RevisionSchema,
-  RollbackSchema,
   SourceSchema,
   TermSchema
 } from '../model';
@@ -452,105 +431,6 @@ return compassFetch<organizationsAcademicTermActivateResponse>(getOrganizationsA
 );}
 
 
-export type organizationsAcademicTermApproveResponse200 = {
-  data: AcademicTermProjectionSchema
-  status: 200
-}
-
-export type organizationsAcademicTermApproveResponse400 = {
-  data: ApiErrorSchema
-  status: 400
-}
-
-export type organizationsAcademicTermApproveResponse401 = {
-  data: ApiErrorSchema
-  status: 401
-}
-
-export type organizationsAcademicTermApproveResponse403 = {
-  data: ApiErrorSchema
-  status: 403
-}
-
-export type organizationsAcademicTermApproveResponse404 = {
-  data: ApiErrorSchema
-  status: 404
-}
-
-export type organizationsAcademicTermApproveResponse405 = {
-  data: ApiErrorSchema
-  status: 405
-}
-
-export type organizationsAcademicTermApproveResponse409 = {
-  data: ApiErrorSchema
-  status: 409
-}
-
-export type organizationsAcademicTermApproveResponse413 = {
-  data: ApiErrorSchema
-  status: 413
-}
-
-export type organizationsAcademicTermApproveResponse422 = {
-  data: ApiErrorSchema
-  status: 422
-}
-
-export type organizationsAcademicTermApproveResponse429 = {
-  data: ApiErrorSchema
-  status: 429
-}
-
-export type organizationsAcademicTermApproveResponse500 = {
-  data: ApiErrorSchema
-  status: 500
-}
-
-export type organizationsAcademicTermApproveResponse503 = {
-  data: ApiErrorSchema
-  status: 503
-}
-
-export type organizationsAcademicTermApproveResponseSuccess = (organizationsAcademicTermApproveResponse200) & {
-  headers: Record<string, string>;
-};
-export type organizationsAcademicTermApproveResponseError = (organizationsAcademicTermApproveResponse400 | organizationsAcademicTermApproveResponse401 | organizationsAcademicTermApproveResponse403 | organizationsAcademicTermApproveResponse404 | organizationsAcademicTermApproveResponse405 | organizationsAcademicTermApproveResponse409 | organizationsAcademicTermApproveResponse413 | organizationsAcademicTermApproveResponse422 | organizationsAcademicTermApproveResponse429 | organizationsAcademicTermApproveResponse500 | organizationsAcademicTermApproveResponse503) & {
-  headers: Record<string, string>;
-};
-
-export type organizationsAcademicTermApproveResponse = (organizationsAcademicTermApproveResponseSuccess | organizationsAcademicTermApproveResponseError)
-
-export const getOrganizationsAcademicTermApproveUrl = (termId: number,) => {
-
-
-
-
-  return `/api/v1/organizations/governance/academic-terms/${termId}/approve/`
-}
-
-/**
- * @summary Academic Term Approve
- */
-export const organizationsAcademicTermApprove = async (termId: number,
-    lifecycleSchema: LifecycleSchema, options?: Parameters<typeof compassFetch>[1]): Promise<organizationsAcademicTermApproveResponse> => {
-
-    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Array.isArray(h)) return Object.fromEntries(h);
-    return h;
-  };
-return compassFetch<organizationsAcademicTermApproveResponse>(getOrganizationsAcademicTermApproveUrl(termId),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(lifecycleSchema)
-  }
-);}
-
-
 export type organizationsAcademicTermArchiveResponse200 = {
   data: AcademicTermProjectionSchema
   status: 200
@@ -749,105 +629,6 @@ return compassFetch<organizationsAcademicTermCloseResponse>(getOrganizationsAcad
 );}
 
 
-export type organizationsAcademicTermRollbackResponse200 = {
-  data: AcademicTermProjectionSchema
-  status: 200
-}
-
-export type organizationsAcademicTermRollbackResponse400 = {
-  data: ApiErrorSchema
-  status: 400
-}
-
-export type organizationsAcademicTermRollbackResponse401 = {
-  data: ApiErrorSchema
-  status: 401
-}
-
-export type organizationsAcademicTermRollbackResponse403 = {
-  data: ApiErrorSchema
-  status: 403
-}
-
-export type organizationsAcademicTermRollbackResponse404 = {
-  data: ApiErrorSchema
-  status: 404
-}
-
-export type organizationsAcademicTermRollbackResponse405 = {
-  data: ApiErrorSchema
-  status: 405
-}
-
-export type organizationsAcademicTermRollbackResponse409 = {
-  data: ApiErrorSchema
-  status: 409
-}
-
-export type organizationsAcademicTermRollbackResponse413 = {
-  data: ApiErrorSchema
-  status: 413
-}
-
-export type organizationsAcademicTermRollbackResponse422 = {
-  data: ApiErrorSchema
-  status: 422
-}
-
-export type organizationsAcademicTermRollbackResponse429 = {
-  data: ApiErrorSchema
-  status: 429
-}
-
-export type organizationsAcademicTermRollbackResponse500 = {
-  data: ApiErrorSchema
-  status: 500
-}
-
-export type organizationsAcademicTermRollbackResponse503 = {
-  data: ApiErrorSchema
-  status: 503
-}
-
-export type organizationsAcademicTermRollbackResponseSuccess = (organizationsAcademicTermRollbackResponse200) & {
-  headers: Record<string, string>;
-};
-export type organizationsAcademicTermRollbackResponseError = (organizationsAcademicTermRollbackResponse400 | organizationsAcademicTermRollbackResponse401 | organizationsAcademicTermRollbackResponse403 | organizationsAcademicTermRollbackResponse404 | organizationsAcademicTermRollbackResponse405 | organizationsAcademicTermRollbackResponse409 | organizationsAcademicTermRollbackResponse413 | organizationsAcademicTermRollbackResponse422 | organizationsAcademicTermRollbackResponse429 | organizationsAcademicTermRollbackResponse500 | organizationsAcademicTermRollbackResponse503) & {
-  headers: Record<string, string>;
-};
-
-export type organizationsAcademicTermRollbackResponse = (organizationsAcademicTermRollbackResponseSuccess | organizationsAcademicTermRollbackResponseError)
-
-export const getOrganizationsAcademicTermRollbackUrl = (termId: number,) => {
-
-
-
-
-  return `/api/v1/organizations/governance/academic-terms/${termId}/rollback/`
-}
-
-/**
- * @summary Academic Term Rollback
- */
-export const organizationsAcademicTermRollback = async (termId: number,
-    rollbackSchema: RollbackSchema, options?: Parameters<typeof compassFetch>[1]): Promise<organizationsAcademicTermRollbackResponse> => {
-
-    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Array.isArray(h)) return Object.fromEntries(h);
-    return h;
-  };
-return compassFetch<organizationsAcademicTermRollbackResponse>(getOrganizationsAcademicTermRollbackUrl(termId),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(rollbackSchema)
-  }
-);}
-
-
 export type organizationsAcademicTermRolloverPreviewResponse200 = {
   data: AcademicTermRolloverPreviewSchema
   status: 200
@@ -917,133 +698,25 @@ export type organizationsAcademicTermRolloverPreviewResponseError = (organizatio
 
 export type organizationsAcademicTermRolloverPreviewResponse = (organizationsAcademicTermRolloverPreviewResponseSuccess | organizationsAcademicTermRolloverPreviewResponseError)
 
-export const getOrganizationsAcademicTermRolloverPreviewUrl = (termId: number,
-    params?: OrganizationsAcademicTermRolloverPreviewParams,) => {
-  const normalizedParams = new URLSearchParams();
+export const getOrganizationsAcademicTermRolloverPreviewUrl = (termId: number,) => {
 
-  Object.entries(params || {}).forEach(([key, value]) => {
 
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : String(value))
-    }
-  });
 
-  const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0 ? `/api/v1/organizations/governance/academic-terms/${termId}/rollover-preview/?${stringifiedParams}` : `/api/v1/organizations/governance/academic-terms/${termId}/rollover-preview/`
+  return `/api/v1/organizations/governance/academic-terms/${termId}/rollover-preview/`
 }
 
 /**
  * @summary Academic Term Rollover Preview
  */
-export const organizationsAcademicTermRolloverPreview = async (termId: number,
-    params?: OrganizationsAcademicTermRolloverPreviewParams, options?: Parameters<typeof compassFetch>[1]): Promise<organizationsAcademicTermRolloverPreviewResponse> => {
+export const organizationsAcademicTermRolloverPreview = async (termId: number, options?: Parameters<typeof compassFetch>[1]): Promise<organizationsAcademicTermRolloverPreviewResponse> => {
 
-  return compassFetch<organizationsAcademicTermRolloverPreviewResponse>(getOrganizationsAcademicTermRolloverPreviewUrl(termId,params),
+  return compassFetch<organizationsAcademicTermRolloverPreviewResponse>(getOrganizationsAcademicTermRolloverPreviewUrl(termId),
   {
     ...options,
     method: 'GET'
 
 
-  }
-);}
-
-
-export type organizationsAcademicTermSubmitResponse200 = {
-  data: AcademicTermProjectionSchema
-  status: 200
-}
-
-export type organizationsAcademicTermSubmitResponse400 = {
-  data: ApiErrorSchema
-  status: 400
-}
-
-export type organizationsAcademicTermSubmitResponse401 = {
-  data: ApiErrorSchema
-  status: 401
-}
-
-export type organizationsAcademicTermSubmitResponse403 = {
-  data: ApiErrorSchema
-  status: 403
-}
-
-export type organizationsAcademicTermSubmitResponse404 = {
-  data: ApiErrorSchema
-  status: 404
-}
-
-export type organizationsAcademicTermSubmitResponse405 = {
-  data: ApiErrorSchema
-  status: 405
-}
-
-export type organizationsAcademicTermSubmitResponse409 = {
-  data: ApiErrorSchema
-  status: 409
-}
-
-export type organizationsAcademicTermSubmitResponse413 = {
-  data: ApiErrorSchema
-  status: 413
-}
-
-export type organizationsAcademicTermSubmitResponse422 = {
-  data: ApiErrorSchema
-  status: 422
-}
-
-export type organizationsAcademicTermSubmitResponse429 = {
-  data: ApiErrorSchema
-  status: 429
-}
-
-export type organizationsAcademicTermSubmitResponse500 = {
-  data: ApiErrorSchema
-  status: 500
-}
-
-export type organizationsAcademicTermSubmitResponse503 = {
-  data: ApiErrorSchema
-  status: 503
-}
-
-export type organizationsAcademicTermSubmitResponseSuccess = (organizationsAcademicTermSubmitResponse200) & {
-  headers: Record<string, string>;
-};
-export type organizationsAcademicTermSubmitResponseError = (organizationsAcademicTermSubmitResponse400 | organizationsAcademicTermSubmitResponse401 | organizationsAcademicTermSubmitResponse403 | organizationsAcademicTermSubmitResponse404 | organizationsAcademicTermSubmitResponse405 | organizationsAcademicTermSubmitResponse409 | organizationsAcademicTermSubmitResponse413 | organizationsAcademicTermSubmitResponse422 | organizationsAcademicTermSubmitResponse429 | organizationsAcademicTermSubmitResponse500 | organizationsAcademicTermSubmitResponse503) & {
-  headers: Record<string, string>;
-};
-
-export type organizationsAcademicTermSubmitResponse = (organizationsAcademicTermSubmitResponseSuccess | organizationsAcademicTermSubmitResponseError)
-
-export const getOrganizationsAcademicTermSubmitUrl = (termId: number,) => {
-
-
-
-
-  return `/api/v1/organizations/governance/academic-terms/${termId}/submit/`
-}
-
-/**
- * @summary Academic Term Submit
- */
-export const organizationsAcademicTermSubmit = async (termId: number,
-    lifecycleSchema: LifecycleSchema, options?: Parameters<typeof compassFetch>[1]): Promise<organizationsAcademicTermSubmitResponse> => {
-
-    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Array.isArray(h)) return Object.fromEntries(h);
-    return h;
-  };
-return compassFetch<organizationsAcademicTermSubmitResponse>(getOrganizationsAcademicTermSubmitUrl(termId),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(lifecycleSchema)
   }
 );}
 
@@ -1147,861 +820,6 @@ return compassFetch<organizationsAcademicTermUpdateResponse>(getOrganizationsAca
 );}
 
 
-export type organizationsBrandAssetsListResponse200 = {
-  data: BrandAssetPageSchema
-  status: 200
-}
-
-export type organizationsBrandAssetsListResponse400 = {
-  data: ApiErrorSchema
-  status: 400
-}
-
-export type organizationsBrandAssetsListResponse401 = {
-  data: ApiErrorSchema
-  status: 401
-}
-
-export type organizationsBrandAssetsListResponse403 = {
-  data: ApiErrorSchema
-  status: 403
-}
-
-export type organizationsBrandAssetsListResponse404 = {
-  data: ApiErrorSchema
-  status: 404
-}
-
-export type organizationsBrandAssetsListResponse405 = {
-  data: ApiErrorSchema
-  status: 405
-}
-
-export type organizationsBrandAssetsListResponse409 = {
-  data: ApiErrorSchema
-  status: 409
-}
-
-export type organizationsBrandAssetsListResponse413 = {
-  data: ApiErrorSchema
-  status: 413
-}
-
-export type organizationsBrandAssetsListResponse422 = {
-  data: ApiErrorSchema
-  status: 422
-}
-
-export type organizationsBrandAssetsListResponse429 = {
-  data: ApiErrorSchema
-  status: 429
-}
-
-export type organizationsBrandAssetsListResponse500 = {
-  data: ApiErrorSchema
-  status: 500
-}
-
-export type organizationsBrandAssetsListResponse503 = {
-  data: ApiErrorSchema
-  status: 503
-}
-
-export type organizationsBrandAssetsListResponseSuccess = (organizationsBrandAssetsListResponse200) & {
-  headers: Record<string, string>;
-};
-export type organizationsBrandAssetsListResponseError = (organizationsBrandAssetsListResponse400 | organizationsBrandAssetsListResponse401 | organizationsBrandAssetsListResponse403 | organizationsBrandAssetsListResponse404 | organizationsBrandAssetsListResponse405 | organizationsBrandAssetsListResponse409 | organizationsBrandAssetsListResponse413 | organizationsBrandAssetsListResponse422 | organizationsBrandAssetsListResponse429 | organizationsBrandAssetsListResponse500 | organizationsBrandAssetsListResponse503) & {
-  headers: Record<string, string>;
-};
-
-export type organizationsBrandAssetsListResponse = (organizationsBrandAssetsListResponseSuccess | organizationsBrandAssetsListResponseError)
-
-export const getOrganizationsBrandAssetsListUrl = (params?: OrganizationsBrandAssetsListParams,) => {
-  const normalizedParams = new URLSearchParams();
-
-  Object.entries(params || {}).forEach(([key, value]) => {
-
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : String(value))
-    }
-  });
-
-  const stringifiedParams = normalizedParams.toString();
-
-  return stringifiedParams.length > 0 ? `/api/v1/organizations/governance/brand-assets/?${stringifiedParams}` : `/api/v1/organizations/governance/brand-assets/`
-}
-
-/**
- * @summary Brand Assets
- */
-export const organizationsBrandAssetsList = async (params?: OrganizationsBrandAssetsListParams, options?: Parameters<typeof compassFetch>[1]): Promise<organizationsBrandAssetsListResponse> => {
-
-  return compassFetch<organizationsBrandAssetsListResponse>(getOrganizationsBrandAssetsListUrl(params),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
-export type organizationsBrandAssetCreateResponse200 = {
-  data: BrandAssetProjectionSchema
-  status: 200
-}
-
-export type organizationsBrandAssetCreateResponse400 = {
-  data: ApiErrorSchema
-  status: 400
-}
-
-export type organizationsBrandAssetCreateResponse401 = {
-  data: ApiErrorSchema
-  status: 401
-}
-
-export type organizationsBrandAssetCreateResponse403 = {
-  data: ApiErrorSchema
-  status: 403
-}
-
-export type organizationsBrandAssetCreateResponse404 = {
-  data: ApiErrorSchema
-  status: 404
-}
-
-export type organizationsBrandAssetCreateResponse405 = {
-  data: ApiErrorSchema
-  status: 405
-}
-
-export type organizationsBrandAssetCreateResponse409 = {
-  data: ApiErrorSchema
-  status: 409
-}
-
-export type organizationsBrandAssetCreateResponse413 = {
-  data: ApiErrorSchema
-  status: 413
-}
-
-export type organizationsBrandAssetCreateResponse422 = {
-  data: ApiErrorSchema
-  status: 422
-}
-
-export type organizationsBrandAssetCreateResponse429 = {
-  data: ApiErrorSchema
-  status: 429
-}
-
-export type organizationsBrandAssetCreateResponse500 = {
-  data: ApiErrorSchema
-  status: 500
-}
-
-export type organizationsBrandAssetCreateResponse503 = {
-  data: ApiErrorSchema
-  status: 503
-}
-
-export type organizationsBrandAssetCreateResponseSuccess = (organizationsBrandAssetCreateResponse200) & {
-  headers: Record<string, string>;
-};
-export type organizationsBrandAssetCreateResponseError = (organizationsBrandAssetCreateResponse400 | organizationsBrandAssetCreateResponse401 | organizationsBrandAssetCreateResponse403 | organizationsBrandAssetCreateResponse404 | organizationsBrandAssetCreateResponse405 | organizationsBrandAssetCreateResponse409 | organizationsBrandAssetCreateResponse413 | organizationsBrandAssetCreateResponse422 | organizationsBrandAssetCreateResponse429 | organizationsBrandAssetCreateResponse500 | organizationsBrandAssetCreateResponse503) & {
-  headers: Record<string, string>;
-};
-
-export type organizationsBrandAssetCreateResponse = (organizationsBrandAssetCreateResponseSuccess | organizationsBrandAssetCreateResponseError)
-
-export const getOrganizationsBrandAssetCreateUrl = () => {
-
-
-
-
-  return `/api/v1/organizations/governance/brand-assets/`
-}
-
-/**
- * @summary Brand Asset Create
- */
-export const organizationsBrandAssetCreate = async (organizationsBrandAssetCreateBody: OrganizationsBrandAssetCreateBody, options?: Parameters<typeof compassFetch>[1]): Promise<organizationsBrandAssetCreateResponse> => {
-    const formData = new FormData();
-formData.append(`alt_text`, organizationsBrandAssetCreateBody.alt_text);
-formData.append(`asset_type`, organizationsBrandAssetCreateBody.asset_type);
-if(organizationsBrandAssetCreateBody.background_variant !== undefined) {
- formData.append(`background_variant`, organizationsBrandAssetCreateBody.background_variant);
- }
-if(organizationsBrandAssetCreateBody.display_order !== undefined) {
- formData.append(`display_order`, organizationsBrandAssetCreateBody.display_order.toString())
- }
-if(organizationsBrandAssetCreateBody.effective_from !== undefined && organizationsBrandAssetCreateBody.effective_from !== null) {
- formData.append(`effective_from`, organizationsBrandAssetCreateBody.effective_from);
- }
-if(organizationsBrandAssetCreateBody.effective_until !== undefined && organizationsBrandAssetCreateBody.effective_until !== null) {
- formData.append(`effective_until`, organizationsBrandAssetCreateBody.effective_until);
- }
-if(organizationsBrandAssetCreateBody.expected_updated_at !== undefined && organizationsBrandAssetCreateBody.expected_updated_at !== null) {
- formData.append(`expected_updated_at`, organizationsBrandAssetCreateBody.expected_updated_at);
- }
-formData.append(`file`, organizationsBrandAssetCreateBody.file);
-if(organizationsBrandAssetCreateBody.institution_id !== undefined && organizationsBrandAssetCreateBody.institution_id !== null) {
- formData.append(`institution_id`, organizationsBrandAssetCreateBody.institution_id.toString())
- }
-if(organizationsBrandAssetCreateBody.office_id !== undefined && organizationsBrandAssetCreateBody.office_id !== null) {
- formData.append(`office_id`, organizationsBrandAssetCreateBody.office_id.toString())
- }
-formData.append(`owner_type`, organizationsBrandAssetCreateBody.owner_type);
-if(organizationsBrandAssetCreateBody.placement !== undefined) {
- formData.append(`placement`, organizationsBrandAssetCreateBody.placement);
- }
-formData.append(`semantic_role`, organizationsBrandAssetCreateBody.semantic_role);
-if(organizationsBrandAssetCreateBody.source_note !== undefined) {
- formData.append(`source_note`, organizationsBrandAssetCreateBody.source_note);
- }
-if(organizationsBrandAssetCreateBody.usage_context !== undefined) {
- formData.append(`usage_context`, organizationsBrandAssetCreateBody.usage_context);
- }
-if(organizationsBrandAssetCreateBody.version_label !== undefined) {
- formData.append(`version_label`, organizationsBrandAssetCreateBody.version_label);
- }
-
-  return compassFetch<organizationsBrandAssetCreateResponse>(getOrganizationsBrandAssetCreateUrl(),
-  {
-    ...options,
-    method: 'POST'
-    ,
-    body: formData
-  }
-);}
-
-
-export type organizationsBrandAssetDetailResponse200 = {
-  data: BrandAssetProjectionSchema
-  status: 200
-}
-
-export type organizationsBrandAssetDetailResponse400 = {
-  data: ApiErrorSchema
-  status: 400
-}
-
-export type organizationsBrandAssetDetailResponse401 = {
-  data: ApiErrorSchema
-  status: 401
-}
-
-export type organizationsBrandAssetDetailResponse403 = {
-  data: ApiErrorSchema
-  status: 403
-}
-
-export type organizationsBrandAssetDetailResponse404 = {
-  data: ApiErrorSchema
-  status: 404
-}
-
-export type organizationsBrandAssetDetailResponse405 = {
-  data: ApiErrorSchema
-  status: 405
-}
-
-export type organizationsBrandAssetDetailResponse409 = {
-  data: ApiErrorSchema
-  status: 409
-}
-
-export type organizationsBrandAssetDetailResponse413 = {
-  data: ApiErrorSchema
-  status: 413
-}
-
-export type organizationsBrandAssetDetailResponse422 = {
-  data: ApiErrorSchema
-  status: 422
-}
-
-export type organizationsBrandAssetDetailResponse429 = {
-  data: ApiErrorSchema
-  status: 429
-}
-
-export type organizationsBrandAssetDetailResponse500 = {
-  data: ApiErrorSchema
-  status: 500
-}
-
-export type organizationsBrandAssetDetailResponse503 = {
-  data: ApiErrorSchema
-  status: 503
-}
-
-export type organizationsBrandAssetDetailResponseSuccess = (organizationsBrandAssetDetailResponse200) & {
-  headers: Record<string, string>;
-};
-export type organizationsBrandAssetDetailResponseError = (organizationsBrandAssetDetailResponse400 | organizationsBrandAssetDetailResponse401 | organizationsBrandAssetDetailResponse403 | organizationsBrandAssetDetailResponse404 | organizationsBrandAssetDetailResponse405 | organizationsBrandAssetDetailResponse409 | organizationsBrandAssetDetailResponse413 | organizationsBrandAssetDetailResponse422 | organizationsBrandAssetDetailResponse429 | organizationsBrandAssetDetailResponse500 | organizationsBrandAssetDetailResponse503) & {
-  headers: Record<string, string>;
-};
-
-export type organizationsBrandAssetDetailResponse = (organizationsBrandAssetDetailResponseSuccess | organizationsBrandAssetDetailResponseError)
-
-export const getOrganizationsBrandAssetDetailUrl = (assetId: number,) => {
-
-
-
-
-  return `/api/v1/organizations/governance/brand-assets/${assetId}/`
-}
-
-/**
- * @summary Brand Asset
- */
-export const organizationsBrandAssetDetail = async (assetId: number, options?: Parameters<typeof compassFetch>[1]): Promise<organizationsBrandAssetDetailResponse> => {
-
-  return compassFetch<organizationsBrandAssetDetailResponse>(getOrganizationsBrandAssetDetailUrl(assetId),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
-export type organizationsBrandAssetActivateResponse200 = {
-  data: BrandAssetProjectionSchema
-  status: 200
-}
-
-export type organizationsBrandAssetActivateResponse400 = {
-  data: ApiErrorSchema
-  status: 400
-}
-
-export type organizationsBrandAssetActivateResponse401 = {
-  data: ApiErrorSchema
-  status: 401
-}
-
-export type organizationsBrandAssetActivateResponse403 = {
-  data: ApiErrorSchema
-  status: 403
-}
-
-export type organizationsBrandAssetActivateResponse404 = {
-  data: ApiErrorSchema
-  status: 404
-}
-
-export type organizationsBrandAssetActivateResponse405 = {
-  data: ApiErrorSchema
-  status: 405
-}
-
-export type organizationsBrandAssetActivateResponse409 = {
-  data: ApiErrorSchema
-  status: 409
-}
-
-export type organizationsBrandAssetActivateResponse413 = {
-  data: ApiErrorSchema
-  status: 413
-}
-
-export type organizationsBrandAssetActivateResponse422 = {
-  data: ApiErrorSchema
-  status: 422
-}
-
-export type organizationsBrandAssetActivateResponse429 = {
-  data: ApiErrorSchema
-  status: 429
-}
-
-export type organizationsBrandAssetActivateResponse500 = {
-  data: ApiErrorSchema
-  status: 500
-}
-
-export type organizationsBrandAssetActivateResponse503 = {
-  data: ApiErrorSchema
-  status: 503
-}
-
-export type organizationsBrandAssetActivateResponseSuccess = (organizationsBrandAssetActivateResponse200) & {
-  headers: Record<string, string>;
-};
-export type organizationsBrandAssetActivateResponseError = (organizationsBrandAssetActivateResponse400 | organizationsBrandAssetActivateResponse401 | organizationsBrandAssetActivateResponse403 | organizationsBrandAssetActivateResponse404 | organizationsBrandAssetActivateResponse405 | organizationsBrandAssetActivateResponse409 | organizationsBrandAssetActivateResponse413 | organizationsBrandAssetActivateResponse422 | organizationsBrandAssetActivateResponse429 | organizationsBrandAssetActivateResponse500 | organizationsBrandAssetActivateResponse503) & {
-  headers: Record<string, string>;
-};
-
-export type organizationsBrandAssetActivateResponse = (organizationsBrandAssetActivateResponseSuccess | organizationsBrandAssetActivateResponseError)
-
-export const getOrganizationsBrandAssetActivateUrl = (assetId: number,) => {
-
-
-
-
-  return `/api/v1/organizations/governance/brand-assets/${assetId}/activate/`
-}
-
-/**
- * @summary Brand Asset Activate
- */
-export const organizationsBrandAssetActivate = async (assetId: number,
-    lifecycleSchema: LifecycleSchema, options?: Parameters<typeof compassFetch>[1]): Promise<organizationsBrandAssetActivateResponse> => {
-
-    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Array.isArray(h)) return Object.fromEntries(h);
-    return h;
-  };
-return compassFetch<organizationsBrandAssetActivateResponse>(getOrganizationsBrandAssetActivateUrl(assetId),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(lifecycleSchema)
-  }
-);}
-
-
-export type organizationsBrandAssetArchiveResponse200 = {
-  data: BrandAssetProjectionSchema
-  status: 200
-}
-
-export type organizationsBrandAssetArchiveResponse400 = {
-  data: ApiErrorSchema
-  status: 400
-}
-
-export type organizationsBrandAssetArchiveResponse401 = {
-  data: ApiErrorSchema
-  status: 401
-}
-
-export type organizationsBrandAssetArchiveResponse403 = {
-  data: ApiErrorSchema
-  status: 403
-}
-
-export type organizationsBrandAssetArchiveResponse404 = {
-  data: ApiErrorSchema
-  status: 404
-}
-
-export type organizationsBrandAssetArchiveResponse405 = {
-  data: ApiErrorSchema
-  status: 405
-}
-
-export type organizationsBrandAssetArchiveResponse409 = {
-  data: ApiErrorSchema
-  status: 409
-}
-
-export type organizationsBrandAssetArchiveResponse413 = {
-  data: ApiErrorSchema
-  status: 413
-}
-
-export type organizationsBrandAssetArchiveResponse422 = {
-  data: ApiErrorSchema
-  status: 422
-}
-
-export type organizationsBrandAssetArchiveResponse429 = {
-  data: ApiErrorSchema
-  status: 429
-}
-
-export type organizationsBrandAssetArchiveResponse500 = {
-  data: ApiErrorSchema
-  status: 500
-}
-
-export type organizationsBrandAssetArchiveResponse503 = {
-  data: ApiErrorSchema
-  status: 503
-}
-
-export type organizationsBrandAssetArchiveResponseSuccess = (organizationsBrandAssetArchiveResponse200) & {
-  headers: Record<string, string>;
-};
-export type organizationsBrandAssetArchiveResponseError = (organizationsBrandAssetArchiveResponse400 | organizationsBrandAssetArchiveResponse401 | organizationsBrandAssetArchiveResponse403 | organizationsBrandAssetArchiveResponse404 | organizationsBrandAssetArchiveResponse405 | organizationsBrandAssetArchiveResponse409 | organizationsBrandAssetArchiveResponse413 | organizationsBrandAssetArchiveResponse422 | organizationsBrandAssetArchiveResponse429 | organizationsBrandAssetArchiveResponse500 | organizationsBrandAssetArchiveResponse503) & {
-  headers: Record<string, string>;
-};
-
-export type organizationsBrandAssetArchiveResponse = (organizationsBrandAssetArchiveResponseSuccess | organizationsBrandAssetArchiveResponseError)
-
-export const getOrganizationsBrandAssetArchiveUrl = (assetId: number,) => {
-
-
-
-
-  return `/api/v1/organizations/governance/brand-assets/${assetId}/archive/`
-}
-
-/**
- * @summary Brand Asset Archive
- */
-export const organizationsBrandAssetArchive = async (assetId: number,
-    lifecycleSchema: LifecycleSchema, options?: Parameters<typeof compassFetch>[1]): Promise<organizationsBrandAssetArchiveResponse> => {
-
-    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Array.isArray(h)) return Object.fromEntries(h);
-    return h;
-  };
-return compassFetch<organizationsBrandAssetArchiveResponse>(getOrganizationsBrandAssetArchiveUrl(assetId),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(lifecycleSchema)
-  }
-);}
-
-
-export type organizationsBrandAssetDownloadResponse200ImageJpeg = {
-  data: Blob
-  status: 200
-}
-
-export type organizationsBrandAssetDownloadResponse200ImagePng = {
-  data: Blob
-  status: 200
-}
-
-export type organizationsBrandAssetDownloadResponse200ImageWebp = {
-  data: Blob
-  status: 200
-}
-
-export type organizationsBrandAssetDownloadResponse400 = {
-  data: ApiErrorSchema
-  status: 400
-}
-
-export type organizationsBrandAssetDownloadResponse401 = {
-  data: ApiErrorSchema
-  status: 401
-}
-
-export type organizationsBrandAssetDownloadResponse403 = {
-  data: ApiErrorSchema
-  status: 403
-}
-
-export type organizationsBrandAssetDownloadResponse404 = {
-  data: ApiErrorSchema
-  status: 404
-}
-
-export type organizationsBrandAssetDownloadResponse405 = {
-  data: ApiErrorSchema
-  status: 405
-}
-
-export type organizationsBrandAssetDownloadResponse409 = {
-  data: ApiErrorSchema
-  status: 409
-}
-
-export type organizationsBrandAssetDownloadResponse413 = {
-  data: ApiErrorSchema
-  status: 413
-}
-
-export type organizationsBrandAssetDownloadResponse422 = {
-  data: ApiErrorSchema
-  status: 422
-}
-
-export type organizationsBrandAssetDownloadResponse429 = {
-  data: ApiErrorSchema
-  status: 429
-}
-
-export type organizationsBrandAssetDownloadResponse500 = {
-  data: ApiErrorSchema
-  status: 500
-}
-
-export type organizationsBrandAssetDownloadResponse503 = {
-  data: ApiErrorSchema
-  status: 503
-}
-
-export type organizationsBrandAssetDownloadResponseSuccess = (organizationsBrandAssetDownloadResponse200ImageJpeg | organizationsBrandAssetDownloadResponse200ImagePng | organizationsBrandAssetDownloadResponse200ImageWebp) & {
-  headers: Record<string, string>;
-};
-export type organizationsBrandAssetDownloadResponseError = (organizationsBrandAssetDownloadResponse400 | organizationsBrandAssetDownloadResponse401 | organizationsBrandAssetDownloadResponse403 | organizationsBrandAssetDownloadResponse404 | organizationsBrandAssetDownloadResponse405 | organizationsBrandAssetDownloadResponse409 | organizationsBrandAssetDownloadResponse413 | organizationsBrandAssetDownloadResponse422 | organizationsBrandAssetDownloadResponse429 | organizationsBrandAssetDownloadResponse500 | organizationsBrandAssetDownloadResponse503) & {
-  headers: Record<string, string>;
-};
-
-export type organizationsBrandAssetDownloadResponse = (organizationsBrandAssetDownloadResponseSuccess | organizationsBrandAssetDownloadResponseError)
-
-export const getOrganizationsBrandAssetDownloadUrl = (assetId: number,) => {
-
-
-
-
-  return `/api/v1/organizations/governance/brand-assets/${assetId}/download/`
-}
-
-/**
- * @summary Brand Asset Download
- */
-export const organizationsBrandAssetDownload = async (assetId: number, options?: Parameters<typeof compassFetch>[1]): Promise<organizationsBrandAssetDownloadResponse> => {
-
-  return compassFetch<organizationsBrandAssetDownloadResponse>(getOrganizationsBrandAssetDownloadUrl(assetId),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
-export type organizationsBrandAssetRetireResponse200 = {
-  data: BrandAssetProjectionSchema
-  status: 200
-}
-
-export type organizationsBrandAssetRetireResponse400 = {
-  data: ApiErrorSchema
-  status: 400
-}
-
-export type organizationsBrandAssetRetireResponse401 = {
-  data: ApiErrorSchema
-  status: 401
-}
-
-export type organizationsBrandAssetRetireResponse403 = {
-  data: ApiErrorSchema
-  status: 403
-}
-
-export type organizationsBrandAssetRetireResponse404 = {
-  data: ApiErrorSchema
-  status: 404
-}
-
-export type organizationsBrandAssetRetireResponse405 = {
-  data: ApiErrorSchema
-  status: 405
-}
-
-export type organizationsBrandAssetRetireResponse409 = {
-  data: ApiErrorSchema
-  status: 409
-}
-
-export type organizationsBrandAssetRetireResponse413 = {
-  data: ApiErrorSchema
-  status: 413
-}
-
-export type organizationsBrandAssetRetireResponse422 = {
-  data: ApiErrorSchema
-  status: 422
-}
-
-export type organizationsBrandAssetRetireResponse429 = {
-  data: ApiErrorSchema
-  status: 429
-}
-
-export type organizationsBrandAssetRetireResponse500 = {
-  data: ApiErrorSchema
-  status: 500
-}
-
-export type organizationsBrandAssetRetireResponse503 = {
-  data: ApiErrorSchema
-  status: 503
-}
-
-export type organizationsBrandAssetRetireResponseSuccess = (organizationsBrandAssetRetireResponse200) & {
-  headers: Record<string, string>;
-};
-export type organizationsBrandAssetRetireResponseError = (organizationsBrandAssetRetireResponse400 | organizationsBrandAssetRetireResponse401 | organizationsBrandAssetRetireResponse403 | organizationsBrandAssetRetireResponse404 | organizationsBrandAssetRetireResponse405 | organizationsBrandAssetRetireResponse409 | organizationsBrandAssetRetireResponse413 | organizationsBrandAssetRetireResponse422 | organizationsBrandAssetRetireResponse429 | organizationsBrandAssetRetireResponse500 | organizationsBrandAssetRetireResponse503) & {
-  headers: Record<string, string>;
-};
-
-export type organizationsBrandAssetRetireResponse = (organizationsBrandAssetRetireResponseSuccess | organizationsBrandAssetRetireResponseError)
-
-export const getOrganizationsBrandAssetRetireUrl = (assetId: number,) => {
-
-
-
-
-  return `/api/v1/organizations/governance/brand-assets/${assetId}/retire/`
-}
-
-/**
- * @summary Brand Asset Retire
- */
-export const organizationsBrandAssetRetire = async (assetId: number,
-    lifecycleSchema: LifecycleSchema, options?: Parameters<typeof compassFetch>[1]): Promise<organizationsBrandAssetRetireResponse> => {
-
-    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Array.isArray(h)) return Object.fromEntries(h);
-    return h;
-  };
-return compassFetch<organizationsBrandAssetRetireResponse>(getOrganizationsBrandAssetRetireUrl(assetId),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(lifecycleSchema)
-  }
-);}
-
-
-export type organizationsBrandAssetUpdateResponse200 = {
-  data: BrandAssetProjectionSchema
-  status: 200
-}
-
-export type organizationsBrandAssetUpdateResponse400 = {
-  data: ApiErrorSchema
-  status: 400
-}
-
-export type organizationsBrandAssetUpdateResponse401 = {
-  data: ApiErrorSchema
-  status: 401
-}
-
-export type organizationsBrandAssetUpdateResponse403 = {
-  data: ApiErrorSchema
-  status: 403
-}
-
-export type organizationsBrandAssetUpdateResponse404 = {
-  data: ApiErrorSchema
-  status: 404
-}
-
-export type organizationsBrandAssetUpdateResponse405 = {
-  data: ApiErrorSchema
-  status: 405
-}
-
-export type organizationsBrandAssetUpdateResponse409 = {
-  data: ApiErrorSchema
-  status: 409
-}
-
-export type organizationsBrandAssetUpdateResponse413 = {
-  data: ApiErrorSchema
-  status: 413
-}
-
-export type organizationsBrandAssetUpdateResponse422 = {
-  data: ApiErrorSchema
-  status: 422
-}
-
-export type organizationsBrandAssetUpdateResponse429 = {
-  data: ApiErrorSchema
-  status: 429
-}
-
-export type organizationsBrandAssetUpdateResponse500 = {
-  data: ApiErrorSchema
-  status: 500
-}
-
-export type organizationsBrandAssetUpdateResponse503 = {
-  data: ApiErrorSchema
-  status: 503
-}
-
-export type organizationsBrandAssetUpdateResponseSuccess = (organizationsBrandAssetUpdateResponse200) & {
-  headers: Record<string, string>;
-};
-export type organizationsBrandAssetUpdateResponseError = (organizationsBrandAssetUpdateResponse400 | organizationsBrandAssetUpdateResponse401 | organizationsBrandAssetUpdateResponse403 | organizationsBrandAssetUpdateResponse404 | organizationsBrandAssetUpdateResponse405 | organizationsBrandAssetUpdateResponse409 | organizationsBrandAssetUpdateResponse413 | organizationsBrandAssetUpdateResponse422 | organizationsBrandAssetUpdateResponse429 | organizationsBrandAssetUpdateResponse500 | organizationsBrandAssetUpdateResponse503) & {
-  headers: Record<string, string>;
-};
-
-export type organizationsBrandAssetUpdateResponse = (organizationsBrandAssetUpdateResponseSuccess | organizationsBrandAssetUpdateResponseError)
-
-export const getOrganizationsBrandAssetUpdateUrl = (assetId: number,) => {
-
-
-
-
-  return `/api/v1/organizations/governance/brand-assets/${assetId}/update/`
-}
-
-/**
- * @summary Brand Asset Update
- */
-export const organizationsBrandAssetUpdate = async (assetId: number,
-    organizationsBrandAssetUpdateBody: OrganizationsBrandAssetUpdateBody, options?: Parameters<typeof compassFetch>[1]): Promise<organizationsBrandAssetUpdateResponse> => {
-    const formData = new FormData();
-formData.append(`alt_text`, organizationsBrandAssetUpdateBody.alt_text);
-formData.append(`asset_type`, organizationsBrandAssetUpdateBody.asset_type);
-if(organizationsBrandAssetUpdateBody.background_variant !== undefined) {
- formData.append(`background_variant`, organizationsBrandAssetUpdateBody.background_variant);
- }
-if(organizationsBrandAssetUpdateBody.display_order !== undefined) {
- formData.append(`display_order`, organizationsBrandAssetUpdateBody.display_order.toString())
- }
-if(organizationsBrandAssetUpdateBody.effective_from !== undefined && organizationsBrandAssetUpdateBody.effective_from !== null) {
- formData.append(`effective_from`, organizationsBrandAssetUpdateBody.effective_from);
- }
-if(organizationsBrandAssetUpdateBody.effective_until !== undefined && organizationsBrandAssetUpdateBody.effective_until !== null) {
- formData.append(`effective_until`, organizationsBrandAssetUpdateBody.effective_until);
- }
-if(organizationsBrandAssetUpdateBody.expected_updated_at !== undefined && organizationsBrandAssetUpdateBody.expected_updated_at !== null) {
- formData.append(`expected_updated_at`, organizationsBrandAssetUpdateBody.expected_updated_at);
- }
-if(organizationsBrandAssetUpdateBody.file !== undefined && organizationsBrandAssetUpdateBody.file !== null) {
- formData.append(`file`, organizationsBrandAssetUpdateBody.file);
- }
-if(organizationsBrandAssetUpdateBody.institution_id !== undefined && organizationsBrandAssetUpdateBody.institution_id !== null) {
- formData.append(`institution_id`, organizationsBrandAssetUpdateBody.institution_id.toString())
- }
-if(organizationsBrandAssetUpdateBody.office_id !== undefined && organizationsBrandAssetUpdateBody.office_id !== null) {
- formData.append(`office_id`, organizationsBrandAssetUpdateBody.office_id.toString())
- }
-formData.append(`owner_type`, organizationsBrandAssetUpdateBody.owner_type);
-if(organizationsBrandAssetUpdateBody.placement !== undefined) {
- formData.append(`placement`, organizationsBrandAssetUpdateBody.placement);
- }
-formData.append(`semantic_role`, organizationsBrandAssetUpdateBody.semantic_role);
-if(organizationsBrandAssetUpdateBody.source_note !== undefined) {
- formData.append(`source_note`, organizationsBrandAssetUpdateBody.source_note);
- }
-if(organizationsBrandAssetUpdateBody.usage_context !== undefined) {
- formData.append(`usage_context`, organizationsBrandAssetUpdateBody.usage_context);
- }
-if(organizationsBrandAssetUpdateBody.version_label !== undefined) {
- formData.append(`version_label`, organizationsBrandAssetUpdateBody.version_label);
- }
-
-  return compassFetch<organizationsBrandAssetUpdateResponse>(getOrganizationsBrandAssetUpdateUrl(assetId),
-  {
-    ...options,
-    method: 'POST'
-    ,
-    body: formData
-  }
-);}
-
-
 export type organizationsDocumentTemplateVersionDetailResponse200 = {
   data: DocumentTemplateVersionProjectionSchema
   status: 200
@@ -2085,197 +903,6 @@ export const getOrganizationsDocumentTemplateVersionDetailUrl = (versionId: numb
 export const organizationsDocumentTemplateVersionDetail = async (versionId: number, options?: Parameters<typeof compassFetch>[1]): Promise<organizationsDocumentTemplateVersionDetailResponse> => {
 
   return compassFetch<organizationsDocumentTemplateVersionDetailResponse>(getOrganizationsDocumentTemplateVersionDetailUrl(versionId),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
-export type organizationsDocumentTemplateVersionActivateResponse200 = {
-  data: DocumentTemplateVersionProjectionSchema
-  status: 200
-}
-
-export type organizationsDocumentTemplateVersionActivateResponse400 = {
-  data: ApiErrorSchema
-  status: 400
-}
-
-export type organizationsDocumentTemplateVersionActivateResponse401 = {
-  data: ApiErrorSchema
-  status: 401
-}
-
-export type organizationsDocumentTemplateVersionActivateResponse403 = {
-  data: ApiErrorSchema
-  status: 403
-}
-
-export type organizationsDocumentTemplateVersionActivateResponse404 = {
-  data: ApiErrorSchema
-  status: 404
-}
-
-export type organizationsDocumentTemplateVersionActivateResponse405 = {
-  data: ApiErrorSchema
-  status: 405
-}
-
-export type organizationsDocumentTemplateVersionActivateResponse409 = {
-  data: ApiErrorSchema
-  status: 409
-}
-
-export type organizationsDocumentTemplateVersionActivateResponse413 = {
-  data: ApiErrorSchema
-  status: 413
-}
-
-export type organizationsDocumentTemplateVersionActivateResponse422 = {
-  data: ApiErrorSchema
-  status: 422
-}
-
-export type organizationsDocumentTemplateVersionActivateResponse429 = {
-  data: ApiErrorSchema
-  status: 429
-}
-
-export type organizationsDocumentTemplateVersionActivateResponse500 = {
-  data: ApiErrorSchema
-  status: 500
-}
-
-export type organizationsDocumentTemplateVersionActivateResponse503 = {
-  data: ApiErrorSchema
-  status: 503
-}
-
-export type organizationsDocumentTemplateVersionActivateResponseSuccess = (organizationsDocumentTemplateVersionActivateResponse200) & {
-  headers: Record<string, string>;
-};
-export type organizationsDocumentTemplateVersionActivateResponseError = (organizationsDocumentTemplateVersionActivateResponse400 | organizationsDocumentTemplateVersionActivateResponse401 | organizationsDocumentTemplateVersionActivateResponse403 | organizationsDocumentTemplateVersionActivateResponse404 | organizationsDocumentTemplateVersionActivateResponse405 | organizationsDocumentTemplateVersionActivateResponse409 | organizationsDocumentTemplateVersionActivateResponse413 | organizationsDocumentTemplateVersionActivateResponse422 | organizationsDocumentTemplateVersionActivateResponse429 | organizationsDocumentTemplateVersionActivateResponse500 | organizationsDocumentTemplateVersionActivateResponse503) & {
-  headers: Record<string, string>;
-};
-
-export type organizationsDocumentTemplateVersionActivateResponse = (organizationsDocumentTemplateVersionActivateResponseSuccess | organizationsDocumentTemplateVersionActivateResponseError)
-
-export const getOrganizationsDocumentTemplateVersionActivateUrl = (versionId: number,) => {
-
-
-
-
-  return `/api/v1/organizations/governance/document-template-versions/${versionId}/activate/`
-}
-
-/**
- * @summary Document Template Version Activate
- */
-export const organizationsDocumentTemplateVersionActivate = async (versionId: number,
-    lifecycleSchema: LifecycleSchema, options?: Parameters<typeof compassFetch>[1]): Promise<organizationsDocumentTemplateVersionActivateResponse> => {
-
-    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Array.isArray(h)) return Object.fromEntries(h);
-    return h;
-  };
-return compassFetch<organizationsDocumentTemplateVersionActivateResponse>(getOrganizationsDocumentTemplateVersionActivateUrl(versionId),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(lifecycleSchema)
-  }
-);}
-
-
-export type organizationsDocumentTemplateVersionActivationPreflightResponse200 = {
-  data: DocumentTemplateActivationPreflightSchema
-  status: 200
-}
-
-export type organizationsDocumentTemplateVersionActivationPreflightResponse400 = {
-  data: ApiErrorSchema
-  status: 400
-}
-
-export type organizationsDocumentTemplateVersionActivationPreflightResponse401 = {
-  data: ApiErrorSchema
-  status: 401
-}
-
-export type organizationsDocumentTemplateVersionActivationPreflightResponse403 = {
-  data: ApiErrorSchema
-  status: 403
-}
-
-export type organizationsDocumentTemplateVersionActivationPreflightResponse404 = {
-  data: ApiErrorSchema
-  status: 404
-}
-
-export type organizationsDocumentTemplateVersionActivationPreflightResponse405 = {
-  data: ApiErrorSchema
-  status: 405
-}
-
-export type organizationsDocumentTemplateVersionActivationPreflightResponse409 = {
-  data: ApiErrorSchema
-  status: 409
-}
-
-export type organizationsDocumentTemplateVersionActivationPreflightResponse413 = {
-  data: ApiErrorSchema
-  status: 413
-}
-
-export type organizationsDocumentTemplateVersionActivationPreflightResponse422 = {
-  data: ApiErrorSchema
-  status: 422
-}
-
-export type organizationsDocumentTemplateVersionActivationPreflightResponse429 = {
-  data: ApiErrorSchema
-  status: 429
-}
-
-export type organizationsDocumentTemplateVersionActivationPreflightResponse500 = {
-  data: ApiErrorSchema
-  status: 500
-}
-
-export type organizationsDocumentTemplateVersionActivationPreflightResponse503 = {
-  data: ApiErrorSchema
-  status: 503
-}
-
-export type organizationsDocumentTemplateVersionActivationPreflightResponseSuccess = (organizationsDocumentTemplateVersionActivationPreflightResponse200) & {
-  headers: Record<string, string>;
-};
-export type organizationsDocumentTemplateVersionActivationPreflightResponseError = (organizationsDocumentTemplateVersionActivationPreflightResponse400 | organizationsDocumentTemplateVersionActivationPreflightResponse401 | organizationsDocumentTemplateVersionActivationPreflightResponse403 | organizationsDocumentTemplateVersionActivationPreflightResponse404 | organizationsDocumentTemplateVersionActivationPreflightResponse405 | organizationsDocumentTemplateVersionActivationPreflightResponse409 | organizationsDocumentTemplateVersionActivationPreflightResponse413 | organizationsDocumentTemplateVersionActivationPreflightResponse422 | organizationsDocumentTemplateVersionActivationPreflightResponse429 | organizationsDocumentTemplateVersionActivationPreflightResponse500 | organizationsDocumentTemplateVersionActivationPreflightResponse503) & {
-  headers: Record<string, string>;
-};
-
-export type organizationsDocumentTemplateVersionActivationPreflightResponse = (organizationsDocumentTemplateVersionActivationPreflightResponseSuccess | organizationsDocumentTemplateVersionActivationPreflightResponseError)
-
-export const getOrganizationsDocumentTemplateVersionActivationPreflightUrl = (versionId: number,) => {
-
-
-
-
-  return `/api/v1/organizations/governance/document-template-versions/${versionId}/activation-preflight/`
-}
-
-/**
- * @summary Document Template Version Preflight
- */
-export const organizationsDocumentTemplateVersionActivationPreflight = async (versionId: number, options?: Parameters<typeof compassFetch>[1]): Promise<organizationsDocumentTemplateVersionActivationPreflightResponse> => {
-
-  return compassFetch<organizationsDocumentTemplateVersionActivationPreflightResponse>(getOrganizationsDocumentTemplateVersionActivationPreflightUrl(versionId),
   {
     ...options,
     method: 'GET'
@@ -2483,88 +1110,180 @@ return compassFetch<organizationsDocumentTemplateVersionCloneResponse>(getOrgani
 );}
 
 
-export type organizationsDocumentTemplateVersionRetireResponse200 = {
-  data: DocumentTemplateVersionProjectionSchema
+export type organizationsDocumentTemplateVersionPublicationPreflightResponse200 = {
+  data: DocumentTemplatePublicationPreflightSchema
   status: 200
 }
 
-export type organizationsDocumentTemplateVersionRetireResponse400 = {
+export type organizationsDocumentTemplateVersionPublicationPreflightResponse400 = {
   data: ApiErrorSchema
   status: 400
 }
 
-export type organizationsDocumentTemplateVersionRetireResponse401 = {
+export type organizationsDocumentTemplateVersionPublicationPreflightResponse401 = {
   data: ApiErrorSchema
   status: 401
 }
 
-export type organizationsDocumentTemplateVersionRetireResponse403 = {
+export type organizationsDocumentTemplateVersionPublicationPreflightResponse403 = {
   data: ApiErrorSchema
   status: 403
 }
 
-export type organizationsDocumentTemplateVersionRetireResponse404 = {
+export type organizationsDocumentTemplateVersionPublicationPreflightResponse404 = {
   data: ApiErrorSchema
   status: 404
 }
 
-export type organizationsDocumentTemplateVersionRetireResponse405 = {
+export type organizationsDocumentTemplateVersionPublicationPreflightResponse405 = {
   data: ApiErrorSchema
   status: 405
 }
 
-export type organizationsDocumentTemplateVersionRetireResponse409 = {
+export type organizationsDocumentTemplateVersionPublicationPreflightResponse409 = {
   data: ApiErrorSchema
   status: 409
 }
 
-export type organizationsDocumentTemplateVersionRetireResponse413 = {
+export type organizationsDocumentTemplateVersionPublicationPreflightResponse413 = {
   data: ApiErrorSchema
   status: 413
 }
 
-export type organizationsDocumentTemplateVersionRetireResponse422 = {
+export type organizationsDocumentTemplateVersionPublicationPreflightResponse422 = {
   data: ApiErrorSchema
   status: 422
 }
 
-export type organizationsDocumentTemplateVersionRetireResponse429 = {
+export type organizationsDocumentTemplateVersionPublicationPreflightResponse429 = {
   data: ApiErrorSchema
   status: 429
 }
 
-export type organizationsDocumentTemplateVersionRetireResponse500 = {
+export type organizationsDocumentTemplateVersionPublicationPreflightResponse500 = {
   data: ApiErrorSchema
   status: 500
 }
 
-export type organizationsDocumentTemplateVersionRetireResponse503 = {
+export type organizationsDocumentTemplateVersionPublicationPreflightResponse503 = {
   data: ApiErrorSchema
   status: 503
 }
 
-export type organizationsDocumentTemplateVersionRetireResponseSuccess = (organizationsDocumentTemplateVersionRetireResponse200) & {
+export type organizationsDocumentTemplateVersionPublicationPreflightResponseSuccess = (organizationsDocumentTemplateVersionPublicationPreflightResponse200) & {
   headers: Record<string, string>;
 };
-export type organizationsDocumentTemplateVersionRetireResponseError = (organizationsDocumentTemplateVersionRetireResponse400 | organizationsDocumentTemplateVersionRetireResponse401 | organizationsDocumentTemplateVersionRetireResponse403 | organizationsDocumentTemplateVersionRetireResponse404 | organizationsDocumentTemplateVersionRetireResponse405 | organizationsDocumentTemplateVersionRetireResponse409 | organizationsDocumentTemplateVersionRetireResponse413 | organizationsDocumentTemplateVersionRetireResponse422 | organizationsDocumentTemplateVersionRetireResponse429 | organizationsDocumentTemplateVersionRetireResponse500 | organizationsDocumentTemplateVersionRetireResponse503) & {
+export type organizationsDocumentTemplateVersionPublicationPreflightResponseError = (organizationsDocumentTemplateVersionPublicationPreflightResponse400 | organizationsDocumentTemplateVersionPublicationPreflightResponse401 | organizationsDocumentTemplateVersionPublicationPreflightResponse403 | organizationsDocumentTemplateVersionPublicationPreflightResponse404 | organizationsDocumentTemplateVersionPublicationPreflightResponse405 | organizationsDocumentTemplateVersionPublicationPreflightResponse409 | organizationsDocumentTemplateVersionPublicationPreflightResponse413 | organizationsDocumentTemplateVersionPublicationPreflightResponse422 | organizationsDocumentTemplateVersionPublicationPreflightResponse429 | organizationsDocumentTemplateVersionPublicationPreflightResponse500 | organizationsDocumentTemplateVersionPublicationPreflightResponse503) & {
   headers: Record<string, string>;
 };
 
-export type organizationsDocumentTemplateVersionRetireResponse = (organizationsDocumentTemplateVersionRetireResponseSuccess | organizationsDocumentTemplateVersionRetireResponseError)
+export type organizationsDocumentTemplateVersionPublicationPreflightResponse = (organizationsDocumentTemplateVersionPublicationPreflightResponseSuccess | organizationsDocumentTemplateVersionPublicationPreflightResponseError)
 
-export const getOrganizationsDocumentTemplateVersionRetireUrl = (versionId: number,) => {
-
-
+export const getOrganizationsDocumentTemplateVersionPublicationPreflightUrl = (versionId: number,) => {
 
 
-  return `/api/v1/organizations/governance/document-template-versions/${versionId}/retire/`
+
+
+  return `/api/v1/organizations/governance/document-template-versions/${versionId}/publication-preflight/`
 }
 
 /**
- * @summary Document Template Version Retire
+ * @summary Document Template Version Preflight
  */
-export const organizationsDocumentTemplateVersionRetire = async (versionId: number,
-    lifecycleSchema: LifecycleSchema, options?: Parameters<typeof compassFetch>[1]): Promise<organizationsDocumentTemplateVersionRetireResponse> => {
+export const organizationsDocumentTemplateVersionPublicationPreflight = async (versionId: number, options?: Parameters<typeof compassFetch>[1]): Promise<organizationsDocumentTemplateVersionPublicationPreflightResponse> => {
+
+  return compassFetch<organizationsDocumentTemplateVersionPublicationPreflightResponse>(getOrganizationsDocumentTemplateVersionPublicationPreflightUrl(versionId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+export type organizationsDocumentTemplateVersionPublishResponse200 = {
+  data: DocumentTemplateVersionProjectionSchema
+  status: 200
+}
+
+export type organizationsDocumentTemplateVersionPublishResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type organizationsDocumentTemplateVersionPublishResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type organizationsDocumentTemplateVersionPublishResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type organizationsDocumentTemplateVersionPublishResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type organizationsDocumentTemplateVersionPublishResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type organizationsDocumentTemplateVersionPublishResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type organizationsDocumentTemplateVersionPublishResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type organizationsDocumentTemplateVersionPublishResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type organizationsDocumentTemplateVersionPublishResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type organizationsDocumentTemplateVersionPublishResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type organizationsDocumentTemplateVersionPublishResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type organizationsDocumentTemplateVersionPublishResponseSuccess = (organizationsDocumentTemplateVersionPublishResponse200) & {
+  headers: Record<string, string>;
+};
+export type organizationsDocumentTemplateVersionPublishResponseError = (organizationsDocumentTemplateVersionPublishResponse400 | organizationsDocumentTemplateVersionPublishResponse401 | organizationsDocumentTemplateVersionPublishResponse403 | organizationsDocumentTemplateVersionPublishResponse404 | organizationsDocumentTemplateVersionPublishResponse405 | organizationsDocumentTemplateVersionPublishResponse409 | organizationsDocumentTemplateVersionPublishResponse413 | organizationsDocumentTemplateVersionPublishResponse422 | organizationsDocumentTemplateVersionPublishResponse429 | organizationsDocumentTemplateVersionPublishResponse500 | organizationsDocumentTemplateVersionPublishResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type organizationsDocumentTemplateVersionPublishResponse = (organizationsDocumentTemplateVersionPublishResponseSuccess | organizationsDocumentTemplateVersionPublishResponseError)
+
+export const getOrganizationsDocumentTemplateVersionPublishUrl = (versionId: number,) => {
+
+
+
+
+  return `/api/v1/organizations/governance/document-template-versions/${versionId}/publish/`
+}
+
+/**
+ * @summary Document Template Version Publish
+ */
+export const organizationsDocumentTemplateVersionPublish = async (versionId: number,
+    lifecycleSchema: LifecycleSchema, options?: Parameters<typeof compassFetch>[1]): Promise<organizationsDocumentTemplateVersionPublishResponse> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -2572,7 +1291,7 @@ export const organizationsDocumentTemplateVersionRetire = async (versionId: numb
     if (Array.isArray(h)) return Object.fromEntries(h);
     return h;
   };
-return compassFetch<organizationsDocumentTemplateVersionRetireResponse>(getOrganizationsDocumentTemplateVersionRetireUrl(versionId),
+return compassFetch<organizationsDocumentTemplateVersionPublishResponse>(getOrganizationsDocumentTemplateVersionPublishUrl(versionId),
   {
     ...options,
     method: 'POST',
@@ -2970,105 +1689,6 @@ export const organizationsDocumentTemplateDetail = async (templateId: number, op
 );}
 
 
-export type organizationsDocumentTemplateActivateResponse200 = {
-  data: DocumentTemplateProjectionSchema
-  status: 200
-}
-
-export type organizationsDocumentTemplateActivateResponse400 = {
-  data: ApiErrorSchema
-  status: 400
-}
-
-export type organizationsDocumentTemplateActivateResponse401 = {
-  data: ApiErrorSchema
-  status: 401
-}
-
-export type organizationsDocumentTemplateActivateResponse403 = {
-  data: ApiErrorSchema
-  status: 403
-}
-
-export type organizationsDocumentTemplateActivateResponse404 = {
-  data: ApiErrorSchema
-  status: 404
-}
-
-export type organizationsDocumentTemplateActivateResponse405 = {
-  data: ApiErrorSchema
-  status: 405
-}
-
-export type organizationsDocumentTemplateActivateResponse409 = {
-  data: ApiErrorSchema
-  status: 409
-}
-
-export type organizationsDocumentTemplateActivateResponse413 = {
-  data: ApiErrorSchema
-  status: 413
-}
-
-export type organizationsDocumentTemplateActivateResponse422 = {
-  data: ApiErrorSchema
-  status: 422
-}
-
-export type organizationsDocumentTemplateActivateResponse429 = {
-  data: ApiErrorSchema
-  status: 429
-}
-
-export type organizationsDocumentTemplateActivateResponse500 = {
-  data: ApiErrorSchema
-  status: 500
-}
-
-export type organizationsDocumentTemplateActivateResponse503 = {
-  data: ApiErrorSchema
-  status: 503
-}
-
-export type organizationsDocumentTemplateActivateResponseSuccess = (organizationsDocumentTemplateActivateResponse200) & {
-  headers: Record<string, string>;
-};
-export type organizationsDocumentTemplateActivateResponseError = (organizationsDocumentTemplateActivateResponse400 | organizationsDocumentTemplateActivateResponse401 | organizationsDocumentTemplateActivateResponse403 | organizationsDocumentTemplateActivateResponse404 | organizationsDocumentTemplateActivateResponse405 | organizationsDocumentTemplateActivateResponse409 | organizationsDocumentTemplateActivateResponse413 | organizationsDocumentTemplateActivateResponse422 | organizationsDocumentTemplateActivateResponse429 | organizationsDocumentTemplateActivateResponse500 | organizationsDocumentTemplateActivateResponse503) & {
-  headers: Record<string, string>;
-};
-
-export type organizationsDocumentTemplateActivateResponse = (organizationsDocumentTemplateActivateResponseSuccess | organizationsDocumentTemplateActivateResponseError)
-
-export const getOrganizationsDocumentTemplateActivateUrl = (templateId: number,) => {
-
-
-
-
-  return `/api/v1/organizations/governance/document-templates/${templateId}/activate/`
-}
-
-/**
- * @summary Document Template Activate
- */
-export const organizationsDocumentTemplateActivate = async (templateId: number,
-    lifecycleSchema: LifecycleSchema, options?: Parameters<typeof compassFetch>[1]): Promise<organizationsDocumentTemplateActivateResponse> => {
-
-    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Array.isArray(h)) return Object.fromEntries(h);
-    return h;
-  };
-return compassFetch<organizationsDocumentTemplateActivateResponse>(getOrganizationsDocumentTemplateActivateUrl(templateId),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(lifecycleSchema)
-  }
-);}
-
-
 export type organizationsDocumentTemplateArchiveResponse200 = {
   data: DocumentTemplateProjectionSchema
   status: 200
@@ -3159,105 +1779,6 @@ export const organizationsDocumentTemplateArchive = async (templateId: number,
     return h;
   };
 return compassFetch<organizationsDocumentTemplateArchiveResponse>(getOrganizationsDocumentTemplateArchiveUrl(templateId),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(lifecycleSchema)
-  }
-);}
-
-
-export type organizationsDocumentTemplateRetireResponse200 = {
-  data: DocumentTemplateProjectionSchema
-  status: 200
-}
-
-export type organizationsDocumentTemplateRetireResponse400 = {
-  data: ApiErrorSchema
-  status: 400
-}
-
-export type organizationsDocumentTemplateRetireResponse401 = {
-  data: ApiErrorSchema
-  status: 401
-}
-
-export type organizationsDocumentTemplateRetireResponse403 = {
-  data: ApiErrorSchema
-  status: 403
-}
-
-export type organizationsDocumentTemplateRetireResponse404 = {
-  data: ApiErrorSchema
-  status: 404
-}
-
-export type organizationsDocumentTemplateRetireResponse405 = {
-  data: ApiErrorSchema
-  status: 405
-}
-
-export type organizationsDocumentTemplateRetireResponse409 = {
-  data: ApiErrorSchema
-  status: 409
-}
-
-export type organizationsDocumentTemplateRetireResponse413 = {
-  data: ApiErrorSchema
-  status: 413
-}
-
-export type organizationsDocumentTemplateRetireResponse422 = {
-  data: ApiErrorSchema
-  status: 422
-}
-
-export type organizationsDocumentTemplateRetireResponse429 = {
-  data: ApiErrorSchema
-  status: 429
-}
-
-export type organizationsDocumentTemplateRetireResponse500 = {
-  data: ApiErrorSchema
-  status: 500
-}
-
-export type organizationsDocumentTemplateRetireResponse503 = {
-  data: ApiErrorSchema
-  status: 503
-}
-
-export type organizationsDocumentTemplateRetireResponseSuccess = (organizationsDocumentTemplateRetireResponse200) & {
-  headers: Record<string, string>;
-};
-export type organizationsDocumentTemplateRetireResponseError = (organizationsDocumentTemplateRetireResponse400 | organizationsDocumentTemplateRetireResponse401 | organizationsDocumentTemplateRetireResponse403 | organizationsDocumentTemplateRetireResponse404 | organizationsDocumentTemplateRetireResponse405 | organizationsDocumentTemplateRetireResponse409 | organizationsDocumentTemplateRetireResponse413 | organizationsDocumentTemplateRetireResponse422 | organizationsDocumentTemplateRetireResponse429 | organizationsDocumentTemplateRetireResponse500 | organizationsDocumentTemplateRetireResponse503) & {
-  headers: Record<string, string>;
-};
-
-export type organizationsDocumentTemplateRetireResponse = (organizationsDocumentTemplateRetireResponseSuccess | organizationsDocumentTemplateRetireResponseError)
-
-export const getOrganizationsDocumentTemplateRetireUrl = (templateId: number,) => {
-
-
-
-
-  return `/api/v1/organizations/governance/document-templates/${templateId}/retire/`
-}
-
-/**
- * @summary Document Template Retire
- */
-export const organizationsDocumentTemplateRetire = async (templateId: number,
-    lifecycleSchema: LifecycleSchema, options?: Parameters<typeof compassFetch>[1]): Promise<organizationsDocumentTemplateRetireResponse> => {
-
-    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Array.isArray(h)) return Object.fromEntries(h);
-    return h;
-  };
-return compassFetch<organizationsDocumentTemplateRetireResponse>(getOrganizationsDocumentTemplateRetireUrl(templateId),
   {
     ...options,
     method: 'POST',
@@ -4441,296 +2962,6 @@ export const organizationsFormRevisionDetail = async (revisionId: number, option
 );}
 
 
-export type organizationsFormRevisionActivateResponse200 = {
-  data: FormRevisionProjectionSchema
-  status: 200
-}
-
-export type organizationsFormRevisionActivateResponse400 = {
-  data: ApiErrorSchema
-  status: 400
-}
-
-export type organizationsFormRevisionActivateResponse401 = {
-  data: ApiErrorSchema
-  status: 401
-}
-
-export type organizationsFormRevisionActivateResponse403 = {
-  data: ApiErrorSchema
-  status: 403
-}
-
-export type organizationsFormRevisionActivateResponse404 = {
-  data: ApiErrorSchema
-  status: 404
-}
-
-export type organizationsFormRevisionActivateResponse405 = {
-  data: ApiErrorSchema
-  status: 405
-}
-
-export type organizationsFormRevisionActivateResponse409 = {
-  data: ApiErrorSchema
-  status: 409
-}
-
-export type organizationsFormRevisionActivateResponse413 = {
-  data: ApiErrorSchema
-  status: 413
-}
-
-export type organizationsFormRevisionActivateResponse422 = {
-  data: ApiErrorSchema
-  status: 422
-}
-
-export type organizationsFormRevisionActivateResponse429 = {
-  data: ApiErrorSchema
-  status: 429
-}
-
-export type organizationsFormRevisionActivateResponse500 = {
-  data: ApiErrorSchema
-  status: 500
-}
-
-export type organizationsFormRevisionActivateResponse503 = {
-  data: ApiErrorSchema
-  status: 503
-}
-
-export type organizationsFormRevisionActivateResponseSuccess = (organizationsFormRevisionActivateResponse200) & {
-  headers: Record<string, string>;
-};
-export type organizationsFormRevisionActivateResponseError = (organizationsFormRevisionActivateResponse400 | organizationsFormRevisionActivateResponse401 | organizationsFormRevisionActivateResponse403 | organizationsFormRevisionActivateResponse404 | organizationsFormRevisionActivateResponse405 | organizationsFormRevisionActivateResponse409 | organizationsFormRevisionActivateResponse413 | organizationsFormRevisionActivateResponse422 | organizationsFormRevisionActivateResponse429 | organizationsFormRevisionActivateResponse500 | organizationsFormRevisionActivateResponse503) & {
-  headers: Record<string, string>;
-};
-
-export type organizationsFormRevisionActivateResponse = (organizationsFormRevisionActivateResponseSuccess | organizationsFormRevisionActivateResponseError)
-
-export const getOrganizationsFormRevisionActivateUrl = (revisionId: number,) => {
-
-
-
-
-  return `/api/v1/organizations/governance/form-revisions/${revisionId}/activate/`
-}
-
-/**
- * @summary Form Revision Activate
- */
-export const organizationsFormRevisionActivate = async (revisionId: number,
-    lifecycleSchema: LifecycleSchema, options?: Parameters<typeof compassFetch>[1]): Promise<organizationsFormRevisionActivateResponse> => {
-
-    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Array.isArray(h)) return Object.fromEntries(h);
-    return h;
-  };
-return compassFetch<organizationsFormRevisionActivateResponse>(getOrganizationsFormRevisionActivateUrl(revisionId),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(lifecycleSchema)
-  }
-);}
-
-
-export type organizationsFormRevisionActivationPreflightResponse200 = {
-  data: FormRevisionActivationPreflightSchema
-  status: 200
-}
-
-export type organizationsFormRevisionActivationPreflightResponse400 = {
-  data: ApiErrorSchema
-  status: 400
-}
-
-export type organizationsFormRevisionActivationPreflightResponse401 = {
-  data: ApiErrorSchema
-  status: 401
-}
-
-export type organizationsFormRevisionActivationPreflightResponse403 = {
-  data: ApiErrorSchema
-  status: 403
-}
-
-export type organizationsFormRevisionActivationPreflightResponse404 = {
-  data: ApiErrorSchema
-  status: 404
-}
-
-export type organizationsFormRevisionActivationPreflightResponse405 = {
-  data: ApiErrorSchema
-  status: 405
-}
-
-export type organizationsFormRevisionActivationPreflightResponse409 = {
-  data: ApiErrorSchema
-  status: 409
-}
-
-export type organizationsFormRevisionActivationPreflightResponse413 = {
-  data: ApiErrorSchema
-  status: 413
-}
-
-export type organizationsFormRevisionActivationPreflightResponse422 = {
-  data: ApiErrorSchema
-  status: 422
-}
-
-export type organizationsFormRevisionActivationPreflightResponse429 = {
-  data: ApiErrorSchema
-  status: 429
-}
-
-export type organizationsFormRevisionActivationPreflightResponse500 = {
-  data: ApiErrorSchema
-  status: 500
-}
-
-export type organizationsFormRevisionActivationPreflightResponse503 = {
-  data: ApiErrorSchema
-  status: 503
-}
-
-export type organizationsFormRevisionActivationPreflightResponseSuccess = (organizationsFormRevisionActivationPreflightResponse200) & {
-  headers: Record<string, string>;
-};
-export type organizationsFormRevisionActivationPreflightResponseError = (organizationsFormRevisionActivationPreflightResponse400 | organizationsFormRevisionActivationPreflightResponse401 | organizationsFormRevisionActivationPreflightResponse403 | organizationsFormRevisionActivationPreflightResponse404 | organizationsFormRevisionActivationPreflightResponse405 | organizationsFormRevisionActivationPreflightResponse409 | organizationsFormRevisionActivationPreflightResponse413 | organizationsFormRevisionActivationPreflightResponse422 | organizationsFormRevisionActivationPreflightResponse429 | organizationsFormRevisionActivationPreflightResponse500 | organizationsFormRevisionActivationPreflightResponse503) & {
-  headers: Record<string, string>;
-};
-
-export type organizationsFormRevisionActivationPreflightResponse = (organizationsFormRevisionActivationPreflightResponseSuccess | organizationsFormRevisionActivationPreflightResponseError)
-
-export const getOrganizationsFormRevisionActivationPreflightUrl = (revisionId: number,) => {
-
-
-
-
-  return `/api/v1/organizations/governance/form-revisions/${revisionId}/activation-preflight/`
-}
-
-/**
- * @summary Form Revision Preflight
- */
-export const organizationsFormRevisionActivationPreflight = async (revisionId: number, options?: Parameters<typeof compassFetch>[1]): Promise<organizationsFormRevisionActivationPreflightResponse> => {
-
-  return compassFetch<organizationsFormRevisionActivationPreflightResponse>(getOrganizationsFormRevisionActivationPreflightUrl(revisionId),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
-export type organizationsFormRevisionApproveResponse200 = {
-  data: FormRevisionProjectionSchema
-  status: 200
-}
-
-export type organizationsFormRevisionApproveResponse400 = {
-  data: ApiErrorSchema
-  status: 400
-}
-
-export type organizationsFormRevisionApproveResponse401 = {
-  data: ApiErrorSchema
-  status: 401
-}
-
-export type organizationsFormRevisionApproveResponse403 = {
-  data: ApiErrorSchema
-  status: 403
-}
-
-export type organizationsFormRevisionApproveResponse404 = {
-  data: ApiErrorSchema
-  status: 404
-}
-
-export type organizationsFormRevisionApproveResponse405 = {
-  data: ApiErrorSchema
-  status: 405
-}
-
-export type organizationsFormRevisionApproveResponse409 = {
-  data: ApiErrorSchema
-  status: 409
-}
-
-export type organizationsFormRevisionApproveResponse413 = {
-  data: ApiErrorSchema
-  status: 413
-}
-
-export type organizationsFormRevisionApproveResponse422 = {
-  data: ApiErrorSchema
-  status: 422
-}
-
-export type organizationsFormRevisionApproveResponse429 = {
-  data: ApiErrorSchema
-  status: 429
-}
-
-export type organizationsFormRevisionApproveResponse500 = {
-  data: ApiErrorSchema
-  status: 500
-}
-
-export type organizationsFormRevisionApproveResponse503 = {
-  data: ApiErrorSchema
-  status: 503
-}
-
-export type organizationsFormRevisionApproveResponseSuccess = (organizationsFormRevisionApproveResponse200) & {
-  headers: Record<string, string>;
-};
-export type organizationsFormRevisionApproveResponseError = (organizationsFormRevisionApproveResponse400 | organizationsFormRevisionApproveResponse401 | organizationsFormRevisionApproveResponse403 | organizationsFormRevisionApproveResponse404 | organizationsFormRevisionApproveResponse405 | organizationsFormRevisionApproveResponse409 | organizationsFormRevisionApproveResponse413 | organizationsFormRevisionApproveResponse422 | organizationsFormRevisionApproveResponse429 | organizationsFormRevisionApproveResponse500 | organizationsFormRevisionApproveResponse503) & {
-  headers: Record<string, string>;
-};
-
-export type organizationsFormRevisionApproveResponse = (organizationsFormRevisionApproveResponseSuccess | organizationsFormRevisionApproveResponseError)
-
-export const getOrganizationsFormRevisionApproveUrl = (revisionId: number,) => {
-
-
-
-
-  return `/api/v1/organizations/governance/form-revisions/${revisionId}/approve/`
-}
-
-/**
- * @summary Form Revision Approve
- */
-export const organizationsFormRevisionApprove = async (revisionId: number,
-    lifecycleSchema: LifecycleSchema, options?: Parameters<typeof compassFetch>[1]): Promise<organizationsFormRevisionApproveResponse> => {
-
-    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Array.isArray(h)) return Object.fromEntries(h);
-    return h;
-  };
-return compassFetch<organizationsFormRevisionApproveResponse>(getOrganizationsFormRevisionApproveUrl(revisionId),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(lifecycleSchema)
-  }
-);}
-
-
 export type organizationsFormRevisionArchiveResponse200 = {
   data: FormRevisionProjectionSchema
   status: 200
@@ -5028,88 +3259,180 @@ return compassFetch<organizationsFormRevisionCloneResponse>(getOrganizationsForm
 );}
 
 
-export type organizationsFormRevisionRetireResponse200 = {
-  data: FormRevisionProjectionSchema
+export type organizationsFormRevisionPublicationPreflightResponse200 = {
+  data: FormRevisionPublicationPreflightSchema
   status: 200
 }
 
-export type organizationsFormRevisionRetireResponse400 = {
+export type organizationsFormRevisionPublicationPreflightResponse400 = {
   data: ApiErrorSchema
   status: 400
 }
 
-export type organizationsFormRevisionRetireResponse401 = {
+export type organizationsFormRevisionPublicationPreflightResponse401 = {
   data: ApiErrorSchema
   status: 401
 }
 
-export type organizationsFormRevisionRetireResponse403 = {
+export type organizationsFormRevisionPublicationPreflightResponse403 = {
   data: ApiErrorSchema
   status: 403
 }
 
-export type organizationsFormRevisionRetireResponse404 = {
+export type organizationsFormRevisionPublicationPreflightResponse404 = {
   data: ApiErrorSchema
   status: 404
 }
 
-export type organizationsFormRevisionRetireResponse405 = {
+export type organizationsFormRevisionPublicationPreflightResponse405 = {
   data: ApiErrorSchema
   status: 405
 }
 
-export type organizationsFormRevisionRetireResponse409 = {
+export type organizationsFormRevisionPublicationPreflightResponse409 = {
   data: ApiErrorSchema
   status: 409
 }
 
-export type organizationsFormRevisionRetireResponse413 = {
+export type organizationsFormRevisionPublicationPreflightResponse413 = {
   data: ApiErrorSchema
   status: 413
 }
 
-export type organizationsFormRevisionRetireResponse422 = {
+export type organizationsFormRevisionPublicationPreflightResponse422 = {
   data: ApiErrorSchema
   status: 422
 }
 
-export type organizationsFormRevisionRetireResponse429 = {
+export type organizationsFormRevisionPublicationPreflightResponse429 = {
   data: ApiErrorSchema
   status: 429
 }
 
-export type organizationsFormRevisionRetireResponse500 = {
+export type organizationsFormRevisionPublicationPreflightResponse500 = {
   data: ApiErrorSchema
   status: 500
 }
 
-export type organizationsFormRevisionRetireResponse503 = {
+export type organizationsFormRevisionPublicationPreflightResponse503 = {
   data: ApiErrorSchema
   status: 503
 }
 
-export type organizationsFormRevisionRetireResponseSuccess = (organizationsFormRevisionRetireResponse200) & {
+export type organizationsFormRevisionPublicationPreflightResponseSuccess = (organizationsFormRevisionPublicationPreflightResponse200) & {
   headers: Record<string, string>;
 };
-export type organizationsFormRevisionRetireResponseError = (organizationsFormRevisionRetireResponse400 | organizationsFormRevisionRetireResponse401 | organizationsFormRevisionRetireResponse403 | organizationsFormRevisionRetireResponse404 | organizationsFormRevisionRetireResponse405 | organizationsFormRevisionRetireResponse409 | organizationsFormRevisionRetireResponse413 | organizationsFormRevisionRetireResponse422 | organizationsFormRevisionRetireResponse429 | organizationsFormRevisionRetireResponse500 | organizationsFormRevisionRetireResponse503) & {
+export type organizationsFormRevisionPublicationPreflightResponseError = (organizationsFormRevisionPublicationPreflightResponse400 | organizationsFormRevisionPublicationPreflightResponse401 | organizationsFormRevisionPublicationPreflightResponse403 | organizationsFormRevisionPublicationPreflightResponse404 | organizationsFormRevisionPublicationPreflightResponse405 | organizationsFormRevisionPublicationPreflightResponse409 | organizationsFormRevisionPublicationPreflightResponse413 | organizationsFormRevisionPublicationPreflightResponse422 | organizationsFormRevisionPublicationPreflightResponse429 | organizationsFormRevisionPublicationPreflightResponse500 | organizationsFormRevisionPublicationPreflightResponse503) & {
   headers: Record<string, string>;
 };
 
-export type organizationsFormRevisionRetireResponse = (organizationsFormRevisionRetireResponseSuccess | organizationsFormRevisionRetireResponseError)
+export type organizationsFormRevisionPublicationPreflightResponse = (organizationsFormRevisionPublicationPreflightResponseSuccess | organizationsFormRevisionPublicationPreflightResponseError)
 
-export const getOrganizationsFormRevisionRetireUrl = (revisionId: number,) => {
-
-
+export const getOrganizationsFormRevisionPublicationPreflightUrl = (revisionId: number,) => {
 
 
-  return `/api/v1/organizations/governance/form-revisions/${revisionId}/retire/`
+
+
+  return `/api/v1/organizations/governance/form-revisions/${revisionId}/publication-preflight/`
 }
 
 /**
- * @summary Form Revision Retire
+ * @summary Form Revision Preflight
  */
-export const organizationsFormRevisionRetire = async (revisionId: number,
-    lifecycleSchema: LifecycleSchema, options?: Parameters<typeof compassFetch>[1]): Promise<organizationsFormRevisionRetireResponse> => {
+export const organizationsFormRevisionPublicationPreflight = async (revisionId: number, options?: Parameters<typeof compassFetch>[1]): Promise<organizationsFormRevisionPublicationPreflightResponse> => {
+
+  return compassFetch<organizationsFormRevisionPublicationPreflightResponse>(getOrganizationsFormRevisionPublicationPreflightUrl(revisionId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+export type organizationsFormRevisionPublishResponse200 = {
+  data: FormRevisionProjectionSchema
+  status: 200
+}
+
+export type organizationsFormRevisionPublishResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type organizationsFormRevisionPublishResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type organizationsFormRevisionPublishResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type organizationsFormRevisionPublishResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type organizationsFormRevisionPublishResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type organizationsFormRevisionPublishResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type organizationsFormRevisionPublishResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type organizationsFormRevisionPublishResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type organizationsFormRevisionPublishResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type organizationsFormRevisionPublishResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type organizationsFormRevisionPublishResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type organizationsFormRevisionPublishResponseSuccess = (organizationsFormRevisionPublishResponse200) & {
+  headers: Record<string, string>;
+};
+export type organizationsFormRevisionPublishResponseError = (organizationsFormRevisionPublishResponse400 | organizationsFormRevisionPublishResponse401 | organizationsFormRevisionPublishResponse403 | organizationsFormRevisionPublishResponse404 | organizationsFormRevisionPublishResponse405 | organizationsFormRevisionPublishResponse409 | organizationsFormRevisionPublishResponse413 | organizationsFormRevisionPublishResponse422 | organizationsFormRevisionPublishResponse429 | organizationsFormRevisionPublishResponse500 | organizationsFormRevisionPublishResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type organizationsFormRevisionPublishResponse = (organizationsFormRevisionPublishResponseSuccess | organizationsFormRevisionPublishResponseError)
+
+export const getOrganizationsFormRevisionPublishUrl = (revisionId: number,) => {
+
+
+
+
+  return `/api/v1/organizations/governance/form-revisions/${revisionId}/publish/`
+}
+
+/**
+ * @summary Form Revision Publish
+ */
+export const organizationsFormRevisionPublish = async (revisionId: number,
+    lifecycleSchema: LifecycleSchema, options?: Parameters<typeof compassFetch>[1]): Promise<organizationsFormRevisionPublishResponse> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -5117,7 +3440,7 @@ export const organizationsFormRevisionRetire = async (revisionId: number,
     if (Array.isArray(h)) return Object.fromEntries(h);
     return h;
   };
-return compassFetch<organizationsFormRevisionRetireResponse>(getOrganizationsFormRevisionRetireUrl(revisionId),
+return compassFetch<organizationsFormRevisionPublishResponse>(getOrganizationsFormRevisionPublishUrl(revisionId),
   {
     ...options,
     method: 'POST',
@@ -5214,8 +3537,8 @@ export const getOrganizationsFormRevisionSourceUploadUrl = (revisionId: number,)
 export const organizationsFormRevisionSourceUpload = async (revisionId: number,
     organizationsFormRevisionSourceUploadBody: OrganizationsFormRevisionSourceUploadBody, options?: Parameters<typeof compassFetch>[1]): Promise<organizationsFormRevisionSourceUploadResponse> => {
     const formData = new FormData();
-if(organizationsFormRevisionSourceUploadBody.expected_updated_at !== undefined && organizationsFormRevisionSourceUploadBody.expected_updated_at !== null) {
- formData.append(`expected_updated_at`, organizationsFormRevisionSourceUploadBody.expected_updated_at);
+if(organizationsFormRevisionSourceUploadBody.expected_resource_version !== undefined && organizationsFormRevisionSourceUploadBody.expected_resource_version !== null) {
+ formData.append(`expected_resource_version`, organizationsFormRevisionSourceUploadBody.expected_resource_version);
  }
 formData.append(`file`, organizationsFormRevisionSourceUploadBody.file);
 if(organizationsFormRevisionSourceUploadBody.source_label !== undefined) {
@@ -5359,105 +3682,6 @@ export const organizationsFormRevisionSourceDownload = async (revisionId: number
 );}
 
 
-export type organizationsFormRevisionSubmitResponse200 = {
-  data: FormRevisionProjectionSchema
-  status: 200
-}
-
-export type organizationsFormRevisionSubmitResponse400 = {
-  data: ApiErrorSchema
-  status: 400
-}
-
-export type organizationsFormRevisionSubmitResponse401 = {
-  data: ApiErrorSchema
-  status: 401
-}
-
-export type organizationsFormRevisionSubmitResponse403 = {
-  data: ApiErrorSchema
-  status: 403
-}
-
-export type organizationsFormRevisionSubmitResponse404 = {
-  data: ApiErrorSchema
-  status: 404
-}
-
-export type organizationsFormRevisionSubmitResponse405 = {
-  data: ApiErrorSchema
-  status: 405
-}
-
-export type organizationsFormRevisionSubmitResponse409 = {
-  data: ApiErrorSchema
-  status: 409
-}
-
-export type organizationsFormRevisionSubmitResponse413 = {
-  data: ApiErrorSchema
-  status: 413
-}
-
-export type organizationsFormRevisionSubmitResponse422 = {
-  data: ApiErrorSchema
-  status: 422
-}
-
-export type organizationsFormRevisionSubmitResponse429 = {
-  data: ApiErrorSchema
-  status: 429
-}
-
-export type organizationsFormRevisionSubmitResponse500 = {
-  data: ApiErrorSchema
-  status: 500
-}
-
-export type organizationsFormRevisionSubmitResponse503 = {
-  data: ApiErrorSchema
-  status: 503
-}
-
-export type organizationsFormRevisionSubmitResponseSuccess = (organizationsFormRevisionSubmitResponse200) & {
-  headers: Record<string, string>;
-};
-export type organizationsFormRevisionSubmitResponseError = (organizationsFormRevisionSubmitResponse400 | organizationsFormRevisionSubmitResponse401 | organizationsFormRevisionSubmitResponse403 | organizationsFormRevisionSubmitResponse404 | organizationsFormRevisionSubmitResponse405 | organizationsFormRevisionSubmitResponse409 | organizationsFormRevisionSubmitResponse413 | organizationsFormRevisionSubmitResponse422 | organizationsFormRevisionSubmitResponse429 | organizationsFormRevisionSubmitResponse500 | organizationsFormRevisionSubmitResponse503) & {
-  headers: Record<string, string>;
-};
-
-export type organizationsFormRevisionSubmitResponse = (organizationsFormRevisionSubmitResponseSuccess | organizationsFormRevisionSubmitResponseError)
-
-export const getOrganizationsFormRevisionSubmitUrl = (revisionId: number,) => {
-
-
-
-
-  return `/api/v1/organizations/governance/form-revisions/${revisionId}/submit/`
-}
-
-/**
- * @summary Form Revision Submit
- */
-export const organizationsFormRevisionSubmit = async (revisionId: number,
-    lifecycleSchema: LifecycleSchema, options?: Parameters<typeof compassFetch>[1]): Promise<organizationsFormRevisionSubmitResponse> => {
-
-    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Array.isArray(h)) return Object.fromEntries(h);
-    return h;
-  };
-return compassFetch<organizationsFormRevisionSubmitResponse>(getOrganizationsFormRevisionSubmitUrl(revisionId),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(lifecycleSchema)
-  }
-);}
-
-
 export type organizationsFormRevisionUpdateResponse200 = {
   data: FormRevisionProjectionSchema
   status: 200
@@ -5557,96 +3781,89 @@ return compassFetch<organizationsFormRevisionUpdateResponse>(getOrganizationsFor
 );}
 
 
-export type organizationsInstitutionProfilesListResponse200 = {
-  data: InstitutionProfilePageSchema
+export type organizationsInstitutionalIdentityDetailResponse200 = {
+  data: InstitutionalIdentityProjectionSchema
   status: 200
 }
 
-export type organizationsInstitutionProfilesListResponse400 = {
+export type organizationsInstitutionalIdentityDetailResponse400 = {
   data: ApiErrorSchema
   status: 400
 }
 
-export type organizationsInstitutionProfilesListResponse401 = {
+export type organizationsInstitutionalIdentityDetailResponse401 = {
   data: ApiErrorSchema
   status: 401
 }
 
-export type organizationsInstitutionProfilesListResponse403 = {
+export type organizationsInstitutionalIdentityDetailResponse403 = {
   data: ApiErrorSchema
   status: 403
 }
 
-export type organizationsInstitutionProfilesListResponse404 = {
+export type organizationsInstitutionalIdentityDetailResponse404 = {
   data: ApiErrorSchema
   status: 404
 }
 
-export type organizationsInstitutionProfilesListResponse405 = {
+export type organizationsInstitutionalIdentityDetailResponse405 = {
   data: ApiErrorSchema
   status: 405
 }
 
-export type organizationsInstitutionProfilesListResponse409 = {
+export type organizationsInstitutionalIdentityDetailResponse409 = {
   data: ApiErrorSchema
   status: 409
 }
 
-export type organizationsInstitutionProfilesListResponse413 = {
+export type organizationsInstitutionalIdentityDetailResponse413 = {
   data: ApiErrorSchema
   status: 413
 }
 
-export type organizationsInstitutionProfilesListResponse422 = {
+export type organizationsInstitutionalIdentityDetailResponse422 = {
   data: ApiErrorSchema
   status: 422
 }
 
-export type organizationsInstitutionProfilesListResponse429 = {
+export type organizationsInstitutionalIdentityDetailResponse429 = {
   data: ApiErrorSchema
   status: 429
 }
 
-export type organizationsInstitutionProfilesListResponse500 = {
+export type organizationsInstitutionalIdentityDetailResponse500 = {
   data: ApiErrorSchema
   status: 500
 }
 
-export type organizationsInstitutionProfilesListResponse503 = {
+export type organizationsInstitutionalIdentityDetailResponse503 = {
   data: ApiErrorSchema
   status: 503
 }
 
-export type organizationsInstitutionProfilesListResponseSuccess = (organizationsInstitutionProfilesListResponse200) & {
+export type organizationsInstitutionalIdentityDetailResponseSuccess = (organizationsInstitutionalIdentityDetailResponse200) & {
   headers: Record<string, string>;
 };
-export type organizationsInstitutionProfilesListResponseError = (organizationsInstitutionProfilesListResponse400 | organizationsInstitutionProfilesListResponse401 | organizationsInstitutionProfilesListResponse403 | organizationsInstitutionProfilesListResponse404 | organizationsInstitutionProfilesListResponse405 | organizationsInstitutionProfilesListResponse409 | organizationsInstitutionProfilesListResponse413 | organizationsInstitutionProfilesListResponse422 | organizationsInstitutionProfilesListResponse429 | organizationsInstitutionProfilesListResponse500 | organizationsInstitutionProfilesListResponse503) & {
+export type organizationsInstitutionalIdentityDetailResponseError = (organizationsInstitutionalIdentityDetailResponse400 | organizationsInstitutionalIdentityDetailResponse401 | organizationsInstitutionalIdentityDetailResponse403 | organizationsInstitutionalIdentityDetailResponse404 | organizationsInstitutionalIdentityDetailResponse405 | organizationsInstitutionalIdentityDetailResponse409 | organizationsInstitutionalIdentityDetailResponse413 | organizationsInstitutionalIdentityDetailResponse422 | organizationsInstitutionalIdentityDetailResponse429 | organizationsInstitutionalIdentityDetailResponse500 | organizationsInstitutionalIdentityDetailResponse503) & {
   headers: Record<string, string>;
 };
 
-export type organizationsInstitutionProfilesListResponse = (organizationsInstitutionProfilesListResponseSuccess | organizationsInstitutionProfilesListResponseError)
+export type organizationsInstitutionalIdentityDetailResponse = (organizationsInstitutionalIdentityDetailResponseSuccess | organizationsInstitutionalIdentityDetailResponseError)
 
-export const getOrganizationsInstitutionProfilesListUrl = (params?: OrganizationsInstitutionProfilesListParams,) => {
-  const normalizedParams = new URLSearchParams();
+export const getOrganizationsInstitutionalIdentityDetailUrl = () => {
 
-  Object.entries(params || {}).forEach(([key, value]) => {
 
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : String(value))
-    }
-  });
 
-  const stringifiedParams = normalizedParams.toString();
 
-  return stringifiedParams.length > 0 ? `/api/v1/organizations/governance/institution-profiles/?${stringifiedParams}` : `/api/v1/organizations/governance/institution-profiles/`
+  return `/api/v1/organizations/institutional-identity/`
 }
 
 /**
- * @summary Institution Profiles
+ * @summary Institutional Identity Detail
  */
-export const organizationsInstitutionProfilesList = async (params?: OrganizationsInstitutionProfilesListParams, options?: Parameters<typeof compassFetch>[1]): Promise<organizationsInstitutionProfilesListResponse> => {
+export const organizationsInstitutionalIdentityDetail = async ( options?: Parameters<typeof compassFetch>[1]): Promise<organizationsInstitutionalIdentityDetailResponse> => {
 
-  return compassFetch<organizationsInstitutionProfilesListResponse>(getOrganizationsInstitutionProfilesListUrl(params),
+  return compassFetch<organizationsInstitutionalIdentityDetailResponse>(getOrganizationsInstitutionalIdentityDetailUrl(),
   {
     ...options,
     method: 'GET'
@@ -5656,87 +3873,87 @@ export const organizationsInstitutionProfilesList = async (params?: Organization
 );}
 
 
-export type organizationsInstitutionProfileCreateResponse200 = {
-  data: InstitutionProfileProjectionSchema
+export type organizationsInstitutionalIdentityUpdateResponse200 = {
+  data: InstitutionalIdentityProjectionSchema
   status: 200
 }
 
-export type organizationsInstitutionProfileCreateResponse400 = {
+export type organizationsInstitutionalIdentityUpdateResponse400 = {
   data: ApiErrorSchema
   status: 400
 }
 
-export type organizationsInstitutionProfileCreateResponse401 = {
+export type organizationsInstitutionalIdentityUpdateResponse401 = {
   data: ApiErrorSchema
   status: 401
 }
 
-export type organizationsInstitutionProfileCreateResponse403 = {
+export type organizationsInstitutionalIdentityUpdateResponse403 = {
   data: ApiErrorSchema
   status: 403
 }
 
-export type organizationsInstitutionProfileCreateResponse404 = {
+export type organizationsInstitutionalIdentityUpdateResponse404 = {
   data: ApiErrorSchema
   status: 404
 }
 
-export type organizationsInstitutionProfileCreateResponse405 = {
+export type organizationsInstitutionalIdentityUpdateResponse405 = {
   data: ApiErrorSchema
   status: 405
 }
 
-export type organizationsInstitutionProfileCreateResponse409 = {
+export type organizationsInstitutionalIdentityUpdateResponse409 = {
   data: ApiErrorSchema
   status: 409
 }
 
-export type organizationsInstitutionProfileCreateResponse413 = {
+export type organizationsInstitutionalIdentityUpdateResponse413 = {
   data: ApiErrorSchema
   status: 413
 }
 
-export type organizationsInstitutionProfileCreateResponse422 = {
+export type organizationsInstitutionalIdentityUpdateResponse422 = {
   data: ApiErrorSchema
   status: 422
 }
 
-export type organizationsInstitutionProfileCreateResponse429 = {
+export type organizationsInstitutionalIdentityUpdateResponse429 = {
   data: ApiErrorSchema
   status: 429
 }
 
-export type organizationsInstitutionProfileCreateResponse500 = {
+export type organizationsInstitutionalIdentityUpdateResponse500 = {
   data: ApiErrorSchema
   status: 500
 }
 
-export type organizationsInstitutionProfileCreateResponse503 = {
+export type organizationsInstitutionalIdentityUpdateResponse503 = {
   data: ApiErrorSchema
   status: 503
 }
 
-export type organizationsInstitutionProfileCreateResponseSuccess = (organizationsInstitutionProfileCreateResponse200) & {
+export type organizationsInstitutionalIdentityUpdateResponseSuccess = (organizationsInstitutionalIdentityUpdateResponse200) & {
   headers: Record<string, string>;
 };
-export type organizationsInstitutionProfileCreateResponseError = (organizationsInstitutionProfileCreateResponse400 | organizationsInstitutionProfileCreateResponse401 | organizationsInstitutionProfileCreateResponse403 | organizationsInstitutionProfileCreateResponse404 | organizationsInstitutionProfileCreateResponse405 | organizationsInstitutionProfileCreateResponse409 | organizationsInstitutionProfileCreateResponse413 | organizationsInstitutionProfileCreateResponse422 | organizationsInstitutionProfileCreateResponse429 | organizationsInstitutionProfileCreateResponse500 | organizationsInstitutionProfileCreateResponse503) & {
+export type organizationsInstitutionalIdentityUpdateResponseError = (organizationsInstitutionalIdentityUpdateResponse400 | organizationsInstitutionalIdentityUpdateResponse401 | organizationsInstitutionalIdentityUpdateResponse403 | organizationsInstitutionalIdentityUpdateResponse404 | organizationsInstitutionalIdentityUpdateResponse405 | organizationsInstitutionalIdentityUpdateResponse409 | organizationsInstitutionalIdentityUpdateResponse413 | organizationsInstitutionalIdentityUpdateResponse422 | organizationsInstitutionalIdentityUpdateResponse429 | organizationsInstitutionalIdentityUpdateResponse500 | organizationsInstitutionalIdentityUpdateResponse503) & {
   headers: Record<string, string>;
 };
 
-export type organizationsInstitutionProfileCreateResponse = (organizationsInstitutionProfileCreateResponseSuccess | organizationsInstitutionProfileCreateResponseError)
+export type organizationsInstitutionalIdentityUpdateResponse = (organizationsInstitutionalIdentityUpdateResponseSuccess | organizationsInstitutionalIdentityUpdateResponseError)
 
-export const getOrganizationsInstitutionProfileCreateUrl = () => {
-
-
+export const getOrganizationsInstitutionalIdentityUpdateUrl = () => {
 
 
-  return `/api/v1/organizations/governance/institution-profiles/`
+
+
+  return `/api/v1/organizations/institutional-identity/`
 }
 
 /**
- * @summary Institution Profile Create
+ * @summary Institutional Identity Update
  */
-export const organizationsInstitutionProfileCreate = async (institutionSchema: InstitutionSchema, options?: Parameters<typeof compassFetch>[1]): Promise<organizationsInstitutionProfileCreateResponse> => {
+export const organizationsInstitutionalIdentityUpdate = async (institutionalIdentityUpdateSchema: InstitutionalIdentityUpdateSchema, options?: Parameters<typeof compassFetch>[1]): Promise<organizationsInstitutionalIdentityUpdateResponse> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -5744,1870 +3961,12 @@ export const organizationsInstitutionProfileCreate = async (institutionSchema: I
     if (Array.isArray(h)) return Object.fromEntries(h);
     return h;
   };
-return compassFetch<organizationsInstitutionProfileCreateResponse>(getOrganizationsInstitutionProfileCreateUrl(),
+return compassFetch<organizationsInstitutionalIdentityUpdateResponse>(getOrganizationsInstitutionalIdentityUpdateUrl(),
   {
     ...options,
-    method: 'POST',
+    method: 'PUT',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(institutionSchema)
-  }
-);}
-
-
-export type organizationsInstitutionProfileDetailResponse200 = {
-  data: InstitutionProfileProjectionSchema
-  status: 200
-}
-
-export type organizationsInstitutionProfileDetailResponse400 = {
-  data: ApiErrorSchema
-  status: 400
-}
-
-export type organizationsInstitutionProfileDetailResponse401 = {
-  data: ApiErrorSchema
-  status: 401
-}
-
-export type organizationsInstitutionProfileDetailResponse403 = {
-  data: ApiErrorSchema
-  status: 403
-}
-
-export type organizationsInstitutionProfileDetailResponse404 = {
-  data: ApiErrorSchema
-  status: 404
-}
-
-export type organizationsInstitutionProfileDetailResponse405 = {
-  data: ApiErrorSchema
-  status: 405
-}
-
-export type organizationsInstitutionProfileDetailResponse409 = {
-  data: ApiErrorSchema
-  status: 409
-}
-
-export type organizationsInstitutionProfileDetailResponse413 = {
-  data: ApiErrorSchema
-  status: 413
-}
-
-export type organizationsInstitutionProfileDetailResponse422 = {
-  data: ApiErrorSchema
-  status: 422
-}
-
-export type organizationsInstitutionProfileDetailResponse429 = {
-  data: ApiErrorSchema
-  status: 429
-}
-
-export type organizationsInstitutionProfileDetailResponse500 = {
-  data: ApiErrorSchema
-  status: 500
-}
-
-export type organizationsInstitutionProfileDetailResponse503 = {
-  data: ApiErrorSchema
-  status: 503
-}
-
-export type organizationsInstitutionProfileDetailResponseSuccess = (organizationsInstitutionProfileDetailResponse200) & {
-  headers: Record<string, string>;
-};
-export type organizationsInstitutionProfileDetailResponseError = (organizationsInstitutionProfileDetailResponse400 | organizationsInstitutionProfileDetailResponse401 | organizationsInstitutionProfileDetailResponse403 | organizationsInstitutionProfileDetailResponse404 | organizationsInstitutionProfileDetailResponse405 | organizationsInstitutionProfileDetailResponse409 | organizationsInstitutionProfileDetailResponse413 | organizationsInstitutionProfileDetailResponse422 | organizationsInstitutionProfileDetailResponse429 | organizationsInstitutionProfileDetailResponse500 | organizationsInstitutionProfileDetailResponse503) & {
-  headers: Record<string, string>;
-};
-
-export type organizationsInstitutionProfileDetailResponse = (organizationsInstitutionProfileDetailResponseSuccess | organizationsInstitutionProfileDetailResponseError)
-
-export const getOrganizationsInstitutionProfileDetailUrl = (profileId: number,) => {
-
-
-
-
-  return `/api/v1/organizations/governance/institution-profiles/${profileId}/`
-}
-
-/**
- * @summary Institution Profile
- */
-export const organizationsInstitutionProfileDetail = async (profileId: number, options?: Parameters<typeof compassFetch>[1]): Promise<organizationsInstitutionProfileDetailResponse> => {
-
-  return compassFetch<organizationsInstitutionProfileDetailResponse>(getOrganizationsInstitutionProfileDetailUrl(profileId),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
-export type organizationsInstitutionProfileActivateResponse200 = {
-  data: InstitutionProfileProjectionSchema
-  status: 200
-}
-
-export type organizationsInstitutionProfileActivateResponse400 = {
-  data: ApiErrorSchema
-  status: 400
-}
-
-export type organizationsInstitutionProfileActivateResponse401 = {
-  data: ApiErrorSchema
-  status: 401
-}
-
-export type organizationsInstitutionProfileActivateResponse403 = {
-  data: ApiErrorSchema
-  status: 403
-}
-
-export type organizationsInstitutionProfileActivateResponse404 = {
-  data: ApiErrorSchema
-  status: 404
-}
-
-export type organizationsInstitutionProfileActivateResponse405 = {
-  data: ApiErrorSchema
-  status: 405
-}
-
-export type organizationsInstitutionProfileActivateResponse409 = {
-  data: ApiErrorSchema
-  status: 409
-}
-
-export type organizationsInstitutionProfileActivateResponse413 = {
-  data: ApiErrorSchema
-  status: 413
-}
-
-export type organizationsInstitutionProfileActivateResponse422 = {
-  data: ApiErrorSchema
-  status: 422
-}
-
-export type organizationsInstitutionProfileActivateResponse429 = {
-  data: ApiErrorSchema
-  status: 429
-}
-
-export type organizationsInstitutionProfileActivateResponse500 = {
-  data: ApiErrorSchema
-  status: 500
-}
-
-export type organizationsInstitutionProfileActivateResponse503 = {
-  data: ApiErrorSchema
-  status: 503
-}
-
-export type organizationsInstitutionProfileActivateResponseSuccess = (organizationsInstitutionProfileActivateResponse200) & {
-  headers: Record<string, string>;
-};
-export type organizationsInstitutionProfileActivateResponseError = (organizationsInstitutionProfileActivateResponse400 | organizationsInstitutionProfileActivateResponse401 | organizationsInstitutionProfileActivateResponse403 | organizationsInstitutionProfileActivateResponse404 | organizationsInstitutionProfileActivateResponse405 | organizationsInstitutionProfileActivateResponse409 | organizationsInstitutionProfileActivateResponse413 | organizationsInstitutionProfileActivateResponse422 | organizationsInstitutionProfileActivateResponse429 | organizationsInstitutionProfileActivateResponse500 | organizationsInstitutionProfileActivateResponse503) & {
-  headers: Record<string, string>;
-};
-
-export type organizationsInstitutionProfileActivateResponse = (organizationsInstitutionProfileActivateResponseSuccess | organizationsInstitutionProfileActivateResponseError)
-
-export const getOrganizationsInstitutionProfileActivateUrl = (profileId: number,) => {
-
-
-
-
-  return `/api/v1/organizations/governance/institution-profiles/${profileId}/activate/`
-}
-
-/**
- * @summary Institution Profile Activate
- */
-export const organizationsInstitutionProfileActivate = async (profileId: number,
-    lifecycleSchema: LifecycleSchema, options?: Parameters<typeof compassFetch>[1]): Promise<organizationsInstitutionProfileActivateResponse> => {
-
-    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Array.isArray(h)) return Object.fromEntries(h);
-    return h;
-  };
-return compassFetch<organizationsInstitutionProfileActivateResponse>(getOrganizationsInstitutionProfileActivateUrl(profileId),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(lifecycleSchema)
-  }
-);}
-
-
-export type organizationsInstitutionProfileArchiveResponse200 = {
-  data: InstitutionProfileProjectionSchema
-  status: 200
-}
-
-export type organizationsInstitutionProfileArchiveResponse400 = {
-  data: ApiErrorSchema
-  status: 400
-}
-
-export type organizationsInstitutionProfileArchiveResponse401 = {
-  data: ApiErrorSchema
-  status: 401
-}
-
-export type organizationsInstitutionProfileArchiveResponse403 = {
-  data: ApiErrorSchema
-  status: 403
-}
-
-export type organizationsInstitutionProfileArchiveResponse404 = {
-  data: ApiErrorSchema
-  status: 404
-}
-
-export type organizationsInstitutionProfileArchiveResponse405 = {
-  data: ApiErrorSchema
-  status: 405
-}
-
-export type organizationsInstitutionProfileArchiveResponse409 = {
-  data: ApiErrorSchema
-  status: 409
-}
-
-export type organizationsInstitutionProfileArchiveResponse413 = {
-  data: ApiErrorSchema
-  status: 413
-}
-
-export type organizationsInstitutionProfileArchiveResponse422 = {
-  data: ApiErrorSchema
-  status: 422
-}
-
-export type organizationsInstitutionProfileArchiveResponse429 = {
-  data: ApiErrorSchema
-  status: 429
-}
-
-export type organizationsInstitutionProfileArchiveResponse500 = {
-  data: ApiErrorSchema
-  status: 500
-}
-
-export type organizationsInstitutionProfileArchiveResponse503 = {
-  data: ApiErrorSchema
-  status: 503
-}
-
-export type organizationsInstitutionProfileArchiveResponseSuccess = (organizationsInstitutionProfileArchiveResponse200) & {
-  headers: Record<string, string>;
-};
-export type organizationsInstitutionProfileArchiveResponseError = (organizationsInstitutionProfileArchiveResponse400 | organizationsInstitutionProfileArchiveResponse401 | organizationsInstitutionProfileArchiveResponse403 | organizationsInstitutionProfileArchiveResponse404 | organizationsInstitutionProfileArchiveResponse405 | organizationsInstitutionProfileArchiveResponse409 | organizationsInstitutionProfileArchiveResponse413 | organizationsInstitutionProfileArchiveResponse422 | organizationsInstitutionProfileArchiveResponse429 | organizationsInstitutionProfileArchiveResponse500 | organizationsInstitutionProfileArchiveResponse503) & {
-  headers: Record<string, string>;
-};
-
-export type organizationsInstitutionProfileArchiveResponse = (organizationsInstitutionProfileArchiveResponseSuccess | organizationsInstitutionProfileArchiveResponseError)
-
-export const getOrganizationsInstitutionProfileArchiveUrl = (profileId: number,) => {
-
-
-
-
-  return `/api/v1/organizations/governance/institution-profiles/${profileId}/archive/`
-}
-
-/**
- * @summary Institution Profile Archive
- */
-export const organizationsInstitutionProfileArchive = async (profileId: number,
-    lifecycleSchema: LifecycleSchema, options?: Parameters<typeof compassFetch>[1]): Promise<organizationsInstitutionProfileArchiveResponse> => {
-
-    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Array.isArray(h)) return Object.fromEntries(h);
-    return h;
-  };
-return compassFetch<organizationsInstitutionProfileArchiveResponse>(getOrganizationsInstitutionProfileArchiveUrl(profileId),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(lifecycleSchema)
-  }
-);}
-
-
-export type organizationsInstitutionProfileRetireResponse200 = {
-  data: InstitutionProfileProjectionSchema
-  status: 200
-}
-
-export type organizationsInstitutionProfileRetireResponse400 = {
-  data: ApiErrorSchema
-  status: 400
-}
-
-export type organizationsInstitutionProfileRetireResponse401 = {
-  data: ApiErrorSchema
-  status: 401
-}
-
-export type organizationsInstitutionProfileRetireResponse403 = {
-  data: ApiErrorSchema
-  status: 403
-}
-
-export type organizationsInstitutionProfileRetireResponse404 = {
-  data: ApiErrorSchema
-  status: 404
-}
-
-export type organizationsInstitutionProfileRetireResponse405 = {
-  data: ApiErrorSchema
-  status: 405
-}
-
-export type organizationsInstitutionProfileRetireResponse409 = {
-  data: ApiErrorSchema
-  status: 409
-}
-
-export type organizationsInstitutionProfileRetireResponse413 = {
-  data: ApiErrorSchema
-  status: 413
-}
-
-export type organizationsInstitutionProfileRetireResponse422 = {
-  data: ApiErrorSchema
-  status: 422
-}
-
-export type organizationsInstitutionProfileRetireResponse429 = {
-  data: ApiErrorSchema
-  status: 429
-}
-
-export type organizationsInstitutionProfileRetireResponse500 = {
-  data: ApiErrorSchema
-  status: 500
-}
-
-export type organizationsInstitutionProfileRetireResponse503 = {
-  data: ApiErrorSchema
-  status: 503
-}
-
-export type organizationsInstitutionProfileRetireResponseSuccess = (organizationsInstitutionProfileRetireResponse200) & {
-  headers: Record<string, string>;
-};
-export type organizationsInstitutionProfileRetireResponseError = (organizationsInstitutionProfileRetireResponse400 | organizationsInstitutionProfileRetireResponse401 | organizationsInstitutionProfileRetireResponse403 | organizationsInstitutionProfileRetireResponse404 | organizationsInstitutionProfileRetireResponse405 | organizationsInstitutionProfileRetireResponse409 | organizationsInstitutionProfileRetireResponse413 | organizationsInstitutionProfileRetireResponse422 | organizationsInstitutionProfileRetireResponse429 | organizationsInstitutionProfileRetireResponse500 | organizationsInstitutionProfileRetireResponse503) & {
-  headers: Record<string, string>;
-};
-
-export type organizationsInstitutionProfileRetireResponse = (organizationsInstitutionProfileRetireResponseSuccess | organizationsInstitutionProfileRetireResponseError)
-
-export const getOrganizationsInstitutionProfileRetireUrl = (profileId: number,) => {
-
-
-
-
-  return `/api/v1/organizations/governance/institution-profiles/${profileId}/retire/`
-}
-
-/**
- * @summary Institution Profile Retire
- */
-export const organizationsInstitutionProfileRetire = async (profileId: number,
-    lifecycleSchema: LifecycleSchema, options?: Parameters<typeof compassFetch>[1]): Promise<organizationsInstitutionProfileRetireResponse> => {
-
-    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Array.isArray(h)) return Object.fromEntries(h);
-    return h;
-  };
-return compassFetch<organizationsInstitutionProfileRetireResponse>(getOrganizationsInstitutionProfileRetireUrl(profileId),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(lifecycleSchema)
-  }
-);}
-
-
-export type organizationsInstitutionProfileUpdateResponse200 = {
-  data: InstitutionProfileProjectionSchema
-  status: 200
-}
-
-export type organizationsInstitutionProfileUpdateResponse400 = {
-  data: ApiErrorSchema
-  status: 400
-}
-
-export type organizationsInstitutionProfileUpdateResponse401 = {
-  data: ApiErrorSchema
-  status: 401
-}
-
-export type organizationsInstitutionProfileUpdateResponse403 = {
-  data: ApiErrorSchema
-  status: 403
-}
-
-export type organizationsInstitutionProfileUpdateResponse404 = {
-  data: ApiErrorSchema
-  status: 404
-}
-
-export type organizationsInstitutionProfileUpdateResponse405 = {
-  data: ApiErrorSchema
-  status: 405
-}
-
-export type organizationsInstitutionProfileUpdateResponse409 = {
-  data: ApiErrorSchema
-  status: 409
-}
-
-export type organizationsInstitutionProfileUpdateResponse413 = {
-  data: ApiErrorSchema
-  status: 413
-}
-
-export type organizationsInstitutionProfileUpdateResponse422 = {
-  data: ApiErrorSchema
-  status: 422
-}
-
-export type organizationsInstitutionProfileUpdateResponse429 = {
-  data: ApiErrorSchema
-  status: 429
-}
-
-export type organizationsInstitutionProfileUpdateResponse500 = {
-  data: ApiErrorSchema
-  status: 500
-}
-
-export type organizationsInstitutionProfileUpdateResponse503 = {
-  data: ApiErrorSchema
-  status: 503
-}
-
-export type organizationsInstitutionProfileUpdateResponseSuccess = (organizationsInstitutionProfileUpdateResponse200) & {
-  headers: Record<string, string>;
-};
-export type organizationsInstitutionProfileUpdateResponseError = (organizationsInstitutionProfileUpdateResponse400 | organizationsInstitutionProfileUpdateResponse401 | organizationsInstitutionProfileUpdateResponse403 | organizationsInstitutionProfileUpdateResponse404 | organizationsInstitutionProfileUpdateResponse405 | organizationsInstitutionProfileUpdateResponse409 | organizationsInstitutionProfileUpdateResponse413 | organizationsInstitutionProfileUpdateResponse422 | organizationsInstitutionProfileUpdateResponse429 | organizationsInstitutionProfileUpdateResponse500 | organizationsInstitutionProfileUpdateResponse503) & {
-  headers: Record<string, string>;
-};
-
-export type organizationsInstitutionProfileUpdateResponse = (organizationsInstitutionProfileUpdateResponseSuccess | organizationsInstitutionProfileUpdateResponseError)
-
-export const getOrganizationsInstitutionProfileUpdateUrl = (profileId: number,) => {
-
-
-
-
-  return `/api/v1/organizations/governance/institution-profiles/${profileId}/update/`
-}
-
-/**
- * @summary Institution Profile Update
- */
-export const organizationsInstitutionProfileUpdate = async (profileId: number,
-    institutionSchema: InstitutionSchema, options?: Parameters<typeof compassFetch>[1]): Promise<organizationsInstitutionProfileUpdateResponse> => {
-
-    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Array.isArray(h)) return Object.fromEntries(h);
-    return h;
-  };
-return compassFetch<organizationsInstitutionProfileUpdateResponse>(getOrganizationsInstitutionProfileUpdateUrl(profileId),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(institutionSchema)
-  }
-);}
-
-
-export type organizationsOfficesListResponse200 = {
-  data: OfficeProfilePageSchema
-  status: 200
-}
-
-export type organizationsOfficesListResponse400 = {
-  data: ApiErrorSchema
-  status: 400
-}
-
-export type organizationsOfficesListResponse401 = {
-  data: ApiErrorSchema
-  status: 401
-}
-
-export type organizationsOfficesListResponse403 = {
-  data: ApiErrorSchema
-  status: 403
-}
-
-export type organizationsOfficesListResponse404 = {
-  data: ApiErrorSchema
-  status: 404
-}
-
-export type organizationsOfficesListResponse405 = {
-  data: ApiErrorSchema
-  status: 405
-}
-
-export type organizationsOfficesListResponse409 = {
-  data: ApiErrorSchema
-  status: 409
-}
-
-export type organizationsOfficesListResponse413 = {
-  data: ApiErrorSchema
-  status: 413
-}
-
-export type organizationsOfficesListResponse422 = {
-  data: ApiErrorSchema
-  status: 422
-}
-
-export type organizationsOfficesListResponse429 = {
-  data: ApiErrorSchema
-  status: 429
-}
-
-export type organizationsOfficesListResponse500 = {
-  data: ApiErrorSchema
-  status: 500
-}
-
-export type organizationsOfficesListResponse503 = {
-  data: ApiErrorSchema
-  status: 503
-}
-
-export type organizationsOfficesListResponseSuccess = (organizationsOfficesListResponse200) & {
-  headers: Record<string, string>;
-};
-export type organizationsOfficesListResponseError = (organizationsOfficesListResponse400 | organizationsOfficesListResponse401 | organizationsOfficesListResponse403 | organizationsOfficesListResponse404 | organizationsOfficesListResponse405 | organizationsOfficesListResponse409 | organizationsOfficesListResponse413 | organizationsOfficesListResponse422 | organizationsOfficesListResponse429 | organizationsOfficesListResponse500 | organizationsOfficesListResponse503) & {
-  headers: Record<string, string>;
-};
-
-export type organizationsOfficesListResponse = (organizationsOfficesListResponseSuccess | organizationsOfficesListResponseError)
-
-export const getOrganizationsOfficesListUrl = (params?: OrganizationsOfficesListParams,) => {
-  const normalizedParams = new URLSearchParams();
-
-  Object.entries(params || {}).forEach(([key, value]) => {
-
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : String(value))
-    }
-  });
-
-  const stringifiedParams = normalizedParams.toString();
-
-  return stringifiedParams.length > 0 ? `/api/v1/organizations/governance/offices/?${stringifiedParams}` : `/api/v1/organizations/governance/offices/`
-}
-
-/**
- * @summary Offices
- */
-export const organizationsOfficesList = async (params?: OrganizationsOfficesListParams, options?: Parameters<typeof compassFetch>[1]): Promise<organizationsOfficesListResponse> => {
-
-  return compassFetch<organizationsOfficesListResponse>(getOrganizationsOfficesListUrl(params),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
-export type organizationsOfficeCreateResponse200 = {
-  data: OfficeProfileProjectionSchema
-  status: 200
-}
-
-export type organizationsOfficeCreateResponse400 = {
-  data: ApiErrorSchema
-  status: 400
-}
-
-export type organizationsOfficeCreateResponse401 = {
-  data: ApiErrorSchema
-  status: 401
-}
-
-export type organizationsOfficeCreateResponse403 = {
-  data: ApiErrorSchema
-  status: 403
-}
-
-export type organizationsOfficeCreateResponse404 = {
-  data: ApiErrorSchema
-  status: 404
-}
-
-export type organizationsOfficeCreateResponse405 = {
-  data: ApiErrorSchema
-  status: 405
-}
-
-export type organizationsOfficeCreateResponse409 = {
-  data: ApiErrorSchema
-  status: 409
-}
-
-export type organizationsOfficeCreateResponse413 = {
-  data: ApiErrorSchema
-  status: 413
-}
-
-export type organizationsOfficeCreateResponse422 = {
-  data: ApiErrorSchema
-  status: 422
-}
-
-export type organizationsOfficeCreateResponse429 = {
-  data: ApiErrorSchema
-  status: 429
-}
-
-export type organizationsOfficeCreateResponse500 = {
-  data: ApiErrorSchema
-  status: 500
-}
-
-export type organizationsOfficeCreateResponse503 = {
-  data: ApiErrorSchema
-  status: 503
-}
-
-export type organizationsOfficeCreateResponseSuccess = (organizationsOfficeCreateResponse200) & {
-  headers: Record<string, string>;
-};
-export type organizationsOfficeCreateResponseError = (organizationsOfficeCreateResponse400 | organizationsOfficeCreateResponse401 | organizationsOfficeCreateResponse403 | organizationsOfficeCreateResponse404 | organizationsOfficeCreateResponse405 | organizationsOfficeCreateResponse409 | organizationsOfficeCreateResponse413 | organizationsOfficeCreateResponse422 | organizationsOfficeCreateResponse429 | organizationsOfficeCreateResponse500 | organizationsOfficeCreateResponse503) & {
-  headers: Record<string, string>;
-};
-
-export type organizationsOfficeCreateResponse = (organizationsOfficeCreateResponseSuccess | organizationsOfficeCreateResponseError)
-
-export const getOrganizationsOfficeCreateUrl = () => {
-
-
-
-
-  return `/api/v1/organizations/governance/offices/`
-}
-
-/**
- * @summary Office Create
- */
-export const organizationsOfficeCreate = async (officeSchema: OfficeSchema, options?: Parameters<typeof compassFetch>[1]): Promise<organizationsOfficeCreateResponse> => {
-
-    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Array.isArray(h)) return Object.fromEntries(h);
-    return h;
-  };
-return compassFetch<organizationsOfficeCreateResponse>(getOrganizationsOfficeCreateUrl(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(officeSchema)
-  }
-);}
-
-
-export type organizationsOfficeDetailResponse200 = {
-  data: OfficeProfileProjectionSchema
-  status: 200
-}
-
-export type organizationsOfficeDetailResponse400 = {
-  data: ApiErrorSchema
-  status: 400
-}
-
-export type organizationsOfficeDetailResponse401 = {
-  data: ApiErrorSchema
-  status: 401
-}
-
-export type organizationsOfficeDetailResponse403 = {
-  data: ApiErrorSchema
-  status: 403
-}
-
-export type organizationsOfficeDetailResponse404 = {
-  data: ApiErrorSchema
-  status: 404
-}
-
-export type organizationsOfficeDetailResponse405 = {
-  data: ApiErrorSchema
-  status: 405
-}
-
-export type organizationsOfficeDetailResponse409 = {
-  data: ApiErrorSchema
-  status: 409
-}
-
-export type organizationsOfficeDetailResponse413 = {
-  data: ApiErrorSchema
-  status: 413
-}
-
-export type organizationsOfficeDetailResponse422 = {
-  data: ApiErrorSchema
-  status: 422
-}
-
-export type organizationsOfficeDetailResponse429 = {
-  data: ApiErrorSchema
-  status: 429
-}
-
-export type organizationsOfficeDetailResponse500 = {
-  data: ApiErrorSchema
-  status: 500
-}
-
-export type organizationsOfficeDetailResponse503 = {
-  data: ApiErrorSchema
-  status: 503
-}
-
-export type organizationsOfficeDetailResponseSuccess = (organizationsOfficeDetailResponse200) & {
-  headers: Record<string, string>;
-};
-export type organizationsOfficeDetailResponseError = (organizationsOfficeDetailResponse400 | organizationsOfficeDetailResponse401 | organizationsOfficeDetailResponse403 | organizationsOfficeDetailResponse404 | organizationsOfficeDetailResponse405 | organizationsOfficeDetailResponse409 | organizationsOfficeDetailResponse413 | organizationsOfficeDetailResponse422 | organizationsOfficeDetailResponse429 | organizationsOfficeDetailResponse500 | organizationsOfficeDetailResponse503) & {
-  headers: Record<string, string>;
-};
-
-export type organizationsOfficeDetailResponse = (organizationsOfficeDetailResponseSuccess | organizationsOfficeDetailResponseError)
-
-export const getOrganizationsOfficeDetailUrl = (officeId: number,) => {
-
-
-
-
-  return `/api/v1/organizations/governance/offices/${officeId}/`
-}
-
-/**
- * @summary Office
- */
-export const organizationsOfficeDetail = async (officeId: number, options?: Parameters<typeof compassFetch>[1]): Promise<organizationsOfficeDetailResponse> => {
-
-  return compassFetch<organizationsOfficeDetailResponse>(getOrganizationsOfficeDetailUrl(officeId),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
-export type organizationsOfficeActivateResponse200 = {
-  data: OfficeProfileProjectionSchema
-  status: 200
-}
-
-export type organizationsOfficeActivateResponse400 = {
-  data: ApiErrorSchema
-  status: 400
-}
-
-export type organizationsOfficeActivateResponse401 = {
-  data: ApiErrorSchema
-  status: 401
-}
-
-export type organizationsOfficeActivateResponse403 = {
-  data: ApiErrorSchema
-  status: 403
-}
-
-export type organizationsOfficeActivateResponse404 = {
-  data: ApiErrorSchema
-  status: 404
-}
-
-export type organizationsOfficeActivateResponse405 = {
-  data: ApiErrorSchema
-  status: 405
-}
-
-export type organizationsOfficeActivateResponse409 = {
-  data: ApiErrorSchema
-  status: 409
-}
-
-export type organizationsOfficeActivateResponse413 = {
-  data: ApiErrorSchema
-  status: 413
-}
-
-export type organizationsOfficeActivateResponse422 = {
-  data: ApiErrorSchema
-  status: 422
-}
-
-export type organizationsOfficeActivateResponse429 = {
-  data: ApiErrorSchema
-  status: 429
-}
-
-export type organizationsOfficeActivateResponse500 = {
-  data: ApiErrorSchema
-  status: 500
-}
-
-export type organizationsOfficeActivateResponse503 = {
-  data: ApiErrorSchema
-  status: 503
-}
-
-export type organizationsOfficeActivateResponseSuccess = (organizationsOfficeActivateResponse200) & {
-  headers: Record<string, string>;
-};
-export type organizationsOfficeActivateResponseError = (organizationsOfficeActivateResponse400 | organizationsOfficeActivateResponse401 | organizationsOfficeActivateResponse403 | organizationsOfficeActivateResponse404 | organizationsOfficeActivateResponse405 | organizationsOfficeActivateResponse409 | organizationsOfficeActivateResponse413 | organizationsOfficeActivateResponse422 | organizationsOfficeActivateResponse429 | organizationsOfficeActivateResponse500 | organizationsOfficeActivateResponse503) & {
-  headers: Record<string, string>;
-};
-
-export type organizationsOfficeActivateResponse = (organizationsOfficeActivateResponseSuccess | organizationsOfficeActivateResponseError)
-
-export const getOrganizationsOfficeActivateUrl = (officeId: number,) => {
-
-
-
-
-  return `/api/v1/organizations/governance/offices/${officeId}/activate/`
-}
-
-/**
- * @summary Office Activate
- */
-export const organizationsOfficeActivate = async (officeId: number,
-    lifecycleSchema: LifecycleSchema, options?: Parameters<typeof compassFetch>[1]): Promise<organizationsOfficeActivateResponse> => {
-
-    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Array.isArray(h)) return Object.fromEntries(h);
-    return h;
-  };
-return compassFetch<organizationsOfficeActivateResponse>(getOrganizationsOfficeActivateUrl(officeId),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(lifecycleSchema)
-  }
-);}
-
-
-export type organizationsOfficeArchiveResponse200 = {
-  data: OfficeProfileProjectionSchema
-  status: 200
-}
-
-export type organizationsOfficeArchiveResponse400 = {
-  data: ApiErrorSchema
-  status: 400
-}
-
-export type organizationsOfficeArchiveResponse401 = {
-  data: ApiErrorSchema
-  status: 401
-}
-
-export type organizationsOfficeArchiveResponse403 = {
-  data: ApiErrorSchema
-  status: 403
-}
-
-export type organizationsOfficeArchiveResponse404 = {
-  data: ApiErrorSchema
-  status: 404
-}
-
-export type organizationsOfficeArchiveResponse405 = {
-  data: ApiErrorSchema
-  status: 405
-}
-
-export type organizationsOfficeArchiveResponse409 = {
-  data: ApiErrorSchema
-  status: 409
-}
-
-export type organizationsOfficeArchiveResponse413 = {
-  data: ApiErrorSchema
-  status: 413
-}
-
-export type organizationsOfficeArchiveResponse422 = {
-  data: ApiErrorSchema
-  status: 422
-}
-
-export type organizationsOfficeArchiveResponse429 = {
-  data: ApiErrorSchema
-  status: 429
-}
-
-export type organizationsOfficeArchiveResponse500 = {
-  data: ApiErrorSchema
-  status: 500
-}
-
-export type organizationsOfficeArchiveResponse503 = {
-  data: ApiErrorSchema
-  status: 503
-}
-
-export type organizationsOfficeArchiveResponseSuccess = (organizationsOfficeArchiveResponse200) & {
-  headers: Record<string, string>;
-};
-export type organizationsOfficeArchiveResponseError = (organizationsOfficeArchiveResponse400 | organizationsOfficeArchiveResponse401 | organizationsOfficeArchiveResponse403 | organizationsOfficeArchiveResponse404 | organizationsOfficeArchiveResponse405 | organizationsOfficeArchiveResponse409 | organizationsOfficeArchiveResponse413 | organizationsOfficeArchiveResponse422 | organizationsOfficeArchiveResponse429 | organizationsOfficeArchiveResponse500 | organizationsOfficeArchiveResponse503) & {
-  headers: Record<string, string>;
-};
-
-export type organizationsOfficeArchiveResponse = (organizationsOfficeArchiveResponseSuccess | organizationsOfficeArchiveResponseError)
-
-export const getOrganizationsOfficeArchiveUrl = (officeId: number,) => {
-
-
-
-
-  return `/api/v1/organizations/governance/offices/${officeId}/archive/`
-}
-
-/**
- * @summary Office Archive
- */
-export const organizationsOfficeArchive = async (officeId: number,
-    lifecycleSchema: LifecycleSchema, options?: Parameters<typeof compassFetch>[1]): Promise<organizationsOfficeArchiveResponse> => {
-
-    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Array.isArray(h)) return Object.fromEntries(h);
-    return h;
-  };
-return compassFetch<organizationsOfficeArchiveResponse>(getOrganizationsOfficeArchiveUrl(officeId),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(lifecycleSchema)
-  }
-);}
-
-
-export type organizationsOfficeRetireResponse200 = {
-  data: OfficeProfileProjectionSchema
-  status: 200
-}
-
-export type organizationsOfficeRetireResponse400 = {
-  data: ApiErrorSchema
-  status: 400
-}
-
-export type organizationsOfficeRetireResponse401 = {
-  data: ApiErrorSchema
-  status: 401
-}
-
-export type organizationsOfficeRetireResponse403 = {
-  data: ApiErrorSchema
-  status: 403
-}
-
-export type organizationsOfficeRetireResponse404 = {
-  data: ApiErrorSchema
-  status: 404
-}
-
-export type organizationsOfficeRetireResponse405 = {
-  data: ApiErrorSchema
-  status: 405
-}
-
-export type organizationsOfficeRetireResponse409 = {
-  data: ApiErrorSchema
-  status: 409
-}
-
-export type organizationsOfficeRetireResponse413 = {
-  data: ApiErrorSchema
-  status: 413
-}
-
-export type organizationsOfficeRetireResponse422 = {
-  data: ApiErrorSchema
-  status: 422
-}
-
-export type organizationsOfficeRetireResponse429 = {
-  data: ApiErrorSchema
-  status: 429
-}
-
-export type organizationsOfficeRetireResponse500 = {
-  data: ApiErrorSchema
-  status: 500
-}
-
-export type organizationsOfficeRetireResponse503 = {
-  data: ApiErrorSchema
-  status: 503
-}
-
-export type organizationsOfficeRetireResponseSuccess = (organizationsOfficeRetireResponse200) & {
-  headers: Record<string, string>;
-};
-export type organizationsOfficeRetireResponseError = (organizationsOfficeRetireResponse400 | organizationsOfficeRetireResponse401 | organizationsOfficeRetireResponse403 | organizationsOfficeRetireResponse404 | organizationsOfficeRetireResponse405 | organizationsOfficeRetireResponse409 | organizationsOfficeRetireResponse413 | organizationsOfficeRetireResponse422 | organizationsOfficeRetireResponse429 | organizationsOfficeRetireResponse500 | organizationsOfficeRetireResponse503) & {
-  headers: Record<string, string>;
-};
-
-export type organizationsOfficeRetireResponse = (organizationsOfficeRetireResponseSuccess | organizationsOfficeRetireResponseError)
-
-export const getOrganizationsOfficeRetireUrl = (officeId: number,) => {
-
-
-
-
-  return `/api/v1/organizations/governance/offices/${officeId}/retire/`
-}
-
-/**
- * @summary Office Retire
- */
-export const organizationsOfficeRetire = async (officeId: number,
-    lifecycleSchema: LifecycleSchema, options?: Parameters<typeof compassFetch>[1]): Promise<organizationsOfficeRetireResponse> => {
-
-    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Array.isArray(h)) return Object.fromEntries(h);
-    return h;
-  };
-return compassFetch<organizationsOfficeRetireResponse>(getOrganizationsOfficeRetireUrl(officeId),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(lifecycleSchema)
-  }
-);}
-
-
-export type organizationsOfficeUpdateResponse200 = {
-  data: OfficeProfileProjectionSchema
-  status: 200
-}
-
-export type organizationsOfficeUpdateResponse400 = {
-  data: ApiErrorSchema
-  status: 400
-}
-
-export type organizationsOfficeUpdateResponse401 = {
-  data: ApiErrorSchema
-  status: 401
-}
-
-export type organizationsOfficeUpdateResponse403 = {
-  data: ApiErrorSchema
-  status: 403
-}
-
-export type organizationsOfficeUpdateResponse404 = {
-  data: ApiErrorSchema
-  status: 404
-}
-
-export type organizationsOfficeUpdateResponse405 = {
-  data: ApiErrorSchema
-  status: 405
-}
-
-export type organizationsOfficeUpdateResponse409 = {
-  data: ApiErrorSchema
-  status: 409
-}
-
-export type organizationsOfficeUpdateResponse413 = {
-  data: ApiErrorSchema
-  status: 413
-}
-
-export type organizationsOfficeUpdateResponse422 = {
-  data: ApiErrorSchema
-  status: 422
-}
-
-export type organizationsOfficeUpdateResponse429 = {
-  data: ApiErrorSchema
-  status: 429
-}
-
-export type organizationsOfficeUpdateResponse500 = {
-  data: ApiErrorSchema
-  status: 500
-}
-
-export type organizationsOfficeUpdateResponse503 = {
-  data: ApiErrorSchema
-  status: 503
-}
-
-export type organizationsOfficeUpdateResponseSuccess = (organizationsOfficeUpdateResponse200) & {
-  headers: Record<string, string>;
-};
-export type organizationsOfficeUpdateResponseError = (organizationsOfficeUpdateResponse400 | organizationsOfficeUpdateResponse401 | organizationsOfficeUpdateResponse403 | organizationsOfficeUpdateResponse404 | organizationsOfficeUpdateResponse405 | organizationsOfficeUpdateResponse409 | organizationsOfficeUpdateResponse413 | organizationsOfficeUpdateResponse422 | organizationsOfficeUpdateResponse429 | organizationsOfficeUpdateResponse500 | organizationsOfficeUpdateResponse503) & {
-  headers: Record<string, string>;
-};
-
-export type organizationsOfficeUpdateResponse = (organizationsOfficeUpdateResponseSuccess | organizationsOfficeUpdateResponseError)
-
-export const getOrganizationsOfficeUpdateUrl = (officeId: number,) => {
-
-
-
-
-  return `/api/v1/organizations/governance/offices/${officeId}/update/`
-}
-
-/**
- * @summary Office Update
- */
-export const organizationsOfficeUpdate = async (officeId: number,
-    officeSchema: OfficeSchema, options?: Parameters<typeof compassFetch>[1]): Promise<organizationsOfficeUpdateResponse> => {
-
-    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Array.isArray(h)) return Object.fromEntries(h);
-    return h;
-  };
-return compassFetch<organizationsOfficeUpdateResponse>(getOrganizationsOfficeUpdateUrl(officeId),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(officeSchema)
-  }
-);}
-
-
-export type organizationsPublicLinksListResponse200 = {
-  data: PublicLinkPageSchema
-  status: 200
-}
-
-export type organizationsPublicLinksListResponse400 = {
-  data: ApiErrorSchema
-  status: 400
-}
-
-export type organizationsPublicLinksListResponse401 = {
-  data: ApiErrorSchema
-  status: 401
-}
-
-export type organizationsPublicLinksListResponse403 = {
-  data: ApiErrorSchema
-  status: 403
-}
-
-export type organizationsPublicLinksListResponse404 = {
-  data: ApiErrorSchema
-  status: 404
-}
-
-export type organizationsPublicLinksListResponse405 = {
-  data: ApiErrorSchema
-  status: 405
-}
-
-export type organizationsPublicLinksListResponse409 = {
-  data: ApiErrorSchema
-  status: 409
-}
-
-export type organizationsPublicLinksListResponse413 = {
-  data: ApiErrorSchema
-  status: 413
-}
-
-export type organizationsPublicLinksListResponse422 = {
-  data: ApiErrorSchema
-  status: 422
-}
-
-export type organizationsPublicLinksListResponse429 = {
-  data: ApiErrorSchema
-  status: 429
-}
-
-export type organizationsPublicLinksListResponse500 = {
-  data: ApiErrorSchema
-  status: 500
-}
-
-export type organizationsPublicLinksListResponse503 = {
-  data: ApiErrorSchema
-  status: 503
-}
-
-export type organizationsPublicLinksListResponseSuccess = (organizationsPublicLinksListResponse200) & {
-  headers: Record<string, string>;
-};
-export type organizationsPublicLinksListResponseError = (organizationsPublicLinksListResponse400 | organizationsPublicLinksListResponse401 | organizationsPublicLinksListResponse403 | organizationsPublicLinksListResponse404 | organizationsPublicLinksListResponse405 | organizationsPublicLinksListResponse409 | organizationsPublicLinksListResponse413 | organizationsPublicLinksListResponse422 | organizationsPublicLinksListResponse429 | organizationsPublicLinksListResponse500 | organizationsPublicLinksListResponse503) & {
-  headers: Record<string, string>;
-};
-
-export type organizationsPublicLinksListResponse = (organizationsPublicLinksListResponseSuccess | organizationsPublicLinksListResponseError)
-
-export const getOrganizationsPublicLinksListUrl = (params?: OrganizationsPublicLinksListParams,) => {
-  const normalizedParams = new URLSearchParams();
-
-  Object.entries(params || {}).forEach(([key, value]) => {
-
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : String(value))
-    }
-  });
-
-  const stringifiedParams = normalizedParams.toString();
-
-  return stringifiedParams.length > 0 ? `/api/v1/organizations/governance/public-links/?${stringifiedParams}` : `/api/v1/organizations/governance/public-links/`
-}
-
-/**
- * @summary Public Link List
- */
-export const organizationsPublicLinksList = async (params?: OrganizationsPublicLinksListParams, options?: Parameters<typeof compassFetch>[1]): Promise<organizationsPublicLinksListResponse> => {
-
-  return compassFetch<organizationsPublicLinksListResponse>(getOrganizationsPublicLinksListUrl(params),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
-export type organizationsPublicLinkCreateResponse200 = {
-  data: PublicLinkProjectionSchema
-  status: 200
-}
-
-export type organizationsPublicLinkCreateResponse400 = {
-  data: ApiErrorSchema
-  status: 400
-}
-
-export type organizationsPublicLinkCreateResponse401 = {
-  data: ApiErrorSchema
-  status: 401
-}
-
-export type organizationsPublicLinkCreateResponse403 = {
-  data: ApiErrorSchema
-  status: 403
-}
-
-export type organizationsPublicLinkCreateResponse404 = {
-  data: ApiErrorSchema
-  status: 404
-}
-
-export type organizationsPublicLinkCreateResponse405 = {
-  data: ApiErrorSchema
-  status: 405
-}
-
-export type organizationsPublicLinkCreateResponse409 = {
-  data: ApiErrorSchema
-  status: 409
-}
-
-export type organizationsPublicLinkCreateResponse413 = {
-  data: ApiErrorSchema
-  status: 413
-}
-
-export type organizationsPublicLinkCreateResponse422 = {
-  data: ApiErrorSchema
-  status: 422
-}
-
-export type organizationsPublicLinkCreateResponse429 = {
-  data: ApiErrorSchema
-  status: 429
-}
-
-export type organizationsPublicLinkCreateResponse500 = {
-  data: ApiErrorSchema
-  status: 500
-}
-
-export type organizationsPublicLinkCreateResponse503 = {
-  data: ApiErrorSchema
-  status: 503
-}
-
-export type organizationsPublicLinkCreateResponseSuccess = (organizationsPublicLinkCreateResponse200) & {
-  headers: Record<string, string>;
-};
-export type organizationsPublicLinkCreateResponseError = (organizationsPublicLinkCreateResponse400 | organizationsPublicLinkCreateResponse401 | organizationsPublicLinkCreateResponse403 | organizationsPublicLinkCreateResponse404 | organizationsPublicLinkCreateResponse405 | organizationsPublicLinkCreateResponse409 | organizationsPublicLinkCreateResponse413 | organizationsPublicLinkCreateResponse422 | organizationsPublicLinkCreateResponse429 | organizationsPublicLinkCreateResponse500 | organizationsPublicLinkCreateResponse503) & {
-  headers: Record<string, string>;
-};
-
-export type organizationsPublicLinkCreateResponse = (organizationsPublicLinkCreateResponseSuccess | organizationsPublicLinkCreateResponseError)
-
-export const getOrganizationsPublicLinkCreateUrl = () => {
-
-
-
-
-  return `/api/v1/organizations/governance/public-links/`
-}
-
-/**
- * @summary Public Link Create
- */
-export const organizationsPublicLinkCreate = async (publicLinkSchema: PublicLinkSchema, options?: Parameters<typeof compassFetch>[1]): Promise<organizationsPublicLinkCreateResponse> => {
-
-    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Array.isArray(h)) return Object.fromEntries(h);
-    return h;
-  };
-return compassFetch<organizationsPublicLinkCreateResponse>(getOrganizationsPublicLinkCreateUrl(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(publicLinkSchema)
-  }
-);}
-
-
-export type organizationsPublicLinkDetailResponse200 = {
-  data: PublicLinkProjectionSchema
-  status: 200
-}
-
-export type organizationsPublicLinkDetailResponse400 = {
-  data: ApiErrorSchema
-  status: 400
-}
-
-export type organizationsPublicLinkDetailResponse401 = {
-  data: ApiErrorSchema
-  status: 401
-}
-
-export type organizationsPublicLinkDetailResponse403 = {
-  data: ApiErrorSchema
-  status: 403
-}
-
-export type organizationsPublicLinkDetailResponse404 = {
-  data: ApiErrorSchema
-  status: 404
-}
-
-export type organizationsPublicLinkDetailResponse405 = {
-  data: ApiErrorSchema
-  status: 405
-}
-
-export type organizationsPublicLinkDetailResponse409 = {
-  data: ApiErrorSchema
-  status: 409
-}
-
-export type organizationsPublicLinkDetailResponse413 = {
-  data: ApiErrorSchema
-  status: 413
-}
-
-export type organizationsPublicLinkDetailResponse422 = {
-  data: ApiErrorSchema
-  status: 422
-}
-
-export type organizationsPublicLinkDetailResponse429 = {
-  data: ApiErrorSchema
-  status: 429
-}
-
-export type organizationsPublicLinkDetailResponse500 = {
-  data: ApiErrorSchema
-  status: 500
-}
-
-export type organizationsPublicLinkDetailResponse503 = {
-  data: ApiErrorSchema
-  status: 503
-}
-
-export type organizationsPublicLinkDetailResponseSuccess = (organizationsPublicLinkDetailResponse200) & {
-  headers: Record<string, string>;
-};
-export type organizationsPublicLinkDetailResponseError = (organizationsPublicLinkDetailResponse400 | organizationsPublicLinkDetailResponse401 | organizationsPublicLinkDetailResponse403 | organizationsPublicLinkDetailResponse404 | organizationsPublicLinkDetailResponse405 | organizationsPublicLinkDetailResponse409 | organizationsPublicLinkDetailResponse413 | organizationsPublicLinkDetailResponse422 | organizationsPublicLinkDetailResponse429 | organizationsPublicLinkDetailResponse500 | organizationsPublicLinkDetailResponse503) & {
-  headers: Record<string, string>;
-};
-
-export type organizationsPublicLinkDetailResponse = (organizationsPublicLinkDetailResponseSuccess | organizationsPublicLinkDetailResponseError)
-
-export const getOrganizationsPublicLinkDetailUrl = (linkId: number,) => {
-
-
-
-
-  return `/api/v1/organizations/governance/public-links/${linkId}/`
-}
-
-/**
- * @summary Public Link Detail
- */
-export const organizationsPublicLinkDetail = async (linkId: number, options?: Parameters<typeof compassFetch>[1]): Promise<organizationsPublicLinkDetailResponse> => {
-
-  return compassFetch<organizationsPublicLinkDetailResponse>(getOrganizationsPublicLinkDetailUrl(linkId),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
-export type organizationsPublicLinkActivateResponse200 = {
-  data: PublicLinkProjectionSchema
-  status: 200
-}
-
-export type organizationsPublicLinkActivateResponse400 = {
-  data: ApiErrorSchema
-  status: 400
-}
-
-export type organizationsPublicLinkActivateResponse401 = {
-  data: ApiErrorSchema
-  status: 401
-}
-
-export type organizationsPublicLinkActivateResponse403 = {
-  data: ApiErrorSchema
-  status: 403
-}
-
-export type organizationsPublicLinkActivateResponse404 = {
-  data: ApiErrorSchema
-  status: 404
-}
-
-export type organizationsPublicLinkActivateResponse405 = {
-  data: ApiErrorSchema
-  status: 405
-}
-
-export type organizationsPublicLinkActivateResponse409 = {
-  data: ApiErrorSchema
-  status: 409
-}
-
-export type organizationsPublicLinkActivateResponse413 = {
-  data: ApiErrorSchema
-  status: 413
-}
-
-export type organizationsPublicLinkActivateResponse422 = {
-  data: ApiErrorSchema
-  status: 422
-}
-
-export type organizationsPublicLinkActivateResponse429 = {
-  data: ApiErrorSchema
-  status: 429
-}
-
-export type organizationsPublicLinkActivateResponse500 = {
-  data: ApiErrorSchema
-  status: 500
-}
-
-export type organizationsPublicLinkActivateResponse503 = {
-  data: ApiErrorSchema
-  status: 503
-}
-
-export type organizationsPublicLinkActivateResponseSuccess = (organizationsPublicLinkActivateResponse200) & {
-  headers: Record<string, string>;
-};
-export type organizationsPublicLinkActivateResponseError = (organizationsPublicLinkActivateResponse400 | organizationsPublicLinkActivateResponse401 | organizationsPublicLinkActivateResponse403 | organizationsPublicLinkActivateResponse404 | organizationsPublicLinkActivateResponse405 | organizationsPublicLinkActivateResponse409 | organizationsPublicLinkActivateResponse413 | organizationsPublicLinkActivateResponse422 | organizationsPublicLinkActivateResponse429 | organizationsPublicLinkActivateResponse500 | organizationsPublicLinkActivateResponse503) & {
-  headers: Record<string, string>;
-};
-
-export type organizationsPublicLinkActivateResponse = (organizationsPublicLinkActivateResponseSuccess | organizationsPublicLinkActivateResponseError)
-
-export const getOrganizationsPublicLinkActivateUrl = (linkId: number,) => {
-
-
-
-
-  return `/api/v1/organizations/governance/public-links/${linkId}/activate/`
-}
-
-/**
- * @summary Public Link Activate
- */
-export const organizationsPublicLinkActivate = async (linkId: number,
-    lifecycleSchema: LifecycleSchema, options?: Parameters<typeof compassFetch>[1]): Promise<organizationsPublicLinkActivateResponse> => {
-
-    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Array.isArray(h)) return Object.fromEntries(h);
-    return h;
-  };
-return compassFetch<organizationsPublicLinkActivateResponse>(getOrganizationsPublicLinkActivateUrl(linkId),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(lifecycleSchema)
-  }
-);}
-
-
-export type organizationsPublicLinkArchiveResponse200 = {
-  data: PublicLinkProjectionSchema
-  status: 200
-}
-
-export type organizationsPublicLinkArchiveResponse400 = {
-  data: ApiErrorSchema
-  status: 400
-}
-
-export type organizationsPublicLinkArchiveResponse401 = {
-  data: ApiErrorSchema
-  status: 401
-}
-
-export type organizationsPublicLinkArchiveResponse403 = {
-  data: ApiErrorSchema
-  status: 403
-}
-
-export type organizationsPublicLinkArchiveResponse404 = {
-  data: ApiErrorSchema
-  status: 404
-}
-
-export type organizationsPublicLinkArchiveResponse405 = {
-  data: ApiErrorSchema
-  status: 405
-}
-
-export type organizationsPublicLinkArchiveResponse409 = {
-  data: ApiErrorSchema
-  status: 409
-}
-
-export type organizationsPublicLinkArchiveResponse413 = {
-  data: ApiErrorSchema
-  status: 413
-}
-
-export type organizationsPublicLinkArchiveResponse422 = {
-  data: ApiErrorSchema
-  status: 422
-}
-
-export type organizationsPublicLinkArchiveResponse429 = {
-  data: ApiErrorSchema
-  status: 429
-}
-
-export type organizationsPublicLinkArchiveResponse500 = {
-  data: ApiErrorSchema
-  status: 500
-}
-
-export type organizationsPublicLinkArchiveResponse503 = {
-  data: ApiErrorSchema
-  status: 503
-}
-
-export type organizationsPublicLinkArchiveResponseSuccess = (organizationsPublicLinkArchiveResponse200) & {
-  headers: Record<string, string>;
-};
-export type organizationsPublicLinkArchiveResponseError = (organizationsPublicLinkArchiveResponse400 | organizationsPublicLinkArchiveResponse401 | organizationsPublicLinkArchiveResponse403 | organizationsPublicLinkArchiveResponse404 | organizationsPublicLinkArchiveResponse405 | organizationsPublicLinkArchiveResponse409 | organizationsPublicLinkArchiveResponse413 | organizationsPublicLinkArchiveResponse422 | organizationsPublicLinkArchiveResponse429 | organizationsPublicLinkArchiveResponse500 | organizationsPublicLinkArchiveResponse503) & {
-  headers: Record<string, string>;
-};
-
-export type organizationsPublicLinkArchiveResponse = (organizationsPublicLinkArchiveResponseSuccess | organizationsPublicLinkArchiveResponseError)
-
-export const getOrganizationsPublicLinkArchiveUrl = (linkId: number,) => {
-
-
-
-
-  return `/api/v1/organizations/governance/public-links/${linkId}/archive/`
-}
-
-/**
- * @summary Public Link Archive
- */
-export const organizationsPublicLinkArchive = async (linkId: number,
-    lifecycleSchema: LifecycleSchema, options?: Parameters<typeof compassFetch>[1]): Promise<organizationsPublicLinkArchiveResponse> => {
-
-    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Array.isArray(h)) return Object.fromEntries(h);
-    return h;
-  };
-return compassFetch<organizationsPublicLinkArchiveResponse>(getOrganizationsPublicLinkArchiveUrl(linkId),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(lifecycleSchema)
-  }
-);}
-
-
-export type organizationsPublicLinkRetireResponse200 = {
-  data: PublicLinkProjectionSchema
-  status: 200
-}
-
-export type organizationsPublicLinkRetireResponse400 = {
-  data: ApiErrorSchema
-  status: 400
-}
-
-export type organizationsPublicLinkRetireResponse401 = {
-  data: ApiErrorSchema
-  status: 401
-}
-
-export type organizationsPublicLinkRetireResponse403 = {
-  data: ApiErrorSchema
-  status: 403
-}
-
-export type organizationsPublicLinkRetireResponse404 = {
-  data: ApiErrorSchema
-  status: 404
-}
-
-export type organizationsPublicLinkRetireResponse405 = {
-  data: ApiErrorSchema
-  status: 405
-}
-
-export type organizationsPublicLinkRetireResponse409 = {
-  data: ApiErrorSchema
-  status: 409
-}
-
-export type organizationsPublicLinkRetireResponse413 = {
-  data: ApiErrorSchema
-  status: 413
-}
-
-export type organizationsPublicLinkRetireResponse422 = {
-  data: ApiErrorSchema
-  status: 422
-}
-
-export type organizationsPublicLinkRetireResponse429 = {
-  data: ApiErrorSchema
-  status: 429
-}
-
-export type organizationsPublicLinkRetireResponse500 = {
-  data: ApiErrorSchema
-  status: 500
-}
-
-export type organizationsPublicLinkRetireResponse503 = {
-  data: ApiErrorSchema
-  status: 503
-}
-
-export type organizationsPublicLinkRetireResponseSuccess = (organizationsPublicLinkRetireResponse200) & {
-  headers: Record<string, string>;
-};
-export type organizationsPublicLinkRetireResponseError = (organizationsPublicLinkRetireResponse400 | organizationsPublicLinkRetireResponse401 | organizationsPublicLinkRetireResponse403 | organizationsPublicLinkRetireResponse404 | organizationsPublicLinkRetireResponse405 | organizationsPublicLinkRetireResponse409 | organizationsPublicLinkRetireResponse413 | organizationsPublicLinkRetireResponse422 | organizationsPublicLinkRetireResponse429 | organizationsPublicLinkRetireResponse500 | organizationsPublicLinkRetireResponse503) & {
-  headers: Record<string, string>;
-};
-
-export type organizationsPublicLinkRetireResponse = (organizationsPublicLinkRetireResponseSuccess | organizationsPublicLinkRetireResponseError)
-
-export const getOrganizationsPublicLinkRetireUrl = (linkId: number,) => {
-
-
-
-
-  return `/api/v1/organizations/governance/public-links/${linkId}/retire/`
-}
-
-/**
- * @summary Public Link Retire
- */
-export const organizationsPublicLinkRetire = async (linkId: number,
-    lifecycleSchema: LifecycleSchema, options?: Parameters<typeof compassFetch>[1]): Promise<organizationsPublicLinkRetireResponse> => {
-
-    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Array.isArray(h)) return Object.fromEntries(h);
-    return h;
-  };
-return compassFetch<organizationsPublicLinkRetireResponse>(getOrganizationsPublicLinkRetireUrl(linkId),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(lifecycleSchema)
-  }
-);}
-
-
-export type organizationsPublicLinkUpdateResponse200 = {
-  data: PublicLinkProjectionSchema
-  status: 200
-}
-
-export type organizationsPublicLinkUpdateResponse400 = {
-  data: ApiErrorSchema
-  status: 400
-}
-
-export type organizationsPublicLinkUpdateResponse401 = {
-  data: ApiErrorSchema
-  status: 401
-}
-
-export type organizationsPublicLinkUpdateResponse403 = {
-  data: ApiErrorSchema
-  status: 403
-}
-
-export type organizationsPublicLinkUpdateResponse404 = {
-  data: ApiErrorSchema
-  status: 404
-}
-
-export type organizationsPublicLinkUpdateResponse405 = {
-  data: ApiErrorSchema
-  status: 405
-}
-
-export type organizationsPublicLinkUpdateResponse409 = {
-  data: ApiErrorSchema
-  status: 409
-}
-
-export type organizationsPublicLinkUpdateResponse413 = {
-  data: ApiErrorSchema
-  status: 413
-}
-
-export type organizationsPublicLinkUpdateResponse422 = {
-  data: ApiErrorSchema
-  status: 422
-}
-
-export type organizationsPublicLinkUpdateResponse429 = {
-  data: ApiErrorSchema
-  status: 429
-}
-
-export type organizationsPublicLinkUpdateResponse500 = {
-  data: ApiErrorSchema
-  status: 500
-}
-
-export type organizationsPublicLinkUpdateResponse503 = {
-  data: ApiErrorSchema
-  status: 503
-}
-
-export type organizationsPublicLinkUpdateResponseSuccess = (organizationsPublicLinkUpdateResponse200) & {
-  headers: Record<string, string>;
-};
-export type organizationsPublicLinkUpdateResponseError = (organizationsPublicLinkUpdateResponse400 | organizationsPublicLinkUpdateResponse401 | organizationsPublicLinkUpdateResponse403 | organizationsPublicLinkUpdateResponse404 | organizationsPublicLinkUpdateResponse405 | organizationsPublicLinkUpdateResponse409 | organizationsPublicLinkUpdateResponse413 | organizationsPublicLinkUpdateResponse422 | organizationsPublicLinkUpdateResponse429 | organizationsPublicLinkUpdateResponse500 | organizationsPublicLinkUpdateResponse503) & {
-  headers: Record<string, string>;
-};
-
-export type organizationsPublicLinkUpdateResponse = (organizationsPublicLinkUpdateResponseSuccess | organizationsPublicLinkUpdateResponseError)
-
-export const getOrganizationsPublicLinkUpdateUrl = (linkId: number,) => {
-
-
-
-
-  return `/api/v1/organizations/governance/public-links/${linkId}/update/`
-}
-
-/**
- * @summary Public Link Update
- */
-export const organizationsPublicLinkUpdate = async (linkId: number,
-    publicLinkSchema: PublicLinkSchema, options?: Parameters<typeof compassFetch>[1]): Promise<organizationsPublicLinkUpdateResponse> => {
-
-    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Array.isArray(h)) return Object.fromEntries(h);
-    return h;
-  };
-return compassFetch<organizationsPublicLinkUpdateResponse>(getOrganizationsPublicLinkUpdateUrl(linkId),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(publicLinkSchema)
+    body: JSON.stringify(institutionalIdentityUpdateSchema)
   }
 );}
 
@@ -7695,303 +4054,6 @@ export const getOrganizationsPublicAcademicTermUrl = () => {
 export const organizationsPublicAcademicTerm = async ( options?: Parameters<typeof compassFetch>[1]): Promise<organizationsPublicAcademicTermResponse> => {
 
   return compassFetch<organizationsPublicAcademicTermResponse>(getOrganizationsPublicAcademicTermUrl(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
-export type organizationsPublicBrandingResponse200 = {
-  data: PublicBrandingSchema
-  status: 200
-}
-
-export type organizationsPublicBrandingResponse400 = {
-  data: ApiErrorSchema
-  status: 400
-}
-
-export type organizationsPublicBrandingResponse401 = {
-  data: ApiErrorSchema
-  status: 401
-}
-
-export type organizationsPublicBrandingResponse403 = {
-  data: ApiErrorSchema
-  status: 403
-}
-
-export type organizationsPublicBrandingResponse404 = {
-  data: ApiErrorSchema
-  status: 404
-}
-
-export type organizationsPublicBrandingResponse405 = {
-  data: ApiErrorSchema
-  status: 405
-}
-
-export type organizationsPublicBrandingResponse409 = {
-  data: ApiErrorSchema
-  status: 409
-}
-
-export type organizationsPublicBrandingResponse413 = {
-  data: ApiErrorSchema
-  status: 413
-}
-
-export type organizationsPublicBrandingResponse422 = {
-  data: ApiErrorSchema
-  status: 422
-}
-
-export type organizationsPublicBrandingResponse429 = {
-  data: ApiErrorSchema
-  status: 429
-}
-
-export type organizationsPublicBrandingResponse500 = {
-  data: ApiErrorSchema
-  status: 500
-}
-
-export type organizationsPublicBrandingResponse503 = {
-  data: ApiErrorSchema
-  status: 503
-}
-
-export type organizationsPublicBrandingResponseSuccess = (organizationsPublicBrandingResponse200) & {
-  headers: Record<string, string>;
-};
-export type organizationsPublicBrandingResponseError = (organizationsPublicBrandingResponse400 | organizationsPublicBrandingResponse401 | organizationsPublicBrandingResponse403 | organizationsPublicBrandingResponse404 | organizationsPublicBrandingResponse405 | organizationsPublicBrandingResponse409 | organizationsPublicBrandingResponse413 | organizationsPublicBrandingResponse422 | organizationsPublicBrandingResponse429 | organizationsPublicBrandingResponse500 | organizationsPublicBrandingResponse503) & {
-  headers: Record<string, string>;
-};
-
-export type organizationsPublicBrandingResponse = (organizationsPublicBrandingResponseSuccess | organizationsPublicBrandingResponseError)
-
-export const getOrganizationsPublicBrandingUrl = () => {
-
-
-
-
-  return `/api/v1/organizations/public/branding/`
-}
-
-/**
- * @summary Public Branding
- */
-export const organizationsPublicBranding = async ( options?: Parameters<typeof compassFetch>[1]): Promise<organizationsPublicBrandingResponse> => {
-
-  return compassFetch<organizationsPublicBrandingResponse>(getOrganizationsPublicBrandingUrl(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
-export type organizationsPublicBrandingAssetResponse200 = {
-  data: PublicBrandAssetDeliverySchema
-  status: 200
-}
-
-export type organizationsPublicBrandingAssetResponse400 = {
-  data: ApiErrorSchema
-  status: 400
-}
-
-export type organizationsPublicBrandingAssetResponse401 = {
-  data: ApiErrorSchema
-  status: 401
-}
-
-export type organizationsPublicBrandingAssetResponse403 = {
-  data: ApiErrorSchema
-  status: 403
-}
-
-export type organizationsPublicBrandingAssetResponse404 = {
-  data: ApiErrorSchema
-  status: 404
-}
-
-export type organizationsPublicBrandingAssetResponse405 = {
-  data: ApiErrorSchema
-  status: 405
-}
-
-export type organizationsPublicBrandingAssetResponse409 = {
-  data: ApiErrorSchema
-  status: 409
-}
-
-export type organizationsPublicBrandingAssetResponse413 = {
-  data: ApiErrorSchema
-  status: 413
-}
-
-export type organizationsPublicBrandingAssetResponse422 = {
-  data: ApiErrorSchema
-  status: 422
-}
-
-export type organizationsPublicBrandingAssetResponse429 = {
-  data: ApiErrorSchema
-  status: 429
-}
-
-export type organizationsPublicBrandingAssetResponse500 = {
-  data: ApiErrorSchema
-  status: 500
-}
-
-export type organizationsPublicBrandingAssetResponse503 = {
-  data: ApiErrorSchema
-  status: 503
-}
-
-export type organizationsPublicBrandingAssetResponseSuccess = (organizationsPublicBrandingAssetResponse200) & {
-  headers: Record<string, string>;
-};
-export type organizationsPublicBrandingAssetResponseError = (organizationsPublicBrandingAssetResponse400 | organizationsPublicBrandingAssetResponse401 | organizationsPublicBrandingAssetResponse403 | organizationsPublicBrandingAssetResponse404 | organizationsPublicBrandingAssetResponse405 | organizationsPublicBrandingAssetResponse409 | organizationsPublicBrandingAssetResponse413 | organizationsPublicBrandingAssetResponse422 | organizationsPublicBrandingAssetResponse429 | organizationsPublicBrandingAssetResponse500 | organizationsPublicBrandingAssetResponse503) & {
-  headers: Record<string, string>;
-};
-
-export type organizationsPublicBrandingAssetResponse = (organizationsPublicBrandingAssetResponseSuccess | organizationsPublicBrandingAssetResponseError)
-
-export const getOrganizationsPublicBrandingAssetUrl = (assetId: number,) => {
-
-
-
-
-  return `/api/v1/organizations/public/branding/assets/${assetId}/`
-}
-
-/**
- * Issue a short-lived signed URL for one approved public image.
- * @summary Public Branding Asset
- */
-export const organizationsPublicBrandingAsset = async (assetId: number, options?: Parameters<typeof compassFetch>[1]): Promise<organizationsPublicBrandingAssetResponse> => {
-
-  return compassFetch<organizationsPublicBrandingAssetResponse>(getOrganizationsPublicBrandingAssetUrl(assetId),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
-export type organizationsPublicBrandingAssetContentResponse200ImageJpeg = {
-  data: Blob
-  status: 200
-}
-
-export type organizationsPublicBrandingAssetContentResponse200ImagePng = {
-  data: Blob
-  status: 200
-}
-
-export type organizationsPublicBrandingAssetContentResponse200ImageWebp = {
-  data: Blob
-  status: 200
-}
-
-export type organizationsPublicBrandingAssetContentResponse400 = {
-  data: ApiErrorSchema
-  status: 400
-}
-
-export type organizationsPublicBrandingAssetContentResponse401 = {
-  data: ApiErrorSchema
-  status: 401
-}
-
-export type organizationsPublicBrandingAssetContentResponse403 = {
-  data: ApiErrorSchema
-  status: 403
-}
-
-export type organizationsPublicBrandingAssetContentResponse404 = {
-  data: ApiErrorSchema
-  status: 404
-}
-
-export type organizationsPublicBrandingAssetContentResponse405 = {
-  data: ApiErrorSchema
-  status: 405
-}
-
-export type organizationsPublicBrandingAssetContentResponse409 = {
-  data: ApiErrorSchema
-  status: 409
-}
-
-export type organizationsPublicBrandingAssetContentResponse413 = {
-  data: ApiErrorSchema
-  status: 413
-}
-
-export type organizationsPublicBrandingAssetContentResponse422 = {
-  data: ApiErrorSchema
-  status: 422
-}
-
-export type organizationsPublicBrandingAssetContentResponse429 = {
-  data: ApiErrorSchema
-  status: 429
-}
-
-export type organizationsPublicBrandingAssetContentResponse500 = {
-  data: ApiErrorSchema
-  status: 500
-}
-
-export type organizationsPublicBrandingAssetContentResponse503 = {
-  data: ApiErrorSchema
-  status: 503
-}
-
-export type organizationsPublicBrandingAssetContentResponseSuccess = (organizationsPublicBrandingAssetContentResponse200ImageJpeg | organizationsPublicBrandingAssetContentResponse200ImagePng | organizationsPublicBrandingAssetContentResponse200ImageWebp) & {
-  headers: Record<string, string>;
-};
-export type organizationsPublicBrandingAssetContentResponseError = (organizationsPublicBrandingAssetContentResponse400 | organizationsPublicBrandingAssetContentResponse401 | organizationsPublicBrandingAssetContentResponse403 | organizationsPublicBrandingAssetContentResponse404 | organizationsPublicBrandingAssetContentResponse405 | organizationsPublicBrandingAssetContentResponse409 | organizationsPublicBrandingAssetContentResponse413 | organizationsPublicBrandingAssetContentResponse422 | organizationsPublicBrandingAssetContentResponse429 | organizationsPublicBrandingAssetContentResponse500 | organizationsPublicBrandingAssetContentResponse503) & {
-  headers: Record<string, string>;
-};
-
-export type organizationsPublicBrandingAssetContentResponse = (organizationsPublicBrandingAssetContentResponseSuccess | organizationsPublicBrandingAssetContentResponseError)
-
-export const getOrganizationsPublicBrandingAssetContentUrl = (assetId: number,
-    params?: OrganizationsPublicBrandingAssetContentParams,) => {
-  const normalizedParams = new URLSearchParams();
-
-  Object.entries(params || {}).forEach(([key, value]) => {
-
-    if (value !== undefined) {
-      normalizedParams.append(key, value === null ? 'null' : String(value))
-    }
-  });
-
-  const stringifiedParams = normalizedParams.toString();
-
-  return stringifiedParams.length > 0 ? `/api/v1/organizations/public/branding/assets/${assetId}/content/?${stringifiedParams}` : `/api/v1/organizations/public/branding/assets/${assetId}/content/`
-}
-
-/**
- * Serve approved image bytes only through a valid short-lived signature.
- * @summary Public Branding Asset Content
- */
-export const organizationsPublicBrandingAssetContent = async (assetId: number,
-    params?: OrganizationsPublicBrandingAssetContentParams, options?: Parameters<typeof compassFetch>[1]): Promise<organizationsPublicBrandingAssetContentResponse> => {
-
-  return compassFetch<organizationsPublicBrandingAssetContentResponse>(getOrganizationsPublicBrandingAssetContentUrl(assetId,params),
   {
     ...options,
     method: 'GET'
@@ -8268,98 +4330,6 @@ export const getOrganizationsPublicIdentityUrl = () => {
 export const organizationsPublicIdentity = async ( options?: Parameters<typeof compassFetch>[1]): Promise<organizationsPublicIdentityResponse> => {
 
   return compassFetch<organizationsPublicIdentityResponse>(getOrganizationsPublicIdentityUrl(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
-export type organizationsPublicLinksResponse200 = {
-  data: PublicLinksSchema
-  status: 200
-}
-
-export type organizationsPublicLinksResponse400 = {
-  data: ApiErrorSchema
-  status: 400
-}
-
-export type organizationsPublicLinksResponse401 = {
-  data: ApiErrorSchema
-  status: 401
-}
-
-export type organizationsPublicLinksResponse403 = {
-  data: ApiErrorSchema
-  status: 403
-}
-
-export type organizationsPublicLinksResponse404 = {
-  data: ApiErrorSchema
-  status: 404
-}
-
-export type organizationsPublicLinksResponse405 = {
-  data: ApiErrorSchema
-  status: 405
-}
-
-export type organizationsPublicLinksResponse409 = {
-  data: ApiErrorSchema
-  status: 409
-}
-
-export type organizationsPublicLinksResponse413 = {
-  data: ApiErrorSchema
-  status: 413
-}
-
-export type organizationsPublicLinksResponse422 = {
-  data: ApiErrorSchema
-  status: 422
-}
-
-export type organizationsPublicLinksResponse429 = {
-  data: ApiErrorSchema
-  status: 429
-}
-
-export type organizationsPublicLinksResponse500 = {
-  data: ApiErrorSchema
-  status: 500
-}
-
-export type organizationsPublicLinksResponse503 = {
-  data: ApiErrorSchema
-  status: 503
-}
-
-export type organizationsPublicLinksResponseSuccess = (organizationsPublicLinksResponse200) & {
-  headers: Record<string, string>;
-};
-export type organizationsPublicLinksResponseError = (organizationsPublicLinksResponse400 | organizationsPublicLinksResponse401 | organizationsPublicLinksResponse403 | organizationsPublicLinksResponse404 | organizationsPublicLinksResponse405 | organizationsPublicLinksResponse409 | organizationsPublicLinksResponse413 | organizationsPublicLinksResponse422 | organizationsPublicLinksResponse429 | organizationsPublicLinksResponse500 | organizationsPublicLinksResponse503) & {
-  headers: Record<string, string>;
-};
-
-export type organizationsPublicLinksResponse = (organizationsPublicLinksResponseSuccess | organizationsPublicLinksResponseError)
-
-export const getOrganizationsPublicLinksUrl = () => {
-
-
-
-
-  return `/api/v1/organizations/public/links/`
-}
-
-/**
- * @summary Public Links
- */
-export const organizationsPublicLinks = async ( options?: Parameters<typeof compassFetch>[1]): Promise<organizationsPublicLinksResponse> => {
-
-  return compassFetch<organizationsPublicLinksResponse>(getOrganizationsPublicLinksUrl(),
   {
     ...options,
     method: 'GET'

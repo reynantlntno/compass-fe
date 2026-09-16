@@ -8,7 +8,7 @@
 
 export interface CreateSchema {
   administered_at?: string | null;
-  expected_instrument_updated_at?: string | null;
+  expected_instrument_resource_version?: string | null;
   instrument_id?: number | null;
   instrument_key?: string | null;
   source_form_reference?: string | null;

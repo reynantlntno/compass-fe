@@ -11,6 +11,7 @@ export interface InventoryQueueDetailSchema {
   academic_year: string;
   answers?: InventoryQueueDetailSchemaAnswers;
   reopened_at?: string | null;
+  resource_version?: string | null;
   review_state: string;
   schema_key: string;
   schema_version: string;

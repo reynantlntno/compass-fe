@@ -13,6 +13,7 @@ export interface ReferralQueueItemSchema {
   age_bucket: string;
   assignment_state: string;
   reference_code: string;
+  resource_version: string;
   status_code: string;
   status_label: string;
   updated_at: string;

@@ -30,6 +30,7 @@ export interface GoodMoralStaffQueueItemSchema {
   reference_code: string;
   released_at?: string | null;
   request_type: string;
+  resource_version: string;
   reviewer_assigned: boolean;
   status: string;
   student_display_name: string;

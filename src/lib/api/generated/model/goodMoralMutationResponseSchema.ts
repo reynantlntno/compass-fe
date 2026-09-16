@@ -13,6 +13,7 @@ export interface GoodMoralMutationResponseSchema {
   dry_seal_status: string;
   receipt_status: string;
   reference_code: string;
+  resource_version: string;
   status: string;
   updated_at: string;
 }

@@ -11,8 +11,7 @@ export interface DocumentTemplateSchema {
   description?: string;
   display_name: string;
   document_kind: string;
-  expected_updated_at?: string | null;
-  owner_office_id?: number | null;
+  expected_resource_version?: string | null;
   related_form_family_id?: number | null;
   retention_classification?: string;
   source_notes?: string;

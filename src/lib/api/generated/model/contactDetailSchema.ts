@@ -5,6 +5,8 @@
  * The canonical backend API for COMPASS clients.
  * OpenAPI spec version: 1.0.0
  */
+import type { ContactDetailSchemaResolutionCode } from './contactDetailSchemaResolutionCode';
+import type { ContactDetailSchemaStatus } from './contactDetailSchemaStatus';
 
 export interface ContactDetailSchema {
   affiliation: string;
@@ -19,7 +21,8 @@ export interface ContactDetailSchema {
   privacy_acknowledged?: boolean | null;
   privacy_actioned_at?: string | null;
   reference_code: string;
-  status: string;
+  resolution_code?: ContactDetailSchemaResolutionCode;
+  status: ContactDetailSchemaStatus;
   subject?: string | null;
   submission_type: string;
   updated_at: string;

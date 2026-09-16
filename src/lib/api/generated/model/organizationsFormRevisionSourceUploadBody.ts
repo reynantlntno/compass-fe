@@ -7,7 +7,7 @@
  */
 
 export type OrganizationsFormRevisionSourceUploadBody = {
-  expected_updated_at?: string | null;
+  expected_resource_version?: string | null;
   file: Blob | File;
   source_label?: string;
 };

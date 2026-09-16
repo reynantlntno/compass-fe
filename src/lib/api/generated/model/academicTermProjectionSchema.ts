@@ -9,12 +9,12 @@
 export interface AcademicTermProjectionSchema {
   academic_year: string;
   activated_at?: string | null;
-  approved_at?: string | null;
   closed_at?: string | null;
   configuration_identifier: string;
   end_date: string;
   id: string;
   is_current: boolean;
+  resource_version: string;
   semester: string;
   start_date: string;
   status: string;

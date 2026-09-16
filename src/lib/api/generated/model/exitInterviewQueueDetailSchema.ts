@@ -17,6 +17,7 @@ export interface ExitInterviewQueueDetailSchema {
   form_title: string;
   graduation_year_snapshot: string;
   reference_code: string;
+  resource_version: string;
   status: string;
   student_display_name: string;
   student_number?: string | null;

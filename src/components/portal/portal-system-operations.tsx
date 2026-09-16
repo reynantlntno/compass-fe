@@ -1167,14 +1167,14 @@ function SystemOperationsWorkspace() {
       }
     }
 
-    const expectedUpdatedAt = action.maintenance.updated_at ?? null;
+    const expectedResourceVersion = action.maintenance.resource_version ?? null;
     const payload: MaintenanceTransitionSchema = {
       ...(endsAtIso && (action.kind === "activate" || action.kind === "extend") ? { ends_at: endsAtIso } : {}),
-      ...(expectedUpdatedAt ? { expected_updated_at: expectedUpdatedAt } : {}),
+      ...(expectedResourceVersion ? { expected_resource_version: expectedResourceVersion } : {}),
       ...(reason ? { reason_code: reason } : {}),
     };
     const scope = `maintenance:${action.kind}:${action.maintenance.id}`;
-    const fingerprint = JSON.stringify({ endsAt: endsAtIso, expectedUpdatedAt, reason });
+    const fingerprint = JSON.stringify({ endsAt: endsAtIso, expectedResourceVersion, reason });
     const key = getMutationKey(scope, fingerprint);
     setMaintenanceMutation("pending");
     setMaintenanceMutationMessage(null);

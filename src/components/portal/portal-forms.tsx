@@ -45,6 +45,7 @@ import { PortalStatusFilter } from "@/components/portal/portal-status-filter";
 import { PortalWorkspaceNav } from "@/components/portal/portal-workspace-nav";
 import { FORMS_NAV_ITEMS, getFormsNavItems, type FormsNavItem, type FormsSection } from "@/components/portal/portal-forms-navigation";
 import { PortalGraduateTracerSection } from "@/components/portal/portal-graduate-tracer";
+import { downloadPortalBlob, previewPortalBlob } from "@/lib/api/browser-download";
 import {
   EXIT_INTERVIEW_QUEUE_STATUSES,
   FORMS_QUEUE_ORDERS,
@@ -56,6 +57,13 @@ import {
   getPortalInventoryQueue,
   getPortalInventoryQueueDetail,
   getPortalInventorySubmittedAnswers,
+  getPortalInventoryHistory,
+  previewPortalInventoryDocument,
+  downloadPortalInventoryDocument,
+  generatePortalInventoryDocument,
+  previewPortalExitInterviewDocument,
+  downloadPortalExitInterviewDocument,
+  generatePortalExitInterviewDocument,
   INVENTORY_QUEUE_STATUSES,
   parseExitInterviewFilters,
   parseInventoryFilters,
@@ -70,6 +78,7 @@ import {
   type PortalFormsPage,
   type PortalInventoryQueueDetail,
   type PortalInventoryQueueItem,
+  type PortalInventoryHistoryPage,
 } from "@/lib/api/forms";
 import { parseGraduateTracerFilters } from "@/lib/api/graduate-tracer";
 import { createIdempotencyKey, type IdempotencyKey } from "@/lib/api/idempotency";
@@ -283,17 +292,83 @@ function FormsFilterPanel({ section, filters }: { section: FormsSection; filters
   );
 }
 
+type DocumentActionState = { kind: "idle" | "loading" | "error" | "ready"; message?: string };
+
+function DocumentActions({
+  onPreview,
+  onDownload,
+  onGenerate,
+}: {
+  onPreview: () => Promise<Blob>;
+  onDownload: () => Promise<Blob>;
+  onGenerate: () => Promise<unknown>;
+}) {
+  const [state, setState] = useState<DocumentActionState>({ kind: "idle" });
+
+  const run = async (action: "preview" | "download" | "generate") => {
+    setState({ kind: "loading" });
+    try {
+      if (action === "preview") {
+        const opened = previewPortalBlob(await onPreview());
+        setState({ kind: opened ? "ready" : "error", message: opened ? "Preview opened." : "The preview could not be opened." });
+      } else if (action === "download") {
+        downloadPortalBlob(await onDownload(), "compass-governed-document");
+        setState({ kind: "ready", message: "Document downloaded." });
+      } else {
+        await onGenerate();
+        setState({ kind: "ready", message: "Document refreshed." });
+      }
+    } catch {
+      setState({ kind: "error", message: "The document action is unavailable right now." });
+    }
+  };
+
+  return (
+    <div className="portal-counseling__details-actions" aria-live="polite">
+      <Button onClick={() => void run("preview")} size="xs" type="button" variant="outline">Preview document</Button>
+      <Button onClick={() => void run("download")} size="xs" type="button" variant="outline">Download</Button>
+      <Button onClick={() => void run("generate")} size="xs" type="button" variant="ghost">Generate/refresh</Button>
+      {state.kind === "loading" ? <span className="portal-counseling__student-number">Working…</span> : null}
+      {state.message ? <span className="portal-counseling__student-number">{state.message}</span> : null}
+    </div>
+  );
+}
+
+function InventoryHistory({
+  state,
+  onLoad,
+}: {
+  state: { kind: "idle" | "loading" | "error" | "ready"; page?: PortalInventoryHistoryPage };
+  onLoad: () => void;
+}) {
+  if (state.kind === "idle") return <Button onClick={onLoad} size="sm" type="button" variant="outline">View status history</Button>;
+  if (state.kind === "loading") return <div className="portal-counseling__detail-state" role="status"><Skeleton as="span" /><Skeleton as="span" /></div>;
+  if (state.kind === "error") return <div className="portal-counseling__detail-state" role="status"><p>Status history is unavailable right now.</p><Button onClick={onLoad} size="sm" type="button" variant="outline"><RefreshCw aria-hidden="true" />Try again</Button></div>;
+  if (!state.page?.items.length) return <p>No status history is available.</p>;
+  return (
+    <div className="portal-counseling__routine-sensitive">
+      <p className="portal-counseling__kicker">Status history</p>
+      <ul>
+        {state.page.items.map((event, index) => <li key={`${event.transitioned_at}-${index}`}>{labelForValue(event.status_from)} → {labelForValue(event.status_to)} · {formatTimestamp(event.transitioned_at)}</li>)}
+      </ul>
+    </div>
+  );
+}
+
 function InventoryDetails({
+  item,
   state,
   onRetry,
   onSensitive,
   onSensitiveRetry,
 }: {
+  item: PortalInventoryQueueItem;
   state: InventoryDetailState | undefined;
   onRetry: () => void;
   onSensitive: () => void;
   onSensitiveRetry: () => void;
 }) {
+  const [history, setHistory] = useState<{ kind: "idle" | "loading" | "error" | "ready"; page?: PortalInventoryHistoryPage }>({ kind: "idle" });
   if (!state || state.kind === "loading") {
     return <div className="portal-counseling__detail-state" role="status"><Skeleton as="span" /><Skeleton as="span" /></div>;
   }
@@ -312,6 +387,17 @@ function InventoryDetails({
   return (
     <div className="portal-counseling__detail-content">
       <dl>{facts.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>
+      <div className="portal-counseling__detail-actions">
+        <InventoryHistory state={history} onLoad={() => {
+          setHistory({ kind: "loading" });
+          void getPortalInventoryHistory(item).then((page) => setHistory({ kind: "ready", page })).catch(() => setHistory({ kind: "error" }));
+        }} />
+        <DocumentActions
+          onDownload={() => downloadPortalInventoryDocument(item)}
+          onGenerate={() => generatePortalInventoryDocument(item, detail.resource_version, createIdempotencyKey())}
+          onPreview={() => previewPortalInventoryDocument(item)}
+        />
+      </div>
       {detail.status === "SUBMITTED" && !state.sensitive ? <Button onClick={onSensitive} size="sm" type="button" variant="outline">View submitted answers</Button> : null}
       {state.sensitive?.kind === "loading" ? <div className="portal-counseling__detail-state" role="status"><Skeleton as="span" /><Skeleton as="span" /></div> : null}
       {state.sensitive?.kind === "error" ? <div className="portal-counseling__detail-state" role="status"><p>Submitted answers are unavailable right now.</p><Button onClick={onSensitiveRetry} size="sm" type="button" variant="outline"><RefreshCw aria-hidden="true" />Try again</Button></div> : null}
@@ -321,11 +407,13 @@ function InventoryDetails({
 }
 
 function ExitDetails({
+  item,
   state,
   onRetry,
   onSensitive,
   onSensitiveRetry,
 }: {
+  item: PortalExitInterviewQueueItem;
   state: ExitDetailState | undefined;
   onRetry: () => void;
   onSensitive: () => void;
@@ -350,6 +438,11 @@ function ExitDetails({
   return (
     <div className="portal-counseling__detail-content">
       <dl>{facts.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>
+      <DocumentActions
+        onDownload={() => downloadPortalExitInterviewDocument(item.reference_code)}
+        onGenerate={() => generatePortalExitInterviewDocument(item.reference_code, detail.resource_version, createIdempotencyKey())}
+        onPreview={() => previewPortalExitInterviewDocument(item.reference_code)}
+      />
       {detail.status !== "DRAFT" && !state.sensitive ? <Button onClick={onSensitive} size="sm" type="button" variant="outline">View authorized answers</Button> : null}
       {state.sensitive?.kind === "loading" ? <div className="portal-counseling__detail-state" role="status"><Skeleton as="span" /><Skeleton as="span" /></div> : null}
       {state.sensitive?.kind === "error" ? <div className="portal-counseling__detail-state" role="status"><p>Authorized answers are unavailable right now.</p><Button onClick={onSensitiveRetry} size="sm" type="button" variant="outline"><RefreshCw aria-hidden="true" />Try again</Button></div> : null}
@@ -401,7 +494,7 @@ function InventoryTable({
                 <td data-label="Submitted/updated"><span>{formatTimestamp(item.submitted_at)}</span><span className="portal-counseling__student-number">Updated {formatTimestamp(item.updated_at)}</span></td>
                 <td data-label="Details & actions"><div className="portal-counseling__details-actions"><Button aria-controls={expandedId} aria-expanded={isExpanded} aria-label={`${isExpanded ? "Hide" : "Show"} inventory details`} onClick={() => onToggle(item)} size="xs" type="button" variant="outline">{isExpanded ? <ChevronUp aria-hidden="true" /> : <ChevronDown aria-hidden="true" />}<span className="sr-only">{isExpanded ? "Hide" : "Show"} details</span></Button>{canReopen && item.status === "SUBMITTED" ? <Button onClick={() => onAction(item)} size="xs" type="button" variant="ghost">Reopen</Button> : null}</div></td>
               </tr>
-              {isExpanded ? <tr className="portal-counseling__detail-row"><td colSpan={6} id={expandedId}><InventoryDetails state={details.get(item)} onRetry={() => onRetry(item)} onSensitive={() => onSensitive(item)} onSensitiveRetry={() => onSensitiveRetry(item)} />{rowMutation ? <p className={`portal-counseling__mutation portal-counseling__mutation--${rowMutation.state}`} role={rowMutation.state === "error" ? "alert" : "status"}>{rowMutation.message}</p> : null}</td></tr> : null}
+              {isExpanded ? <tr className="portal-counseling__detail-row"><td colSpan={6} id={expandedId}><InventoryDetails item={item} state={details.get(item)} onRetry={() => onRetry(item)} onSensitive={() => onSensitive(item)} onSensitiveRetry={() => onSensitiveRetry(item)} />{rowMutation ? <p className={`portal-counseling__mutation portal-counseling__mutation--${rowMutation.state}`} role={rowMutation.state === "error" ? "alert" : "status"}>{rowMutation.message}</p> : null}</td></tr> : null}
             </Fragment>;
           })}
         </tbody>
@@ -458,7 +551,7 @@ function ExitInterviewTable({
                 <td data-label="Submitted/updated"><span>{formatTimestamp(item.submitted_at)}</span><span className="portal-counseling__student-number">Updated {formatTimestamp(item.updated_at)}</span></td>
                 <td data-label="Details & actions"><div className="portal-counseling__details-actions"><Button aria-controls={expandedId} aria-expanded={isExpanded} aria-label={`${isExpanded ? "Hide" : "Show"} exit interview details`} onClick={() => onToggle(item)} size="xs" type="button" variant="outline">{isExpanded ? <ChevronUp aria-hidden="true" /> : <ChevronDown aria-hidden="true" />}<span className="sr-only">{isExpanded ? "Hide" : "Show"} details</span></Button>{actions.map((action) => <Button key={action} onClick={() => onAction(action, item)} size="xs" type="button" variant={action === "void" ? "outline" : "ghost"}>{labelForValue(action)}</Button>)}</div></td>
               </tr>
-              {isExpanded ? <tr className="portal-counseling__detail-row"><td colSpan={7} id={expandedId}><ExitDetails state={details.get(item)} onRetry={() => onRetry(item)} onSensitive={() => onSensitive(item)} onSensitiveRetry={() => onSensitiveRetry(item)} />{rowMutation ? <p className={`portal-counseling__mutation portal-counseling__mutation--${rowMutation.state}`} role={rowMutation.state === "error" ? "alert" : "status"}>{rowMutation.message}</p> : null}</td></tr> : null}
+              {isExpanded ? <tr className="portal-counseling__detail-row"><td colSpan={7} id={expandedId}><ExitDetails item={item} state={details.get(item)} onRetry={() => onRetry(item)} onSensitive={() => onSensitive(item)} onSensitiveRetry={() => onSensitiveRetry(item)} />{rowMutation ? <p className={`portal-counseling__mutation portal-counseling__mutation--${rowMutation.state}`} role={rowMutation.state === "error" ? "alert" : "status"}>{rowMutation.message}</p> : null}</td></tr> : null}
             </Fragment>;
           })}
         </tbody>

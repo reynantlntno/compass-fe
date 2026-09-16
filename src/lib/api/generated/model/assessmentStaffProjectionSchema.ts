@@ -15,6 +15,7 @@ export interface AssessmentStaffProjectionSchema {
   interpretation_visibility: string;
   released_at: string | null;
   released_to_student: boolean;
+  resource_version?: string | null;
   reviewed_at: string | null;
   status: string;
   student_display_name: string;

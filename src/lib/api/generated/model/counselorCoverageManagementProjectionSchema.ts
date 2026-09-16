@@ -16,6 +16,7 @@ export interface CounselorCoverageManagementProjectionSchema {
   is_active: boolean;
   is_primary: boolean;
   program?: string | null;
+  resource_version: string;
   scope_label: string;
   starts_at: string;
   state: string;

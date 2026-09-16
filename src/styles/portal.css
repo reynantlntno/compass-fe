@@ -11171,7 +11171,19 @@
 
 @layer components {
   .portal-status-filter__control {
+    display: grid;
+    align-content: start;
+    gap: 0.35rem;
     min-width: 0;
+  }
+
+  .portal-status-filter__label {
+    color: var(--compass-brand-maroon-strong);
+    font-size: 0.68rem;
+    font-weight: var(--compass-weight-bold);
+    letter-spacing: 0.08em;
+    line-height: 1.3;
+    text-transform: uppercase;
   }
 
   .portal-status-filter__trigger {
@@ -11623,6 +11635,31 @@
   .portal-counseling__dialog-fields {
     display: grid;
     gap: 0.85rem;
+  }
+
+  .portal-counseling__identity-group {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.85rem;
+    min-width: 0;
+    margin: 0;
+    padding: 1rem;
+    border: 1px solid var(--compass-border);
+    border-radius: 0.75rem;
+  }
+
+  .portal-counseling__identity-group legend {
+    padding-inline: 0.35rem;
+    color: var(--compass-brand-maroon-strong);
+    font-size: 0.88rem;
+    font-weight: var(--compass-weight-bold);
+  }
+
+  .portal-counseling__identity-group .portal-counseling__dialog-field {
+    display: grid;
+    align-content: start;
+    gap: 0.4rem;
+    min-width: 0;
   }
 
   .portal-counseling__detail-row td {
@@ -12225,6 +12262,11 @@
       padding: 0.9rem;
     }
 
+    .portal-counseling__identity-group {
+      grid-template-columns: minmax(0, 1fr);
+      padding: 0.75rem;
+    }
+
     .portal-counseling__frame-heading {
       align-items: start;
       flex-direction: column;
@@ -12427,6 +12469,7 @@
     .portal-counseling__filters,
     .portal-counseling__frame,
     .portal-counseling__dialog,
+    .portal-counseling__identity-group,
     .portal-counseling__nav-skeleton {
       border-color: CanvasText;
       background: Canvas;
@@ -12435,6 +12478,7 @@
     }
 
     .portal-counseling__filter-field label,
+    .portal-status-filter__label,
     .portal-counseling__filter-error,
     .portal-counseling__kicker,
     .portal-counseling__frame-heading h2,
@@ -12443,6 +12487,10 @@
     .portal-counseling__table tbody tr:not(.portal-counseling__detail-row) td::before,
     .portal-counseling__detail-content dt,
     .portal-counseling__dialog-field label {
+      color: CanvasText;
+    }
+
+    .portal-counseling__identity-group legend {
       color: CanvasText;
     }
 

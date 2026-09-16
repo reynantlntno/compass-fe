@@ -7,7 +7,7 @@
  */
 
 export interface DraftUpdateSchema {
-  expected_updated_at?: string | null;
+  expected_resource_version?: string | null;
   graduation_date?: string | null;
   major?: string | null;
   purpose_text?: string | null;

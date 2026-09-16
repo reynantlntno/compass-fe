@@ -3,27 +3,27 @@ import type { ReactNode } from "react";
 
 import { SiteFooter } from "@/components/public/site-footer";
 import { SiteHeader } from "@/components/public/site-header";
-import { getPublicBranding } from "@/lib/branding";
+import { getPublicIdentity } from "@/lib/public-identity";
 import { getCompassSocialMetadata } from "@/lib/metadata";
 
 export const dynamic = "force-dynamic";
 
 export async function generateMetadata(): Promise<Metadata> {
-  const branding = await getPublicBranding();
-  const title = `${branding.officeName} | ${branding.institutionName}`;
-  const description = `${branding.productName} support from the ${branding.officeName} of ${branding.institutionName}.`;
+  const identity = await getPublicIdentity();
+  const title = `${identity.officeName} | ${identity.institutionName}`;
+  const description = `${identity.productName} support from the ${identity.officeName} of ${identity.institutionName}.`;
 
   return {
     title: {
       absolute: title,
     },
     description,
-    ...getCompassSocialMetadata(title, description, `${branding.productName} — ${branding.officeName}`),
+    ...getCompassSocialMetadata(title, description, `${identity.productName} — ${identity.officeName}`),
   };
 }
 
 export default async function PublicLayout({ children }: Readonly<{ children: ReactNode }>) {
-  const branding = await getPublicBranding();
+  const identity = await getPublicIdentity();
 
   return (
     <div className="public-site flex min-h-screen flex-col bg-background text-foreground">
@@ -33,11 +33,11 @@ export default async function PublicLayout({ children }: Readonly<{ children: Re
       >
         Skip to main content
       </a>
-      <SiteHeader branding={branding} />
+      <SiteHeader identity={identity} />
       <main id="main-content" className="flex flex-1 flex-col">
         {children}
       </main>
-      <SiteFooter branding={branding} />
+      <SiteFooter identity={identity} />
     </div>
   );
 }

@@ -20,6 +20,7 @@ export interface RestoreRequestProjectionSchema {
   failed_at?: string | null;
   id: string;
   institutional_authorization_type: string;
+  resource_version?: string | null;
   restore_scope: string;
   safe_reason_code: string;
   started_at?: string | null;

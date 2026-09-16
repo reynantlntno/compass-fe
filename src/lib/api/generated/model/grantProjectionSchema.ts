@@ -15,6 +15,7 @@ export interface GrantProjectionSchema {
   grantee_id: number;
   id: number;
   organization: OrganizationProjectionSchema;
+  resource_version: string;
   revoked_at?: string | null;
   scope_mode: string;
   source_reference: string;

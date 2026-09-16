@@ -19,6 +19,7 @@ export interface ImportBatchSchema {
   executed_at: string | null;
   execution_summary: ImportExecutionSummarySchema;
   id: string;
+  resource_version: string;
   row_count: number;
   source_name: string;
   status: string;

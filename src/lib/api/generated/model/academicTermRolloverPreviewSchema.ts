@@ -6,12 +6,10 @@
  * OpenAPI spec version: 1.0.0
  */
 import type { AcademicTermRolloverProviderSchema } from './academicTermRolloverProviderSchema';
-import type { AcademicTermRolloverRollbackSchema } from './academicTermRolloverRollbackSchema';
 
 export interface AcademicTermRolloverPreviewSchema {
   academic_year: string;
   prior_term: string;
   providers: AcademicTermRolloverProviderSchema[];
-  rollback: AcademicTermRolloverRollbackSchema;
   semester: string;
 }

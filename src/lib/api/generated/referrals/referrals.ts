@@ -19,6 +19,7 @@ import type {
   ReferralPageResultSchema,
   ReferralReassignmentDetailSchema,
   ReferralReassignmentSchema,
+  ReferralReferenceReassignmentDetailSchema,
   ReferralStaffQueuePageResultSchema,
   ReferralSubmitSchema,
   ReferralTransitionSchema,
@@ -1722,6 +1723,197 @@ return compassFetch<referralsReassignmentRequestResponse>(getReferralsReassignme
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
     body: JSON.stringify(referralReassignmentSchema)
+  }
+);}
+
+
+export type referralsReassignmentCurrentResponse200 = {
+  data: ReferralReferenceReassignmentDetailSchema
+  status: 200
+}
+
+export type referralsReassignmentCurrentResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type referralsReassignmentCurrentResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type referralsReassignmentCurrentResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type referralsReassignmentCurrentResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type referralsReassignmentCurrentResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type referralsReassignmentCurrentResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type referralsReassignmentCurrentResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type referralsReassignmentCurrentResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type referralsReassignmentCurrentResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type referralsReassignmentCurrentResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type referralsReassignmentCurrentResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type referralsReassignmentCurrentResponseSuccess = (referralsReassignmentCurrentResponse200) & {
+  headers: Record<string, string>;
+};
+export type referralsReassignmentCurrentResponseError = (referralsReassignmentCurrentResponse400 | referralsReassignmentCurrentResponse401 | referralsReassignmentCurrentResponse403 | referralsReassignmentCurrentResponse404 | referralsReassignmentCurrentResponse405 | referralsReassignmentCurrentResponse409 | referralsReassignmentCurrentResponse413 | referralsReassignmentCurrentResponse422 | referralsReassignmentCurrentResponse429 | referralsReassignmentCurrentResponse500 | referralsReassignmentCurrentResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type referralsReassignmentCurrentResponse = (referralsReassignmentCurrentResponseSuccess | referralsReassignmentCurrentResponseError)
+
+export const getReferralsReassignmentCurrentUrl = (referenceCode: string,) => {
+
+
+
+
+  return `/api/v1/referrals/${referenceCode}/reassignment/current/`
+}
+
+/**
+ * @summary Current Reassignment Detail
+ */
+export const referralsReassignmentCurrent = async (referenceCode: string, options?: Parameters<typeof compassFetch>[1]): Promise<referralsReassignmentCurrentResponse> => {
+
+  return compassFetch<referralsReassignmentCurrentResponse>(getReferralsReassignmentCurrentUrl(referenceCode),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+export type referralsReassignmentReferenceDecisionResponse200 = {
+  data: ReferralMutationResponseSchema
+  status: 200
+}
+
+export type referralsReassignmentReferenceDecisionResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type referralsReassignmentReferenceDecisionResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type referralsReassignmentReferenceDecisionResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type referralsReassignmentReferenceDecisionResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type referralsReassignmentReferenceDecisionResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type referralsReassignmentReferenceDecisionResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type referralsReassignmentReferenceDecisionResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type referralsReassignmentReferenceDecisionResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type referralsReassignmentReferenceDecisionResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type referralsReassignmentReferenceDecisionResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type referralsReassignmentReferenceDecisionResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type referralsReassignmentReferenceDecisionResponseSuccess = (referralsReassignmentReferenceDecisionResponse200) & {
+  headers: Record<string, string>;
+};
+export type referralsReassignmentReferenceDecisionResponseError = (referralsReassignmentReferenceDecisionResponse400 | referralsReassignmentReferenceDecisionResponse401 | referralsReassignmentReferenceDecisionResponse403 | referralsReassignmentReferenceDecisionResponse404 | referralsReassignmentReferenceDecisionResponse405 | referralsReassignmentReferenceDecisionResponse409 | referralsReassignmentReferenceDecisionResponse413 | referralsReassignmentReferenceDecisionResponse422 | referralsReassignmentReferenceDecisionResponse429 | referralsReassignmentReferenceDecisionResponse500 | referralsReassignmentReferenceDecisionResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type referralsReassignmentReferenceDecisionResponse = (referralsReassignmentReferenceDecisionResponseSuccess | referralsReassignmentReferenceDecisionResponseError)
+
+export const getReferralsReassignmentReferenceDecisionUrl = (referenceCode: string,) => {
+
+
+
+
+  return `/api/v1/referrals/${referenceCode}/reassignment/decision/`
+}
+
+/**
+ * @summary Reference Reassignment Decision
+ */
+export const referralsReassignmentReferenceDecision = async (referenceCode: string,
+    referralDecisionSchema: ReferralDecisionSchema, options?: Parameters<typeof compassFetch>[1]): Promise<referralsReassignmentReferenceDecisionResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return compassFetch<referralsReassignmentReferenceDecisionResponse>(getReferralsReassignmentReferenceDecisionUrl(referenceCode),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(referralDecisionSchema)
   }
 );}
 

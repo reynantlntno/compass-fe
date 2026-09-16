@@ -321,7 +321,7 @@ export function CounselingCasesView({ hasCapability, navItems = COUNSELING_NAV_I
       setActionError("Choose a reason before continuing.");
       return;
     }
-    const fingerprint = JSON.stringify({ action, referenceCode: counselingCase.reference_code, reasonCode, resumeTarget });
+    const fingerprint = JSON.stringify({ action, referenceCode: counselingCase.reference_code, resourceVersion: counselingCase.resource_version, reasonCode, resumeTarget });
     const scope = `counseling-case:${action}:${counselingCase.reference_code}`;
     const key = getMutationKey(scope, fingerprint);
     setMutation({ referenceCode: counselingCase.reference_code, state: "pending", message: "Saving case change…" });

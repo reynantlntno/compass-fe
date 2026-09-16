@@ -24,6 +24,7 @@ export interface CounselingSessionWorkspaceContextSchema {
   recording_controls_enabled: boolean;
   recording_requested?: boolean | null;
   reference_code: string;
+  resource_version?: string | null;
   routine_interview_available: boolean;
   scheduled_end_at?: string | null;
   scheduled_start_at?: string | null;

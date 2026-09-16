@@ -12,6 +12,7 @@
 export interface CallSlipQueueItemSchema {
   assignment_state: string;
   reference_code: string;
+  resource_version: string;
   schedule_bucket: string;
   status_code: string;
   status_label: string;

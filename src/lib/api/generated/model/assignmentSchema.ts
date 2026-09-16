@@ -9,7 +9,7 @@
 export interface AssignmentSchema {
   collection_id?: string | null;
   due_at?: string | null;
-  expected_updated_at?: string | null;
+  expected_resource_version?: string | null;
   graduation_year?: string;
   student_profile_id: number;
 }

@@ -21,6 +21,7 @@ export interface ScheduleRecordProjectionSchema {
   max_appointments_per_slot?: number | null;
   mode?: string | null;
   public_reference: string;
+  resource_version: string;
   slot_duration_minutes?: number | null;
   start_time?: string | null;
   state: string;

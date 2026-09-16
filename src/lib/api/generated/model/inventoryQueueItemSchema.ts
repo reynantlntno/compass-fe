@@ -12,6 +12,7 @@
 export interface InventoryQueueItemSchema {
   academic_year: string;
   reopened_at?: string | null;
+  resource_version?: string | null;
   review_state: string;
   schema_key: string;
   schema_version: string;

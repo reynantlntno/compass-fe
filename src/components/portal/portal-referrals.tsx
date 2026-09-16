@@ -35,6 +35,7 @@ import { PortalPageHeader } from "@/components/portal/portal-page-header";
 import { PORTAL_CAPABILITIES } from "@/components/portal/portal-navigation";
 import { PortalStatusFilter } from "@/components/portal/portal-status-filter";
 import { PortalWorkspaceNav } from "@/components/portal/portal-workspace-nav";
+import { downloadPortalBlob, previewPortalBlob } from "@/lib/api/browser-download";
 import { REFERRALS_NAV_ITEMS, getReferralsNavItems, type ReferralsSection } from "@/components/portal/portal-referrals-navigation";
 import {
   REFERRAL_ASSIGNMENTS,
@@ -44,12 +45,18 @@ import {
   REFERRAL_SOURCE_TYPES,
   ReferralsApiError,
   assignPortalReferral,
+  addPortalReferralAction,
   createPortalReferral,
+  decidePortalReferralReassignment,
+  downloadPortalReferralDocument,
+  generatePortalReferralDocument,
+  getPortalReferralReassignment,
   getPortalReferralCounselorOptions,
   getPortalReferralDetail,
   getPortalReferralQueue,
   getPortalStaffStudents,
   parseReferralsFilters,
+  previewPortalReferralDocument,
   referralsHref,
   rememberReferralOptions,
   submitPortalReferral,
@@ -74,19 +81,27 @@ import {
   callSlipsHref,
   createPortalCallSlip,
   createPortalCallSlipFromReferral,
+  decidePortalCallSlipReschedule,
+  downloadPortalCallSlipDocument,
+  generatePortalCallSlipDocument,
+  getPortalCallSlipReschedule,
   getPortalCallSlipCounselorOptions,
   getPortalCallSlipDetail,
   getPortalCallSlipQueue,
+  getPortalPrintableCallSlip,
   issuePortalCallSlip,
   parseCallSlipsFilters,
   recordPortalCallSlipAttendance,
   rememberCallSlipOptions,
+  previewPortalCallSlipDocument,
+  updatePortalCallSlipDraft,
   type CallSlipStaffQueueItem,
   type CallSlipsFilters,
   type PortalCallSlipDetail,
   type PortalCallSlipsPage,
   type ReferralCounselorOptionLike,
 } from "@/lib/api/call-slips";
+import type { ReferralActionSchema } from "@/lib/api/generated/model";
 import { createIdempotencyKey, type IdempotencyKey } from "@/lib/api/idempotency";
 
 const PORTAL_VALUE_LABELS: Record<string, string> = {
@@ -176,6 +191,9 @@ const ASSIGNMENT_OPTIONS = REFERRAL_ASSIGNMENTS.map((value) => ({ label: portalV
 const SLIP_ASSIGNMENT_OPTIONS = CALL_SLIP_ASSIGNMENTS.map((value) => ({ label: portalValueLabel(value), value }));
 const WORKFLOW_REASONS = ["WORKFLOW_PROGRESSION", "HEAD_REVIEW", "WORK_COMPLETED", "DUPLICATE", "INVALID_INTAKE", "WRONG_STUDENT", "TRANSFER_REQUIRED", "OTHER_STRUCTURED"];
 const SLIP_WORKFLOW_REASONS = ["WORKFLOW_PROGRESSION", "SCHEDULE_CHANGE", "ASSIGNMENT_CHANGE", "STUDENT_REQUEST_APPROVED", "STUDENT_REQUEST_DECLINED", "DUPLICATE", "INVALID_NOTICE", "WRONG_STUDENT", "OFFICE_CLOSURE", "COUNSELOR_UNAVAILABLE", "STUDENT_UNAVAILABLE", "NO_RESPONSE", "OTHER_STRUCTURED"];
+const REFERRAL_ACTION_CODES = ["PARENT_CONTACT_ATTEMPTED", "PARENT_NOTIFICATION_RECORDED", "CALL_SLIP_NEEDED", "INTERVIEW_SCHEDULING_NEEDED", "MONITORING_RECORDED", "HEAD_REVIEW_REQUESTED", "CLOSURE_RECOMMENDED", "OTHER_OPERATIONAL_ACTION"];
+const REFERRAL_ACTION_OUTCOMES = ["ATTEMPTED", "COMPLETED", "RECORDED", "NO_RESPONSE", "FOLLOW_UP_REQUIRED", "NOT_APPLICABLE"];
+const SLIP_REISSUE_REASONS = ["AFTER_NO_SHOW", "AFTER_EXPIRY", "AFTER_CANCELLATION"];
 const MAX_PAGE = 100_000;
 const MAX_QUERY_LENGTH = 120;
 
@@ -209,6 +227,216 @@ function errorMessage(error: unknown) {
   if (kind === "validation") return "Check the entry details and try again.";
   if (kind === "rate_limited") return "Too many requests. Wait a moment and try again.";
   return "This couldn’t be saved. Try again when the connection is ready.";
+}
+
+function OperationalDocumentActions({
+  preview,
+  download,
+  generate,
+  printable,
+}: {
+  preview: () => Promise<Blob>;
+  download: () => Promise<Blob>;
+  generate: () => Promise<unknown>;
+  printable?: () => Promise<Blob>;
+}) {
+  const [message, setMessage] = useState<string | null>(null);
+  const [pending, setPending] = useState(false);
+
+  const run = async (action: "preview" | "download" | "generate" | "printable") => {
+    setPending(true);
+    setMessage(null);
+    try {
+      if (action === "preview") {
+        const opened = previewPortalBlob(await preview());
+        setMessage(opened ? "Preview opened." : "The preview could not be opened.");
+      } else if (action === "download") {
+        downloadPortalBlob(await download(), "compass-operational-document");
+        setMessage("Document downloaded.");
+      } else if (action === "printable" && printable) {
+        const opened = previewPortalBlob(await printable());
+        setMessage(opened ? "Printable view opened." : "The printable view could not be opened.");
+      } else {
+        await generate();
+        setMessage("Document refreshed.");
+      }
+    } catch {
+      setMessage("The document action is unavailable right now.");
+    } finally {
+      setPending(false);
+    }
+  };
+
+  return (
+    <div aria-live="polite" className="portal-counseling__details-actions">
+      <Button disabled={pending} onClick={() => void run("preview")} size="xs" type="button" variant="outline">Preview document</Button>
+      <Button disabled={pending} onClick={() => void run("download")} size="xs" type="button" variant="outline">Download</Button>
+      {printable ? <Button disabled={pending} onClick={() => void run("printable")} size="xs" type="button" variant="outline">Printable view</Button> : null}
+      <Button disabled={pending} onClick={() => void run("generate")} size="xs" type="button" variant="ghost">Generate/refresh</Button>
+      {pending ? <span className="portal-counseling__student-number">Working…</span> : null}
+      {message ? <span className="portal-counseling__student-number">{message}</span> : null}
+    </div>
+  );
+}
+
+function ReferralActionPanel({ referenceCode }: { referenceCode: string }) {
+  const [actionCode, setActionCode] = useState(REFERRAL_ACTION_CODES[0]);
+  const [outcomeCode, setOutcomeCode] = useState(REFERRAL_ACTION_OUTCOMES[0]);
+  const [remarks, setRemarks] = useState("");
+  const [message, setMessage] = useState<string | null>(null);
+  const [pending, setPending] = useState(false);
+
+  const save = async () => {
+    setPending(true);
+    setMessage(null);
+    try {
+      await addPortalReferralAction(referenceCode, {
+        action_code: actionCode,
+        outcome_code: outcomeCode,
+        remarks: remarks.trim().slice(0, 2_000),
+      } as ReferralActionSchema, createIdempotencyKey());
+      setRemarks("");
+      setMessage("Action recorded.");
+    } catch (error) {
+      setMessage(errorMessage(error));
+    } finally {
+      setPending(false);
+    }
+  };
+
+  return (
+    <div className="portal-counseling__detail-sublist">
+      <h3>Record operational action</h3>
+      <div className="portal-counseling__details-actions">
+        <select aria-label="Action code" disabled={pending} onChange={(event) => setActionCode(event.target.value)} value={actionCode}>{optionList(REFERRAL_ACTION_CODES.map((value) => ({ label: portalValueLabel(value), value })))}</select>
+        <select aria-label="Outcome code" disabled={pending} onChange={(event) => setOutcomeCode(event.target.value)} value={outcomeCode}>{optionList(REFERRAL_ACTION_OUTCOMES.map((value) => ({ label: portalValueLabel(value), value })))}</select>
+        <Input aria-label="Bounded action remarks" disabled={pending} maxLength={2_000} onChange={(event) => setRemarks(event.target.value)} placeholder="Optional remarks" value={remarks} />
+        <Button disabled={pending} onClick={() => void save()} size="xs" type="button">Save action</Button>
+      </div>
+      {message ? <p className="portal-counseling__student-number" role={message === "Action recorded." ? "status" : "alert"}>{message}</p> : null}
+    </div>
+  );
+}
+
+function ReferralReassignmentPanel({ referenceCode }: { referenceCode: string }) {
+  const [request, setRequest] = useState<Awaited<ReturnType<typeof getPortalReferralReassignment>> extends infer T ? T | null : never>(null);
+  const [state, setState] = useState<"idle" | "loading" | "ready" | "error">("idle");
+  const [message, setMessage] = useState<string | null>(null);
+
+  const load = () => {
+    setState("loading");
+    setMessage(null);
+    void getPortalReferralReassignment(referenceCode).then((value) => {
+      setRequest(value);
+      setState("ready");
+    }).catch(() => {
+      setRequest(null);
+      setState("error");
+      setMessage("No pending reassignment decision is available.");
+    });
+  };
+
+  const decide = (decision: "APPROVED" | "DECLINED") => {
+    if (!request) return;
+    setState("loading");
+    void decidePortalReferralReassignment(referenceCode, {
+      decision,
+      decision_code: decision === "APPROVED" ? "WORK_COMPLETED" : "OTHER_STRUCTURED",
+      decision_detail: "",
+    }, createIdempotencyKey()).then(() => {
+      setState("ready");
+      setRequest(null);
+      setMessage(`Reassignment ${decision === "APPROVED" ? "approved" : "declined"}.`);
+    }).catch((error) => {
+      setState("error");
+      setMessage(errorMessage(error));
+    });
+  };
+
+  return (
+    <div className="portal-counseling__detail-sublist">
+      <h3>Reassignment review</h3>
+      {state === "idle" ? <Button onClick={load} size="sm" type="button" variant="outline">Check pending reassignment</Button> : null}
+      {state === "loading" ? <span className="portal-counseling__student-number">Loading…</span> : null}
+      {request ? <div className="portal-counseling__details-actions"><span>{portalValueLabel(request.request_reason_code)} · {toLocal(request.created_at)}</span><Button onClick={() => decide("APPROVED")} size="xs" type="button">Approve</Button><Button onClick={() => decide("DECLINED")} size="xs" type="button" variant="outline">Decline</Button></div> : null}
+      {message ? <p className="portal-counseling__student-number" role="status">{message}</p> : null}
+    </div>
+  );
+}
+
+function CallSlipReschedulePanel({ referenceCode }: { referenceCode: string }) {
+  const [request, setRequest] = useState<Awaited<ReturnType<typeof getPortalCallSlipReschedule>> extends infer T ? T | null : never>(null);
+  const [state, setState] = useState<"idle" | "loading" | "ready" | "error">("idle");
+  const [message, setMessage] = useState<string | null>(null);
+
+  const load = () => {
+    setState("loading");
+    setMessage(null);
+    void getPortalCallSlipReschedule(referenceCode).then((value) => { setRequest(value); setState("ready"); }).catch(() => { setRequest(null); setState("error"); setMessage("The reschedule request is unavailable right now."); });
+  };
+  const decide = (decision: "APPROVED" | "DECLINED") => {
+    if (!request) return;
+    setState("loading");
+    void decidePortalCallSlipReschedule(referenceCode, {
+      decision,
+      decision_code: decision === "APPROVED" ? "STUDENT_REQUEST_APPROVED" : "STUDENT_REQUEST_DECLINED",
+      decision_detail: "",
+    }, createIdempotencyKey()).then(() => { setRequest(null); setState("ready"); setMessage(`Reschedule ${decision === "APPROVED" ? "approved" : "declined"}.`); }).catch((error) => { setState("error"); setMessage(errorMessage(error)); });
+  };
+  return (
+    <div className="portal-counseling__detail-sublist">
+      <h3>Reschedule review</h3>
+      {state === "idle" ? <Button onClick={load} size="sm" type="button" variant="outline">Review reschedule request</Button> : null}
+      {state === "loading" ? <span className="portal-counseling__student-number">Loading…</span> : null}
+      {request ? <div className="portal-counseling__details-actions"><span>{toLocal(request.proposed_start_at)} → {toLocal(request.proposed_end_at)}</span><Button onClick={() => decide("APPROVED")} size="xs" type="button">Approve</Button><Button onClick={() => decide("DECLINED")} size="xs" type="button" variant="outline">Decline</Button></div> : null}
+      {message ? <p className="portal-counseling__student-number" role={state === "error" ? "alert" : "status"}>{message}</p> : null}
+    </div>
+  );
+}
+
+function CallSlipDraftEditor({ detail }: { detail: PortalCallSlipDetail }) {
+  const [open, setOpen] = useState(false);
+  const [location, setLocation] = useState(detail.student_safe_location ?? "");
+  const [instructions, setInstructions] = useState(detail.student_safe_instructions ?? "");
+  const [remarks, setRemarks] = useState(detail.office_only_remarks ?? "");
+  const [pending, setPending] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+
+  if (detail.status_code !== "DRAFT") return null;
+  const save = async () => {
+    setPending(true);
+    setMessage(null);
+    try {
+      await updatePortalCallSlipDraft(detail.reference_code, {
+        student_safe_location: location.trim().slice(0, 500),
+        student_safe_instructions: instructions.trim().slice(0, 2_000),
+        office_only_remarks: remarks.trim().slice(0, 2_000),
+      }, createIdempotencyKey());
+      setOpen(false);
+      setMessage("Draft updated.");
+    } catch (error) {
+      setMessage(errorMessage(error));
+    } finally {
+      setPending(false);
+    }
+  };
+  return (
+    <div className="portal-counseling__detail-sublist">
+      <h3>Draft fields</h3>
+      {!open ? <Button onClick={() => setOpen(true)} size="sm" type="button" variant="outline">Edit draft fields</Button> : (
+        <div className="portal-counseling__dialog-field">
+          <Label htmlFor={`call-slip-location-${detail.reference_code}`}>Student-safe location</Label>
+          <Input id={`call-slip-location-${detail.reference_code}`} maxLength={500} onChange={(event) => setLocation(event.target.value)} value={location} />
+          <Label htmlFor={`call-slip-instructions-${detail.reference_code}`}>Student-safe instructions</Label>
+          <Textarea id={`call-slip-instructions-${detail.reference_code}`} maxLength={2_000} onChange={(event) => setInstructions(event.target.value)} value={instructions} />
+          <Label htmlFor={`call-slip-remarks-${detail.reference_code}`}>Office remarks</Label>
+          <Textarea id={`call-slip-remarks-${detail.reference_code}`} maxLength={2_000} onChange={(event) => setRemarks(event.target.value)} value={remarks} />
+          <div className="portal-counseling__details-actions"><Button disabled={pending} onClick={() => void save()} size="xs" type="button">Save draft</Button><Button disabled={pending} onClick={() => setOpen(false)} size="xs" type="button" variant="outline">Cancel</Button></div>
+        </div>
+      )}
+      {message ? <p className="portal-counseling__student-number" role="status">{message}</p> : null}
+    </div>
+  );
 }
 
 export function PortalReferralsLoading({ section = "referrals" }: { section?: ReferralsSection }) {
@@ -357,16 +585,35 @@ function ReferralDetailExpanded({
         <div><dt>Assignment</dt><dd>{portalValueLabel(detail.assignment_state ?? "—")}</dd></div>
         <div><dt>Updated</dt><dd>{toLocal(detail.updated_at)}</dd></div>
       </dl>
+      <OperationalDocumentActions
+        download={() => downloadPortalReferralDocument(detail.reference_code)}
+        generate={() => generatePortalReferralDocument(detail.reference_code, detail.resource_version, createIdempotencyKey())}
+        preview={() => previewPortalReferralDocument(detail.reference_code)}
+      />
+      <ReferralActionPanel referenceCode={detail.reference_code} />
+      <ReferralReassignmentPanel referenceCode={detail.reference_code} />
+      <div className="portal-counseling__detail-sublist">
+        <h3>Action history</h3>
+        {detail.actions.length === 0 ? <p>No operational actions recorded.</p> : detail.actions.map((action, index) => <p key={`${action.performed_at}-${index}`}>{portalValueLabel(action.action_code)} · {portalValueLabel(action.outcome_code)} · {toLocal(action.performed_at)}{action.remarks ? ` — ${action.remarks}` : ""}</p>)}
+      </div>
       <div className="portal-counseling__detail-sublist">
         <h3>Linked call slips</h3>
         {callSlips.length === 0 ? <p>No call slips linked to this referral.</p> : null}
         {callSlips.map((entry) => (
-          <p key={entry.reference_code}>
-            <Link href={`/portal/referrals?section=call-slips&q=${encodeURIComponent(entry.reference_code)}`}>
-              {entry.reference_code}
-            </Link>{" "}
-            — {entry.status_label || portalValueLabel(entry.status_code)}
-          </p>
+          <div key={entry.reference_code}>
+            <p>
+              <Link href={`/portal/referrals?section=call-slips&q=${encodeURIComponent(entry.reference_code)}`}>
+                {entry.reference_code}
+              </Link>{" "}
+              — {entry.status_label || portalValueLabel(entry.status_code)}
+            </p>
+            <OperationalDocumentActions
+              download={() => downloadPortalCallSlipDocument(entry.reference_code)}
+              generate={() => generatePortalCallSlipDocument(entry.reference_code, entry.resource_version, createIdempotencyKey())}
+              printable={() => getPortalPrintableCallSlip(entry.reference_code)}
+              preview={() => previewPortalCallSlipDocument(entry.reference_code)}
+            />
+          </div>
         ))}
       </div>
     </div>
@@ -410,6 +657,14 @@ function CallSlipDetailExpanded({
         <div><dt>Mode</dt><dd>{String(detail.mode_label ?? "—")}</dd></div>
         <div><dt>Schedule</dt><dd>{typeof detail.scheduled_start_at === "string" && detail.scheduled_start_at ? toLocal(detail.scheduled_start_at) : "Unscheduled"}</dd></div>
       </dl>
+      <OperationalDocumentActions
+        download={() => downloadPortalCallSlipDocument(detail.reference_code)}
+        generate={() => generatePortalCallSlipDocument(detail.reference_code, detail.resource_version, createIdempotencyKey())}
+        printable={() => getPortalPrintableCallSlip(detail.reference_code)}
+        preview={() => previewPortalCallSlipDocument(detail.reference_code)}
+      />
+      <CallSlipDraftEditor detail={detail} />
+      {detail.status_code === "RESCHEDULE_REQUESTED" ? <CallSlipReschedulePanel referenceCode={detail.reference_code} /> : null}
       <div className="portal-counseling__detail-sublist">
         <h3>Related records</h3>
         {referral ? (
@@ -592,8 +847,9 @@ function CallSlipTable({
       if (hasCapability(PORTAL_CAPABILITIES.callSlipsCancel)) actions.push("cancel");
     }
     if (item.status === "RESCHEDULE_REQUESTED" && hasCapability(PORTAL_CAPABILITIES.callSlipsCancel)) actions.push("cancel");
+    if (["NO_SHOW", "EXPIRED", "CANCELLED"].includes(item.status) && item.referral_reference) actions.push("reissue");
     if (item.assignment_state === "Assigned") {
-      if (hasCapability(PORTAL_CAPABILITIES.callSlipsReassign)) actions.push("reassign");
+      if (hasCapability(PORTAL_CAPABILITIES.callSlipsAssign)) actions.push("reassign");
     } else if (hasCapability(PORTAL_CAPABILITIES.callSlipsAssign)) {
       actions.push("assign");
     }
@@ -607,6 +863,7 @@ function CallSlipTable({
     cancel: "Cancel",
     assign: "Assign",
     reassign: "Reassign",
+    reissue: "Reissue",
   };
   return (
     <div className="portal-counseling__table-wrap">
@@ -1236,7 +1493,7 @@ type QueueState =
 
 type ActionIntent =
   | { kind: "referral-transition"; item: ReferralStaffQueueItem; action: ReferralTransition }
-  | { kind: "call-slip-reason"; item: CallSlipStaffQueueItem; action: "cancel" | "no-show" | "expire" }
+  | { kind: "call-slip-reason"; item: CallSlipStaffQueueItem; action: "cancel" | "no-show" | "expire" | "reissue" }
   | null;
 
 type MutationKeyEntry = { fingerprint: string; key: IdempotencyKey };
@@ -1442,7 +1699,7 @@ const loadReferralDetail = async (item: ReferralStaffQueueItem) => {
   const handleSlipAction = (action: string, item: CallSlipStaffQueueItem) => {
     if (action === "issue") { setActionErrorText(null); setIssueItem(item); return; }
     if (action === "attendance") { setActionErrorText(null); setAttendanceItem(item); return; }
-    if (action === "cancel" || action === "no-show" || action === "expire") {
+    if (action === "cancel" || action === "no-show" || action === "expire" || action === "reissue") {
       setActionReason("");
       setActionDetail("");
       setActionErrorText(null);
@@ -1466,6 +1723,21 @@ const loadReferralDetail = async (item: ReferralStaffQueueItem) => {
         await transitionPortalReferral(actionIntent.item.reference_code, actionIntent.action, actionReason, actionDetail, key);
         discardMutationKey(scope);
         setMutationNote(`Referral ${actionIntent.item.reference_code} updated.`);
+      } else if (actionIntent.action === "reissue") {
+        const referralReference = actionIntent.item.referral_reference;
+        if (!referralReference || !actionReason) throw new CallSlipsApiError("validation");
+        const scope = actionMutationScope(actionIntent);
+        if (!scope) return;
+        const key = getMutationKey(scope, JSON.stringify({ action: "reissue", reason: actionReason }));
+        await createPortalCallSlipFromReferral({
+          referral_reference: referralReference,
+          reissued_from_reference: actionIntent.item.reference_code,
+          reissue_reason_code: actionReason,
+          destination_code: "GUIDANCE_OFFICE",
+          mode: "ONSITE",
+        }, key);
+        discardMutationKey(scope);
+        setMutationNote(`Replacement call slip prepared.`);
       } else {
         const scope = actionMutationScope(actionIntent);
         if (!scope) return;
@@ -1693,7 +1965,7 @@ const loadReferralDetail = async (item: ReferralStaffQueueItem) => {
         open={actionIntent !== null}
         pending={actionPending}
         reason={actionReason}
-        reasonOptions={actionIntent?.kind === "referral-transition" ? WORKFLOW_REASONS : SLIP_WORKFLOW_REASONS}
+        reasonOptions={actionIntent?.kind === "referral-transition" ? WORKFLOW_REASONS : actionIntent?.action === "reissue" ? SLIP_REISSUE_REASONS : SLIP_WORKFLOW_REASONS}
         setDetailText={setActionDetail}
         setReason={setActionReason}
         title={actionIntent?.kind === "referral-transition" ? `Update referral ${actionIntent.item.reference_code}` : "Call slip action"}

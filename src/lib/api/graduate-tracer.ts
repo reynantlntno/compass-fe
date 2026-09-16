@@ -16,6 +16,7 @@ import type {
 } from "@/lib/api/generated/model";
 import { cookieSessionMutationOptions, cookieSessionReadOptions } from "@/lib/api/auth";
 import { withIdempotencyKey, type IdempotencyKey } from "@/lib/api/idempotency";
+import { isOptionalResourceVersion } from "@/lib/api/resource-version";
 import {
   FORMS_PAGE_SIZE,
   FORMS_QUEUE_ORDERS,
@@ -67,6 +68,7 @@ export type PortalGraduateTracerQueueItem = {
   submitted_at: string | null;
   reopened_at: string | null;
   updated_at: string | null;
+  resource_version: string | null;
   review_state: string;
   document_available: boolean;
 };
@@ -227,7 +229,7 @@ function isQueueItem(value: unknown): value is GraduateTracerReviewQueueItemSche
     boundedString(value.form_title, MAX_TEXT_LENGTH) &&
     typeof value.status === "string" && STATUS_SET.has(value.status) &&
     boundedString(value.employment_status, MAX_FILTER_LENGTH, true) &&
-    optionalTimestamp(value.submitted_at) && optionalTimestamp(value.reopened_at) && optionalTimestamp(value.updated_at) &&
+    optionalTimestamp(value.submitted_at) && optionalTimestamp(value.reopened_at) && optionalTimestamp(value.updated_at) && isOptionalResourceVersion(value.resource_version) &&
     boundedString(value.review_state, MAX_TEXT_LENGTH) &&
     typeof value.document_available === "boolean"
   );
@@ -251,6 +253,7 @@ function parseQueueItem(value: unknown): PortalGraduateTracerQueueItem | null {
     submitted_at: value.submitted_at ?? null,
     reopened_at: value.reopened_at ?? null,
     updated_at: value.updated_at ?? null,
+    resource_version: value.resource_version ?? null,
     review_state: value.review_state,
     document_available: value.document_available,
   };
@@ -388,25 +391,25 @@ async function runMutation(
   }
 }
 
-function lifecyclePayload(reason: string | null, expectedUpdatedAt: string | null): GraduateTracerReviewLifecycleSchema {
+function lifecyclePayload(reason: string | null, expectedResourceVersion: string | null): GraduateTracerReviewLifecycleSchema {
   return {
     ...(reason?.trim() ? { reason: reason.trim().slice(0, 500) } : {}),
-    ...(expectedUpdatedAt ? { expected_updated_at: expectedUpdatedAt } : {}),
+    ...(expectedResourceVersion ? { expected_resource_version: expectedResourceVersion } : {}),
   };
 }
 
-export function reopenPortalGraduateTracer(referenceCode: string, reason: string, expectedUpdatedAt: string | null, key: IdempotencyKey, signal?: AbortSignal) {
+export function reopenPortalGraduateTracer(referenceCode: string, reason: string, expectedResourceVersion: string | null, key: IdempotencyKey, signal?: AbortSignal) {
   if (!reason.trim()) throw new GraduateTracerApiError("validation");
-  return runMutation((options) => graduateTracerReviewQueueReopen(safeReference(referenceCode), lifecyclePayload(reason, expectedUpdatedAt), options), key, signal);
+  return runMutation((options) => graduateTracerReviewQueueReopen(safeReference(referenceCode), lifecyclePayload(reason, expectedResourceVersion), options), key, signal);
 }
 
-export function voidPortalGraduateTracer(referenceCode: string, reason: string, expectedUpdatedAt: string | null, key: IdempotencyKey, signal?: AbortSignal) {
+export function voidPortalGraduateTracer(referenceCode: string, reason: string, expectedResourceVersion: string | null, key: IdempotencyKey, signal?: AbortSignal) {
   if (!reason.trim()) throw new GraduateTracerApiError("validation");
-  return runMutation((options) => graduateTracerReviewQueueVoid(safeReference(referenceCode), lifecyclePayload(reason, expectedUpdatedAt), options), key, signal);
+  return runMutation((options) => graduateTracerReviewQueueVoid(safeReference(referenceCode), lifecyclePayload(reason, expectedResourceVersion), options), key, signal);
 }
 
-export function archivePortalGraduateTracer(referenceCode: string, expectedUpdatedAt: string | null, key: IdempotencyKey, signal?: AbortSignal) {
-  return runMutation((options) => graduateTracerReviewQueueArchive(safeReference(referenceCode), lifecyclePayload(null, expectedUpdatedAt), options), key, signal);
+export function archivePortalGraduateTracer(referenceCode: string, expectedResourceVersion: string | null, key: IdempotencyKey, signal?: AbortSignal) {
+  return runMutation((options) => graduateTracerReviewQueueArchive(safeReference(referenceCode), lifecyclePayload(null, expectedResourceVersion), options), key, signal);
 }
 
 export function previewPortalGraduateTracerDocument(referenceCode: string, signal?: AbortSignal) {
@@ -417,8 +420,8 @@ export function downloadPortalGraduateTracerDocument(referenceCode: string, sign
   return readBlobRequest(graduateTracerReviewQueueDocumentDownload(safeReference(referenceCode), cookieSessionReadOptions(signal)));
 }
 
-export async function generatePortalGraduateTracerDocument(referenceCode: string, expectedUpdatedAt: string | null, key: IdempotencyKey, signal?: AbortSignal) {
-  const payload: DocumentGenerateSchema = expectedUpdatedAt ? { expected_updated_at: expectedUpdatedAt } : {};
+export async function generatePortalGraduateTracerDocument(referenceCode: string, expectedResourceVersion: string | null, key: IdempotencyKey, signal?: AbortSignal) {
+  const payload: DocumentGenerateSchema = expectedResourceVersion ? { expected_resource_version: expectedResourceVersion } : {};
   const options = withIdempotencyKey(key, await cookieSessionMutationOptions(signal));
   return readRequest(
     graduateTracerReviewQueueDocumentGenerate(safeReference(referenceCode), payload, options),

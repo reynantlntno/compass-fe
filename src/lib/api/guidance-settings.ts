@@ -31,34 +31,19 @@ import {
 } from "@/lib/api/generated/assessments/assessments";
 import {
   organizationsAcademicTermActivate,
-  organizationsAcademicTermApprove,
   organizationsAcademicTermArchive,
   organizationsAcademicTermClose,
   organizationsAcademicTermCreate,
-  organizationsAcademicTermRollback,
   organizationsAcademicTermRolloverPreview,
-  organizationsAcademicTermSubmit,
   organizationsAcademicTermUpdate,
   organizationsAcademicTermsList,
-  organizationsBrandAssetActivate,
-  organizationsBrandAssetArchive,
-  organizationsBrandAssetCreate,
-  organizationsBrandAssetDownload,
-  organizationsBrandAssetsList,
-  organizationsBrandAssetRetire,
-  organizationsBrandAssetUpdate,
-  organizationsDocumentTemplateActivate,
   organizationsDocumentTemplateArchive,
   organizationsDocumentTemplateCreate,
-  organizationsDocumentTemplateRetire,
   organizationsDocumentTemplatesList,
   organizationsDocumentTemplateUpdate,
-  organizationsDocumentTemplateVersionActivate,
-  organizationsDocumentTemplateVersionActivationPreflight,
   organizationsDocumentTemplateVersionArchive,
   organizationsDocumentTemplateVersionClone,
   organizationsDocumentTemplateVersionDetail,
-  organizationsDocumentTemplateVersionRetire,
   organizationsDocumentTemplateVersionUpdate,
   organizationsDocumentTemplateVersionsList,
   organizationsFormFamiliesList,
@@ -68,29 +53,14 @@ import {
   organizationsFormFamilyRetire,
   organizationsFormFamilyUpdate,
   organizationsFormRevisionsList,
-  organizationsFormRevisionActivationPreflight,
-  organizationsFormRevisionActivate,
-  organizationsFormRevisionApprove,
   organizationsFormRevisionArchive,
   organizationsFormRevisionClone,
   organizationsFormRevisionCreate,
-  organizationsFormRevisionRetire,
   organizationsFormRevisionSourceDownload,
   organizationsFormRevisionSourceUpload,
-  organizationsFormRevisionSubmit,
   organizationsFormRevisionUpdate,
-  organizationsInstitutionProfilesList,
-  organizationsInstitutionProfileActivate,
-  organizationsInstitutionProfileArchive,
-  organizationsInstitutionProfileCreate,
-  organizationsInstitutionProfileRetire,
-  organizationsInstitutionProfileUpdate,
-  organizationsOfficesList,
-  organizationsOfficeActivate,
-  organizationsOfficeArchive,
-  organizationsOfficeCreate,
-  organizationsOfficeRetire,
-  organizationsOfficeUpdate,
+  organizationsInstitutionalIdentityDetail,
+  organizationsInstitutionalIdentityUpdate,
 } from "@/lib/api/generated/organizations/organizations";
 import type {
   AssessmentInstrumentGovernanceCreateSchema,
@@ -101,18 +71,12 @@ import type {
   CoverageCreateSchema,
   CoverageDeactivateSchema,
   CoverageUpdateSchema,
-  DocumentTemplateActivationPreflightSchema,
   DocumentTemplateSchema,
   DocumentTemplateVersionUpdateSchema,
   FamilySchema,
-  FormRevisionActivationPreflightSchema,
-  InstitutionSchema,
   LifecycleSchema,
-  OfficeSchema,
+  InstitutionalIdentityUpdateSchema,
   OrganizationsFormRevisionSourceUploadBody,
-  OrganizationsBrandAssetCreateBody,
-  OrganizationsBrandAssetUpdateBody,
-  RollbackSchema,
   ScheduleChangeSchema,
   WorkflowAccessCreateSchema,
   WorkflowAccessListParams,
@@ -120,7 +84,9 @@ import type {
   TermSchema,
 } from "@/lib/api/generated/model";
 import { cookieSessionMutationOptions, cookieSessionReadOptions } from "@/lib/api/auth";
+import { compassFetch } from "@/lib/api/client";
 import { withIdempotencyKey, type IdempotencyKey } from "@/lib/api/idempotency";
+import { isOptionalResourceVersion, isResourceVersion } from "@/lib/api/resource-version";
 
 export const GUIDANCE_PAGE_SIZE = 20;
 
@@ -150,65 +116,35 @@ export type PortalAcademicTerm = {
   approved_at: string | null;
   activated_at: string | null;
   closed_at: string | null;
+  resource_version: string;
 };
 
-export type PortalInstitutionProfile = {
-  legal_name: string;
-  short_name: string;
-  address: string;
+export type PortalInstitutionalIdentity = {
+  id: string;
+  institution_name: string;
+  institution_short_name: string;
+  institution_former_name: string;
+  institution_former_short_name: string;
   main_campus: string;
-  primary_brand_color: string;
-  secondary_brand_color: string;
-  accent_brand_color: string;
-  version_label: string;
-  status: string;
-  effective_from: string | null;
-  effective_until: string | null;
-  former_name: string;
-  former_short_name: string;
-  source_note: string;
-  activated_at: string | null;
-  retired_at: string | null;
-};
-
-export type PortalOfficeProfile = {
+  institution_address: string;
+  official_website: string;
+  institutional_email: string;
+  facebook_url: string;
   office_name: string;
   office_short_name: string;
   document_header_name: string;
   office_address: string;
+  office_email: string;
+  office_phone: string;
   office_hours: string;
-  contact_email: string;
-  contact_number: string;
-  version_label: string;
-  status: string;
-  effective_from: string | null;
-  effective_until: string | null;
-  legacy_office_name: string;
-  default_signatory_name: string;
-  default_signatory_title: string;
-  footer_note: string;
-  source_note: string;
-  activated_at: string | null;
-  retired_at: string | null;
+  document_footer_text: string;
+  resource_version: string;
 };
 
-export type PortalBrandAsset = {
-  asset_type: string;
-  semantic_role: string;
-  placement: string;
-  owner_type: string;
-  background_variant: string;
-  status: string;
-  version_label: string;
-  usage_context: string;
-  alt_text: string;
-  display_order: number;
-  effective_from: string | null;
-  effective_until: string | null;
-  content_type: string;
-  image_width: number | null;
-  image_height: number | null;
-};
+export type InstitutionalIdentityFields = Omit<
+  PortalInstitutionalIdentity,
+  "id" | "resource_version"
+>;
 
 export type PortalDocumentTemplate = {
   stable_key: string;
@@ -218,8 +154,8 @@ export type PortalDocumentTemplate = {
   retention_classification: string;
   description: string;
   related_form_family_label: string;
-  owner_office_label: string;
   status: string;
+  resource_version: string;
 };
 
 export type PortalDocumentTemplateVersion = {
@@ -231,8 +167,9 @@ export type PortalDocumentTemplateVersion = {
   status: string;
   is_used: boolean;
   related_form_revision_label: string;
-  approved_at: string | null;
-  retired_at: string | null;
+  published_at: string | null;
+  archived_at: string | null;
+  resource_version: string;
 };
 
 export type PortalCounselorCoverage = {
@@ -248,6 +185,7 @@ export type PortalCounselorCoverage = {
   starts_at: string;
   ends_at: string | null;
   updated_at: string;
+  resource_version: string;
 };
 
 export type PortalCounselorOption = {
@@ -272,6 +210,7 @@ export type PortalWorkflowAccess = {
   created_at: string;
   updated_at: string;
   revoked_at: string | null;
+  resource_version: string;
 };
 
 export type PortalWorkflowChoice = { value: string; label: string };
@@ -327,6 +266,7 @@ export type PortalScheduleRecord = {
   state: string;
   state_label: string;
   updated_at: string;
+  resource_version: string;
 };
 
 export type PortalScheduleCounselorOption = { display_name: string };
@@ -350,6 +290,7 @@ export type PortalOfficeClosure = {
   state: string;
   state_label: string;
   updated_at: string | null;
+  resource_version: string | null;
 };
 
 export type GuidanceScheduleFilters = {
@@ -401,6 +342,7 @@ export type PortalFormFamily = {
   display_name: string;
   description: string;
   status: string;
+  resource_version: string;
 };
 
 export type PortalFormRevision = {
@@ -415,11 +357,10 @@ export type PortalFormRevision = {
   internal_schema_version: string;
   internal_template_version: string;
   source_label: string;
-  approved_at: string | null;
-  submitted_at: string | null;
-  activated_at: string | null;
-  retired_at: string | null;
+  published_at: string | null;
+  archived_at: string | null;
   has_source: boolean;
+  resource_version: string;
 };
 
 export type PortalAssessmentInstrument = {
@@ -434,6 +375,7 @@ export type PortalAssessmentInstrument = {
   is_active: boolean;
   created_at: string;
   updated_at: string;
+  resource_version: string;
 };
 
 export type RolloverPreview = {
@@ -441,17 +383,24 @@ export type RolloverPreview = {
   semester: string;
   prior_term: string;
   providers: Array<{ key: string; status: string; count: number; reason_code: string | null }>;
-  rollback: { status: string; condition: string; reference: string };
 };
 
-export type RevisionPreflight = FormRevisionActivationPreflightSchema;
+export type RevisionPreflight = {
+  blockers: string[];
+  ready: boolean;
+  safe_template: boolean;
+  status: string;
+};
+
+type TemplatePublicationPreflight = {
+  blockers: string[];
+  ready: boolean;
+  status: string;
+};
 
 const termKeys = new WeakMap<PortalAcademicTerm, number>();
-const institutionKeys = new WeakMap<PortalInstitutionProfile, number>();
-const officeKeys = new WeakMap<PortalOfficeProfile, number>();
 const familyKeys = new WeakMap<PortalFormFamily, number>();
 const revisionKeys = new WeakMap<PortalFormRevision, number>();
-const brandAssetKeys = new WeakMap<PortalBrandAsset, number>();
 const templateKeys = new WeakMap<PortalDocumentTemplate, number>();
 const templateVersionKeys = new WeakMap<PortalDocumentTemplateVersion, number>();
 const coverageKeys = new WeakMap<PortalCounselorCoverage, number>();
@@ -529,75 +478,41 @@ function parseTerm(value: unknown): PortalAcademicTerm | null {
     status: stringValue(value.status, 30, false), is_current: value.is_current === true,
     configuration_identifier: stringValue(value.configuration_identifier, 160) ?? "",
     approved_at: timestamp(value.approved_at), activated_at: timestamp(value.activated_at), closed_at: timestamp(value.closed_at),
+    resource_version: isResourceVersion(value.resource_version) ? value.resource_version : null,
   };
-  if (!item.academic_year || !item.semester || !item.start_date || !item.end_date || !item.status) return null;
+  if (!item.academic_year || !item.semester || !item.start_date || !item.end_date || !item.status || !item.resource_version) return null;
   const result = item as PortalAcademicTerm;
   termKeys.set(result, id);
   return result;
 }
 
-function parseInstitution(value: unknown): PortalInstitutionProfile | null {
-  if (!isRecord(value)) return null;
-  const id = parseSafeKey(value.id);
-  if (id === null) return null;
-  const required = ["legal_name", "short_name", "status"];
-  if (required.some((key) => !stringValue(value[key], 255, false))) return null;
-  const result = {
-    legal_name: String(value.legal_name), short_name: String(value.short_name), address: stringValue(value.address, 2000) ?? "",
-    main_campus: stringValue(value.main_campus, 255) ?? "", primary_brand_color: stringValue(value.primary_brand_color, 30) ?? "",
-    secondary_brand_color: stringValue(value.secondary_brand_color, 30) ?? "", accent_brand_color: stringValue(value.accent_brand_color, 30) ?? "",
-    version_label: stringValue(value.version_label, 50) ?? "", status: String(value.status), effective_from: timestamp(value.effective_from), effective_until: timestamp(value.effective_until),
-    former_name: stringValue(value.former_name, 255) ?? "", former_short_name: stringValue(value.former_short_name, 50) ?? "",
-    source_note: stringValue(value.source_note, 2000) ?? "", activated_at: timestamp(value.activated_at), retired_at: timestamp(value.retired_at),
-  } as PortalInstitutionProfile;
-  institutionKeys.set(result, id);
-  return result;
-}
-
-function parseOffice(value: unknown): PortalOfficeProfile | null {
-  if (!isRecord(value) || !stringValue(value.office_name, 255, false) || !stringValue(value.status, 30, false)) return null;
-  const id = parseSafeKey(value.id);
-  if (id === null) return null;
-  const result = {
-    office_name: String(value.office_name), office_short_name: stringValue(value.office_short_name, 50) ?? "", document_header_name: stringValue(value.document_header_name, 255) ?? "",
-    office_address: stringValue(value.office_address, 2000) ?? "", office_hours: stringValue(value.office_hours, 255) ?? "", contact_email: stringValue(value.contact_email, 254) ?? "", contact_number: stringValue(value.contact_number, 50) ?? "",
-    version_label: stringValue(value.version_label, 50) ?? "", status: String(value.status), effective_from: timestamp(value.effective_from), effective_until: timestamp(value.effective_until),
-    legacy_office_name: stringValue(value.legacy_office_name, 255) ?? "", default_signatory_name: stringValue(value.default_signatory_name, 255) ?? "", default_signatory_title: stringValue(value.default_signatory_title, 255) ?? "", footer_note: stringValue(value.footer_note, 2000) ?? "", source_note: stringValue(value.source_note, 2000) ?? "", activated_at: timestamp(value.activated_at), retired_at: timestamp(value.retired_at),
-  } as PortalOfficeProfile;
-  officeKeys.set(result, id);
-  return result;
-}
-
-function parseBrandAsset(value: unknown): PortalBrandAsset | null {
-  if (!isRecord(value)) return null;
-  const id = parseSafeKey(value.id);
-  if (
-    id === null ||
-    !stringValue(value.asset_type, 80, false) ||
-    !stringValue(value.semantic_role, 120, false) ||
-    !stringValue(value.owner_type, 80, false) ||
-    !stringValue(value.status, 40, false)
-  ) return null;
-  if (typeof value.display_order !== "number" || !Number.isSafeInteger(value.display_order) || value.display_order < 0) return null;
-  const item = {
-    asset_type: String(value.asset_type),
-    semantic_role: String(value.semantic_role),
-    placement: stringValue(value.placement, 120) ?? "",
-    owner_type: String(value.owner_type),
-    background_variant: stringValue(value.background_variant, 80) ?? "",
-    status: String(value.status),
-    version_label: stringValue(value.version_label, 80) ?? "",
-    usage_context: stringValue(value.usage_context, 160) ?? "",
-    alt_text: stringValue(value.alt_text, 500) ?? "",
-    display_order: value.display_order,
-    effective_from: timestamp(value.effective_from),
-    effective_until: timestamp(value.effective_until),
-    content_type: stringValue(value.content_type, 100) ?? "",
-    image_width: typeof value.image_width === "number" ? value.image_width : null,
-    image_height: typeof value.image_height === "number" ? value.image_height : null,
-  } satisfies PortalBrandAsset;
-  brandAssetKeys.set(item, id);
-  return item;
+function parseInstitutionalIdentity(value: unknown): PortalInstitutionalIdentity | null {
+  if (!isRecord(value) || !isResourceVersion(value.resource_version)) return null;
+  const id = typeof value.id === "string" ? value.id : "";
+  const institutionName = stringValue(value.institution_name, 255, false);
+  const officeName = stringValue(value.office_name, 255, false);
+  if (!id || !institutionName || !officeName) return null;
+  return {
+    id,
+    institution_name: institutionName,
+    institution_short_name: stringValue(value.institution_short_name, 50) ?? "",
+    institution_former_name: stringValue(value.institution_former_name, 255) ?? "",
+    institution_former_short_name: stringValue(value.institution_former_short_name, 50) ?? "",
+    main_campus: stringValue(value.main_campus, 255) ?? "",
+    institution_address: stringValue(value.institution_address, 4000) ?? "",
+    official_website: stringValue(value.official_website, 2048) ?? "",
+    institutional_email: stringValue(value.institutional_email, 254) ?? "",
+    facebook_url: stringValue(value.facebook_url, 2048) ?? "",
+    office_name: officeName,
+    office_short_name: stringValue(value.office_short_name, 50) ?? "",
+    document_header_name: stringValue(value.document_header_name, 255) ?? "",
+    office_address: stringValue(value.office_address, 4000) ?? "",
+    office_email: stringValue(value.office_email, 254) ?? "",
+    office_phone: stringValue(value.office_phone, 50) ?? "",
+    office_hours: stringValue(value.office_hours, 255) ?? "",
+    document_footer_text: stringValue(value.document_footer_text, 4000) ?? "",
+    resource_version: value.resource_version,
+  };
 }
 
 function parseDocumentTemplate(value: unknown): PortalDocumentTemplate | null {
@@ -608,7 +523,8 @@ function parseDocumentTemplate(value: unknown): PortalDocumentTemplate | null {
     !stringValue(value.stable_key, 120, false) ||
     !stringValue(value.display_name, 255, false) ||
     !stringValue(value.document_kind, 100, false) ||
-    !stringValue(value.status, 40, false)
+    !stringValue(value.status, 40, false) ||
+    !isResourceVersion(value.resource_version)
   ) return null;
   const item = {
     stable_key: String(value.stable_key),
@@ -618,8 +534,8 @@ function parseDocumentTemplate(value: unknown): PortalDocumentTemplate | null {
     retention_classification: stringValue(value.retention_classification, 80) ?? "",
     description: stringValue(value.description, 4000) ?? "",
     related_form_family_label: stringValue(value.related_form_family_label, 255) ?? "",
-    owner_office_label: stringValue(value.owner_office_label, 255) ?? "",
     status: String(value.status),
+    resource_version: value.resource_version,
   } satisfies PortalDocumentTemplate;
   templateKeys.set(item, id);
   return item;
@@ -632,7 +548,8 @@ function parseDocumentTemplateVersion(value: unknown): PortalDocumentTemplateVer
     id === null ||
     !stringValue(value.template_stable_key, 120, false) ||
     !stringValue(value.version_label, 80, false) ||
-    !stringValue(value.status, 40, false)
+    !stringValue(value.status, 40, false) ||
+    !isResourceVersion(value.resource_version)
   ) return null;
   const item = {
     template_stable_key: String(value.template_stable_key),
@@ -643,8 +560,9 @@ function parseDocumentTemplateVersion(value: unknown): PortalDocumentTemplateVer
     status: String(value.status),
     is_used: value.is_used === true,
     related_form_revision_label: stringValue(value.related_form_revision_label, 255) ?? "",
-    approved_at: timestamp(value.approved_at),
-    retired_at: timestamp(value.retired_at),
+    published_at: timestamp(value.published_at),
+    archived_at: timestamp(value.archived_at),
+    resource_version: value.resource_version,
   } satisfies PortalDocumentTemplateVersion;
   templateVersionKeys.set(item, id);
   return item;
@@ -659,7 +577,8 @@ function parseCoverage(value: unknown): PortalCounselorCoverage | null {
     !stringValue(value.scope_label, 255, false) ||
     !stringValue(value.state, 40, false) ||
     !stringValue(value.starts_at, 30, false) ||
-    !timestamp(value.updated_at)
+    !timestamp(value.updated_at) ||
+    !isResourceVersion(value.resource_version)
   ) return null;
   const item = {
     counselor_display_name: String(value.counselor_display_name),
@@ -674,6 +593,7 @@ function parseCoverage(value: unknown): PortalCounselorCoverage | null {
     starts_at: String(value.starts_at),
     ends_at: timestamp(value.ends_at),
     updated_at: String(value.updated_at),
+    resource_version: value.resource_version,
   } satisfies PortalCounselorCoverage;
   coverageKeys.set(item, id);
   return item;
@@ -719,7 +639,7 @@ function parseWorkflowAccess(value: unknown): PortalWorkflowAccess | null {
   const validFrom = timestamp(value.valid_from);
   const createdAt = timestamp(value.created_at);
   const updatedAt = timestamp(value.updated_at);
-  if (!validFrom || !createdAt || !updatedAt) return null;
+  if (!validFrom || !createdAt || !updatedAt || !isResourceVersion(value.resource_version)) return null;
   return {
     grant_reference: String(value.grant_reference),
     grantee_display_name: String(value.grantee_display_name),
@@ -738,6 +658,7 @@ function parseWorkflowAccess(value: unknown): PortalWorkflowAccess | null {
     created_at: createdAt,
     updated_at: updatedAt,
     revoked_at: timestamp(value.revoked_at),
+    resource_version: value.resource_version,
   };
 }
 
@@ -840,7 +761,7 @@ function parseScheduleRecord(value: unknown): PortalScheduleRecord | null {
   const state = stringValue(value.state, 40, false);
   const stateLabel = stringValue(value.state_label, 120, false);
   const updatedAt = timestamp(value.updated_at);
-  if (!publicReference || !counselorName || !state || !stateLabel || !updatedAt) return null;
+  if (!publicReference || !counselorName || !state || !stateLabel || !updatedAt || !isResourceVersion(value.resource_version)) return null;
   const optionalInteger = (candidate: unknown, max = 100000): number | null =>
     candidate === null || candidate === undefined
       ? null
@@ -875,6 +796,7 @@ function parseScheduleRecord(value: unknown): PortalScheduleRecord | null {
     state,
     state_label: stateLabel,
     updated_at: updatedAt,
+    resource_version: value.resource_version,
   };
 }
 
@@ -912,7 +834,7 @@ function parseOfficeClosure(value: unknown): PortalOfficeClosure | null {
   if (!isRecord(value)) return null;
   const publicReference = stringValue(value.public_reference, 160, false);
   const date = stringValue(value.date, 30, false);
-  if (!publicReference || !date || !stringValue(value.state, 40, false) || !stringValue(value.state_label, 120, false)) return null;
+  if (!publicReference || !date || !stringValue(value.state, 40, false) || !stringValue(value.state_label, 120, false) || !isOptionalResourceVersion(value.resource_version)) return null;
   if (value.is_all_day !== true && value.is_all_day !== false) return null;
   if (value.is_active !== true && value.is_active !== false) return null;
   return {
@@ -926,6 +848,7 @@ function parseOfficeClosure(value: unknown): PortalOfficeClosure | null {
     state: String(value.state),
     state_label: String(value.state_label),
     updated_at: timestamp(value.updated_at),
+    resource_version: value.resource_version ?? null,
   };
 }
 
@@ -956,37 +879,35 @@ function parseSchedulePreview(value: unknown): PortalSchedulePreview | null {
 }
 
 function parseFamily(value: unknown): PortalFormFamily | null {
-  if (!isRecord(value) || !stringValue(value.stable_key, 80, false) || !stringValue(value.display_name, 255, false) || !stringValue(value.status, 30, false)) return null;
+  if (!isRecord(value) || !stringValue(value.stable_key, 80, false) || !stringValue(value.display_name, 255, false) || !stringValue(value.status, 30, false) || !isResourceVersion(value.resource_version)) return null;
   const id = parseSafeKey(value.id);
   if (id === null) return null;
-  const result = { stable_key: String(value.stable_key), display_name: String(value.display_name), description: stringValue(value.description, 4000) ?? "", status: String(value.status) };
+  const result = { stable_key: String(value.stable_key), display_name: String(value.display_name), description: stringValue(value.description, 4000) ?? "", status: String(value.status), resource_version: value.resource_version };
   familyKeys.set(result, id);
   return result;
 }
 
 function parseRevision(value: unknown): PortalFormRevision | null {
-  if (!isRecord(value) || !stringValue(value.form_family_key, 80, false) || !stringValue(value.official_form_code, 80, false) || !stringValue(value.display_title, 255, false) || !stringValue(value.status, 30, false)) return null;
+  if (!isRecord(value) || !stringValue(value.form_family_key, 80, false) || !stringValue(value.official_form_code, 80, false) || !stringValue(value.display_title, 255, false) || !stringValue(value.status, 30, false) || !isResourceVersion(value.resource_version)) return null;
   const id = parseSafeKey(value.id);
   if (id === null) return null;
-  const result = { form_family_key: String(value.form_family_key), official_form_code: String(value.official_form_code), official_revision: stringValue(value.official_revision, 50) ?? "", display_title: String(value.display_title), status: String(value.status), effective_from: timestamp(value.effective_from), effective_until: timestamp(value.effective_until), is_used: value.is_used === true, internal_schema_version: stringValue(value.internal_schema_version, 80) ?? "", internal_template_version: stringValue(value.internal_template_version, 30) ?? "", source_label: stringValue(value.source_label, 255) ?? "", approved_at: timestamp(value.approved_at), submitted_at: timestamp(value.submitted_at), activated_at: timestamp(value.activated_at), retired_at: timestamp(value.retired_at), has_source: Boolean(value.source_label) };
+  const result = { form_family_key: String(value.form_family_key), official_form_code: String(value.official_form_code), official_revision: stringValue(value.official_revision, 50) ?? "", display_title: String(value.display_title), status: String(value.status), effective_from: timestamp(value.effective_from), effective_until: timestamp(value.effective_until), is_used: value.is_used === true, internal_schema_version: stringValue(value.internal_schema_version, 80) ?? "", internal_template_version: stringValue(value.internal_template_version, 30) ?? "", source_label: stringValue(value.source_label, 255) ?? "", published_at: timestamp(value.published_at), archived_at: timestamp(value.archived_at), has_source: Boolean(value.source_label), resource_version: value.resource_version };
   revisionKeys.set(result, id);
   return result;
 }
 
 function parseInstrument(value: unknown): PortalAssessmentInstrument | null {
-  if (!isRecord(value) || !stringValue(value.key, 100, false) || !stringValue(value.title, 200, false) || !stringValue(value.category, 50, false) || !stringValue(value.created_at, 40, false) || !stringValue(value.updated_at, 40, false)) return null;
-  return { key: String(value.key), title: String(value.title), category: String(value.category), official_source_reference: stringValue(value.official_source_reference, 255) ?? "", has_official_scoring_guide: value.has_official_scoring_guide === true, allows_scores: value.allows_scores === true, allows_interpretation: value.allows_interpretation === true, notes: stringValue(value.notes, 4000) ?? "", is_active: value.is_active === true, created_at: String(value.created_at), updated_at: String(value.updated_at) };
+  if (!isRecord(value) || !stringValue(value.key, 100, false) || !stringValue(value.title, 200, false) || !stringValue(value.category, 50, false) || !stringValue(value.created_at, 40, false) || !stringValue(value.updated_at, 40, false) || !isResourceVersion(value.resource_version)) return null;
+  return { key: String(value.key), title: String(value.title), category: String(value.category), official_source_reference: stringValue(value.official_source_reference, 255) ?? "", has_official_scoring_guide: value.has_official_scoring_guide === true, allows_scores: value.allows_scores === true, allows_interpretation: value.allows_interpretation === true, notes: stringValue(value.notes, 4000) ?? "", is_active: value.is_active === true, created_at: String(value.created_at), updated_at: String(value.updated_at), resource_version: value.resource_version };
 }
 
 function parseRolloverPreview(value: unknown): RolloverPreview | null {
-  if (!isRecord(value) || !stringValue(value.academic_year, 20, false) || !stringValue(value.semester, 100, false) || !stringValue(value.prior_term, 120, false) || !Array.isArray(value.providers) || !isRecord(value.rollback)) return null;
+  if (!isRecord(value) || !stringValue(value.academic_year, 20, false) || !stringValue(value.semester, 100, false) || !stringValue(value.prior_term, 120) || !Array.isArray(value.providers)) return null;
   const providers = value.providers.map((provider) => {
     if (!isRecord(provider) || !stringValue(provider.key, 120, false) || !stringValue(provider.status, 40, false) || typeof provider.count !== "number" || !Number.isSafeInteger(provider.count) || provider.count < 0) return null;
     return { key: String(provider.key), status: String(provider.status), count: provider.count, reason_code: stringValue(provider.reason_code, 120) };
   }).filter((provider): provider is { key: string; status: string; count: number; reason_code: string | null } => provider !== null);
-  const rollback = value.rollback;
-  if (!stringValue(rollback.status, 40, false) || !stringValue(rollback.condition, 500, false) || !stringValue(rollback.reference, 160, false)) return null;
-  return { academic_year: String(value.academic_year), semester: String(value.semester), prior_term: String(value.prior_term), providers, rollback: { status: String(rollback.status), condition: String(rollback.condition), reference: String(rollback.reference) } };
+  return { academic_year: String(value.academic_year), semester: String(value.semester), prior_term: String(value.prior_term), providers };
 }
 
 function parseRevisionPreflight(value: unknown): RevisionPreflight | null {
@@ -994,7 +915,7 @@ function parseRevisionPreflight(value: unknown): RevisionPreflight | null {
   return { blockers: value.blockers, ready: value.ready, safe_template: value.safe_template, status: String(value.status) };
 }
 
-function parseTemplatePreflight(value: unknown): DocumentTemplateActivationPreflightSchema | null {
+function parseTemplatePreflight(value: unknown): TemplatePublicationPreflight | null {
   if (!isRecord(value) || !Array.isArray(value.blockers) || !value.blockers.every((item) => typeof item === "string" && item.length <= 500) || typeof value.ready !== "boolean" || !stringValue(value.status, 40, false)) return null;
   return { blockers: value.blockers, ready: value.ready, status: String(value.status) };
 }
@@ -1014,16 +935,46 @@ function runMutation(request: (options: RequestInit) => Promise<GeneratedRespons
   });
 }
 
+function postLifecycle(path: string, payload: LifecycleSchema, options: RequestInit) {
+  const headers = new Headers(options.headers);
+  headers.set("Content-Type", "application/json");
+  return compassFetch<GeneratedResponse>(path, {
+    ...options,
+    method: "POST",
+    headers,
+    body: JSON.stringify(payload),
+  });
+}
+
 export function getGuidanceAcademicTerms(signal?: AbortSignal) {
   return readRequest(organizationsAcademicTermsList({ page: 1, page_size: GUIDANCE_PAGE_SIZE }, cookieSessionReadOptions(signal)), (value) => parsePage(value, parseTerm));
 }
 
-export function getGuidanceInstitutions(signal?: AbortSignal) {
-  return readRequest(organizationsInstitutionProfilesList({ page: 1, page_size: GUIDANCE_PAGE_SIZE }, cookieSessionReadOptions(signal)), (value) => parsePage(value, parseInstitution));
+export function getGuidanceInstitutionalIdentity(signal?: AbortSignal) {
+  return readRequest(
+    organizationsInstitutionalIdentityDetail(cookieSessionReadOptions(signal)),
+    parseInstitutionalIdentity,
+  );
 }
 
-export function getGuidanceOffices(signal?: AbortSignal) {
-  return readRequest(organizationsOfficesList({ page: 1, page_size: GUIDANCE_PAGE_SIZE }, cookieSessionReadOptions(signal)), (value) => parsePage(value, parseOffice));
+export function updateGuidanceInstitutionalIdentity(
+  identity: PortalInstitutionalIdentity,
+  fields: InstitutionalIdentityFields,
+  key: IdempotencyKey,
+  signal?: AbortSignal,
+) {
+  return cookieSessionMutationOptions(signal)
+    .then((mutationOptions) => organizationsInstitutionalIdentityUpdate(
+      {
+        ...fields,
+        expected_resource_version: identity.resource_version,
+      } satisfies InstitutionalIdentityUpdateSchema,
+      withIdempotencyKey(key, mutationOptions),
+    ))
+    .then(async (response) => {
+      const parsed = await readRequest(Promise.resolve(response), parseInstitutionalIdentity);
+      return parsed;
+    });
 }
 
 export function getGuidanceFamilies(signal?: AbortSignal) {
@@ -1036,10 +987,6 @@ export function getGuidanceRevisions(signal?: AbortSignal) {
 
 export function getGuidanceInstruments(signal?: AbortSignal) {
   return readRequest(assessmentsGovernanceInstrumentsList({ page: 1, page_size: GUIDANCE_PAGE_SIZE }, cookieSessionReadOptions(signal)), (value) => parsePage(value, parseInstrument));
-}
-
-export function getGuidanceBrandAssets(signal?: AbortSignal) {
-  return readRequest(organizationsBrandAssetsList({ page: 1, page_size: GUIDANCE_PAGE_SIZE }, cookieSessionReadOptions(signal)), (value) => parsePage(value, parseBrandAsset));
 }
 
 export function getGuidanceDocumentTemplates(signal?: AbortSignal) {
@@ -1055,7 +1002,14 @@ export function getGuidanceTemplateVersionDetail(version: PortalDocumentTemplate
 }
 
 export function getGuidanceTemplatePreflight(version: PortalDocumentTemplateVersion, signal?: AbortSignal) {
-  return readRequest(organizationsDocumentTemplateVersionActivationPreflight(safeKey(templateVersionKeys.get(version)), cookieSessionReadOptions(signal)), parseTemplatePreflight);
+  const id = safeKey(templateVersionKeys.get(version));
+  return readRequest(
+    compassFetch<GeneratedResponse>(
+      `/api/v1/organizations/governance/document-template-versions/${id}/publication-preflight/`,
+      cookieSessionReadOptions(signal),
+    ),
+    parseTemplatePreflight,
+  );
 }
 
 export function getGuidanceCoverage(filters: GuidanceCoverageFilters = {}, page = 1, signal?: AbortSignal) {
@@ -1124,17 +1078,19 @@ export function revokeGuidanceWorkflowAccess(
   );
 }
 
-export function downloadGuidanceBrandAsset(item: PortalBrandAsset, signal?: AbortSignal) {
-  return readBlob(organizationsBrandAssetDownload(safeKey(brandAssetKeys.get(item)), cookieSessionReadOptions(signal)));
-}
-
-export function getGuidanceRolloverPreview(term: PortalAcademicTerm, priorTerm?: PortalAcademicTerm, signal?: AbortSignal) {
-  const params = priorTerm ? { prior_term_id: safeKey(termKeys.get(priorTerm)) } : {};
-  return readRequest(organizationsAcademicTermRolloverPreview(safeKey(termKeys.get(term)), params, cookieSessionReadOptions(signal)), parseRolloverPreview);
+export function getGuidanceRolloverPreview(term: PortalAcademicTerm, signal?: AbortSignal) {
+  return readRequest(organizationsAcademicTermRolloverPreview(safeKey(termKeys.get(term)), cookieSessionReadOptions(signal)), parseRolloverPreview);
 }
 
 export function getGuidanceRevisionPreflight(revision: PortalFormRevision, signal?: AbortSignal) {
-  return readRequest(organizationsFormRevisionActivationPreflight(safeKey(revisionKeys.get(revision)), cookieSessionReadOptions(signal)), parseRevisionPreflight);
+  const id = safeKey(revisionKeys.get(revision));
+  return readRequest(
+    compassFetch<GeneratedResponse>(
+      `/api/v1/organizations/governance/form-revisions/${id}/publication-preflight/`,
+      cookieSessionReadOptions(signal),
+    ),
+    parseRevisionPreflight,
+  );
 }
 
 export function downloadGuidanceRevisionSource(revision: PortalFormRevision, signal?: AbortSignal) {
@@ -1142,56 +1098,71 @@ export function downloadGuidanceRevisionSource(revision: PortalFormRevision, sig
 }
 
 export function createGuidanceAcademicTerm(payload: TermSchema, key: IdempotencyKey, signal?: AbortSignal) { return runMutation((options) => organizationsAcademicTermCreate(payload, options), key, signal); }
-export function updateGuidanceAcademicTerm(item: PortalAcademicTerm, payload: TermSchema, key: IdempotencyKey, signal?: AbortSignal) { return runMutation((options) => organizationsAcademicTermUpdate(safeKey(termKeys.get(item)), payload, options), key, signal); }
-export function academicTermLifecycle(item: PortalAcademicTerm, action: "submit" | "approve" | "activate" | "close" | "archive", payload: LifecycleSchema, key: IdempotencyKey, signal?: AbortSignal) {
+export function updateGuidanceAcademicTerm(item: PortalAcademicTerm, payload: TermSchema, key: IdempotencyKey, signal?: AbortSignal) { return runMutation((options) => organizationsAcademicTermUpdate(safeKey(termKeys.get(item)), { ...payload, expected_resource_version: payload.expected_resource_version ?? item.resource_version }, options), key, signal); }
+export function academicTermLifecycle(item: PortalAcademicTerm, action: "activate" | "close" | "archive", payload: LifecycleSchema, key: IdempotencyKey, signal?: AbortSignal) {
   const id = safeKey(termKeys.get(item));
-  const request = action === "submit" ? organizationsAcademicTermSubmit : action === "approve" ? organizationsAcademicTermApprove : action === "activate" ? organizationsAcademicTermActivate : action === "close" ? organizationsAcademicTermClose : organizationsAcademicTermArchive;
-  return runMutation((options) => request(id, payload, options), key, signal);
+  const request = action === "activate" ? organizationsAcademicTermActivate : action === "close" ? organizationsAcademicTermClose : organizationsAcademicTermArchive;
+  return runMutation((options) => request(id, { ...payload, expected_resource_version: payload.expected_resource_version ?? item.resource_version }, options), key, signal);
 }
-export function rollbackGuidanceAcademicTerm(item: PortalAcademicTerm, priorTerm: PortalAcademicTerm, payload: Omit<RollbackSchema, "prior_term_id">, key: IdempotencyKey, signal?: AbortSignal) {
-  const body: RollbackSchema = { ...payload, prior_term_id: safeKey(termKeys.get(priorTerm)) };
-  return runMutation((options) => organizationsAcademicTermRollback(safeKey(termKeys.get(item)), body, options), key, signal);
-}
-
-export function createGuidanceInstitution(payload: InstitutionSchema, key: IdempotencyKey, signal?: AbortSignal) { return runMutation((options) => organizationsInstitutionProfileCreate(payload, options), key, signal); }
-export function updateGuidanceInstitution(item: PortalInstitutionProfile, payload: InstitutionSchema, key: IdempotencyKey, signal?: AbortSignal) { return runMutation((options) => organizationsInstitutionProfileUpdate(safeKey(institutionKeys.get(item)), payload, options), key, signal); }
-export function institutionLifecycle(item: PortalInstitutionProfile, action: "activate" | "retire" | "archive", payload: LifecycleSchema, key: IdempotencyKey, signal?: AbortSignal) { const request = action === "activate" ? organizationsInstitutionProfileActivate : action === "retire" ? organizationsInstitutionProfileRetire : organizationsInstitutionProfileArchive; return runMutation((options) => request(safeKey(institutionKeys.get(item)), payload, options), key, signal); }
-export function createGuidanceOffice(payload: OfficeSchema, key: IdempotencyKey, signal?: AbortSignal) { return runMutation((options) => organizationsOfficeCreate(payload, options), key, signal); }
-export function updateGuidanceOffice(item: PortalOfficeProfile, payload: OfficeSchema, key: IdempotencyKey, signal?: AbortSignal) { return runMutation((options) => organizationsOfficeUpdate(safeKey(officeKeys.get(item)), payload, options), key, signal); }
-export function officeLifecycle(item: PortalOfficeProfile, action: "activate" | "retire" | "archive", payload: LifecycleSchema, key: IdempotencyKey, signal?: AbortSignal) { const request = action === "activate" ? organizationsOfficeActivate : action === "retire" ? organizationsOfficeRetire : organizationsOfficeArchive; return runMutation((options) => request(safeKey(officeKeys.get(item)), payload, options), key, signal); }
 
 export function createGuidanceFamily(payload: FamilySchema, key: IdempotencyKey, signal?: AbortSignal) { return runMutation((options) => organizationsFormFamilyCreate(payload, options), key, signal); }
-export function updateGuidanceFamily(item: PortalFormFamily, payload: FamilySchema, key: IdempotencyKey, signal?: AbortSignal) { return runMutation((options) => organizationsFormFamilyUpdate(safeKey(familyKeys.get(item)), payload, options), key, signal); }
-export function familyLifecycle(item: PortalFormFamily, action: "activate" | "retire" | "archive", payload: LifecycleSchema, key: IdempotencyKey, signal?: AbortSignal) { const request = action === "activate" ? organizationsFormFamilyActivate : action === "retire" ? organizationsFormFamilyRetire : organizationsFormFamilyArchive; return runMutation((options) => request(safeKey(familyKeys.get(item)), payload, options), key, signal); }
+export function updateGuidanceFamily(item: PortalFormFamily, payload: FamilySchema, key: IdempotencyKey, signal?: AbortSignal) { return runMutation((options) => organizationsFormFamilyUpdate(safeKey(familyKeys.get(item)), { ...payload, expected_resource_version: payload.expected_resource_version ?? item.resource_version }, options), key, signal); }
+export function familyLifecycle(item: PortalFormFamily, action: "activate" | "retire" | "archive", payload: LifecycleSchema, key: IdempotencyKey, signal?: AbortSignal) { const request = action === "activate" ? organizationsFormFamilyActivate : action === "retire" ? organizationsFormFamilyRetire : organizationsFormFamilyArchive; return runMutation((options) => request(safeKey(familyKeys.get(item)), { ...payload, expected_resource_version: payload.expected_resource_version ?? item.resource_version }, options), key, signal); }
 export function createGuidanceRevision(payload: Record<string, unknown>, key: IdempotencyKey, signal?: AbortSignal) { return runMutation((options) => organizationsFormRevisionCreate(payload as never, options), key, signal); }
 export function createGuidanceRevisionForFamily(family: PortalFormFamily, payload: Omit<Record<string, unknown>, "form_family_id">, key: IdempotencyKey, signal?: AbortSignal) { return createGuidanceRevision({ ...payload, form_family_id: safeKey(familyKeys.get(family)) }, key, signal); }
 export function updateGuidanceRevision(item: PortalFormRevision, family: PortalFormFamily, payload: Omit<Record<string, unknown>, "form_family_id">, key: IdempotencyKey, signal?: AbortSignal) {
-  return runMutation((options) => organizationsFormRevisionUpdate(safeKey(revisionKeys.get(item)), { ...payload, form_family_id: safeKey(familyKeys.get(family)) } as never, options), key, signal);
+  return runMutation((options) => organizationsFormRevisionUpdate(safeKey(revisionKeys.get(item)), { ...payload, expected_resource_version: payload.expected_resource_version ?? item.resource_version, form_family_id: safeKey(familyKeys.get(family)) } as never, options), key, signal);
 }
-export function revisionLifecycle(item: PortalFormRevision, action: "submit" | "approve" | "activate" | "retire" | "archive" | "clone", payload: LifecycleSchema, key: IdempotencyKey, signal?: AbortSignal) { const id = safeKey(revisionKeys.get(item)); const request = action === "submit" ? organizationsFormRevisionSubmit : action === "approve" ? organizationsFormRevisionApprove : action === "activate" ? organizationsFormRevisionActivate : action === "retire" ? organizationsFormRevisionRetire : action === "archive" ? organizationsFormRevisionArchive : organizationsFormRevisionClone; return runMutation((options) => request(id, payload, options), key, signal); }
-export function uploadGuidanceRevisionSource(item: PortalFormRevision, file: File, sourceLabel: string, expectedUpdatedAt: string | null, key: IdempotencyKey, signal?: AbortSignal) { const body: OrganizationsFormRevisionSourceUploadBody = { file, source_label: sourceLabel.trim().slice(0, 255), expected_updated_at: expectedUpdatedAt }; return runMutation((options) => organizationsFormRevisionSourceUpload(safeKey(revisionKeys.get(item)), body, options), key, signal); }
+export function revisionLifecycle(item: PortalFormRevision, action: "publish" | "archive" | "clone", payload: LifecycleSchema, key: IdempotencyKey, signal?: AbortSignal) {
+  const id = safeKey(revisionKeys.get(item));
+  const lifecyclePayload = {
+    ...payload,
+    expected_status: payload.expected_status ?? item.status,
+    expected_resource_version: payload.expected_resource_version ?? item.resource_version,
+  };
+  if (action === "publish") {
+    return runMutation(
+      (options) => postLifecycle(`/api/v1/organizations/governance/form-revisions/${id}/publish/`, lifecyclePayload, options),
+      key,
+      signal,
+    );
+  }
+  const request = action === "archive" ? organizationsFormRevisionArchive : organizationsFormRevisionClone;
+  return runMutation((options) => request(id, lifecyclePayload, options), key, signal);
+}
+export function uploadGuidanceRevisionSource(item: PortalFormRevision, file: File, sourceLabel: string, expectedResourceVersion: string | null, key: IdempotencyKey, signal?: AbortSignal) { const body: OrganizationsFormRevisionSourceUploadBody = { file, source_label: sourceLabel.trim().slice(0, 255), expected_resource_version: expectedResourceVersion ?? item.resource_version }; return runMutation((options) => organizationsFormRevisionSourceUpload(safeKey(revisionKeys.get(item)), body, options), key, signal); }
 
 export function createGuidanceInstrument(payload: AssessmentInstrumentGovernanceCreateSchema, key: IdempotencyKey, signal?: AbortSignal) { return runMutation((options) => assessmentsGovernanceInstrumentCreate(payload, options), key, signal); }
-export function updateGuidanceInstrument(item: PortalAssessmentInstrument, payload: AssessmentInstrumentGovernanceUpdateSchema, key: IdempotencyKey, signal?: AbortSignal) { return runMutation((options) => assessmentsGovernanceInstrumentUpdate(item.key, payload, options), key, signal); }
-export function setGuidanceInstrumentActive(item: PortalAssessmentInstrument, active: boolean, payload: AssessmentInstrumentGovernanceLifecycleSchema, key: IdempotencyKey, signal?: AbortSignal) { const request = active ? assessmentsGovernanceInstrumentActivate : assessmentsGovernanceInstrumentDeactivate; return runMutation((options) => request(item.key, payload, options), key, signal); }
-
-export function createGuidanceBrandAsset(payload: OrganizationsBrandAssetCreateBody, key: IdempotencyKey, signal?: AbortSignal) { return runMutation((options) => organizationsBrandAssetCreate(payload, options), key, signal); }
-export function updateGuidanceBrandAsset(item: PortalBrandAsset, payload: OrganizationsBrandAssetUpdateBody, key: IdempotencyKey, signal?: AbortSignal) { return runMutation((options) => organizationsBrandAssetUpdate(safeKey(brandAssetKeys.get(item)), payload, options), key, signal); }
-export function brandAssetLifecycle(item: PortalBrandAsset, action: "activate" | "retire" | "archive", payload: LifecycleSchema, key: IdempotencyKey, signal?: AbortSignal) {
-  const request = action === "activate" ? organizationsBrandAssetActivate : action === "retire" ? organizationsBrandAssetRetire : organizationsBrandAssetArchive;
-  return runMutation((options) => request(safeKey(brandAssetKeys.get(item)), payload, options), key, signal);
-}
+export function updateGuidanceInstrument(item: PortalAssessmentInstrument, payload: AssessmentInstrumentGovernanceUpdateSchema, key: IdempotencyKey, signal?: AbortSignal) { return runMutation((options) => assessmentsGovernanceInstrumentUpdate(item.key, { ...payload, expected_resource_version: payload.expected_resource_version ?? item.resource_version }, options), key, signal); }
+export function setGuidanceInstrumentActive(item: PortalAssessmentInstrument, active: boolean, payload: AssessmentInstrumentGovernanceLifecycleSchema, key: IdempotencyKey, signal?: AbortSignal) { const request = active ? assessmentsGovernanceInstrumentActivate : assessmentsGovernanceInstrumentDeactivate; return runMutation((options) => request(item.key, { ...payload, expected_resource_version: payload.expected_resource_version ?? item.resource_version }, options), key, signal); }
 
 export function createGuidanceDocumentTemplate(payload: DocumentTemplateSchema, key: IdempotencyKey, signal?: AbortSignal) { return runMutation((options) => organizationsDocumentTemplateCreate(payload, options), key, signal); }
-export function updateGuidanceDocumentTemplate(item: PortalDocumentTemplate, payload: DocumentTemplateSchema, key: IdempotencyKey, signal?: AbortSignal) { return runMutation((options) => organizationsDocumentTemplateUpdate(safeKey(templateKeys.get(item)), payload, options), key, signal); }
-export function documentTemplateLifecycle(item: PortalDocumentTemplate, action: "activate" | "retire" | "archive", payload: LifecycleSchema, key: IdempotencyKey, signal?: AbortSignal) {
-  const request = action === "activate" ? organizationsDocumentTemplateActivate : action === "retire" ? organizationsDocumentTemplateRetire : organizationsDocumentTemplateArchive;
-  return runMutation((options) => request(safeKey(templateKeys.get(item)), payload, options), key, signal);
+export function updateGuidanceDocumentTemplate(item: PortalDocumentTemplate, payload: DocumentTemplateSchema, key: IdempotencyKey, signal?: AbortSignal) { return runMutation((options) => organizationsDocumentTemplateUpdate(safeKey(templateKeys.get(item)), { ...payload, expected_resource_version: payload.expected_resource_version ?? item.resource_version }, options), key, signal); }
+export function documentTemplateLifecycle(item: PortalDocumentTemplate, action: "archive", payload: LifecycleSchema, key: IdempotencyKey, signal?: AbortSignal) {
+  const lifecyclePayload = {
+    ...payload,
+    expected_status: payload.expected_status ?? item.status,
+    expected_resource_version: payload.expected_resource_version ?? item.resource_version,
+  };
+  return runMutation((options) => organizationsDocumentTemplateArchive(safeKey(templateKeys.get(item)), lifecyclePayload, options), key, signal);
 }
-export function updateGuidanceTemplateVersion(item: PortalDocumentTemplateVersion, payload: DocumentTemplateVersionUpdateSchema, key: IdempotencyKey, signal?: AbortSignal) { return runMutation((options) => organizationsDocumentTemplateVersionUpdate(safeKey(templateVersionKeys.get(item)), payload, options), key, signal); }
-export function templateVersionLifecycle(item: PortalDocumentTemplateVersion, action: "activate" | "retire" | "archive" | "clone", payload: LifecycleSchema, key: IdempotencyKey, signal?: AbortSignal) {
-  const request = action === "activate" ? organizationsDocumentTemplateVersionActivate : action === "retire" ? organizationsDocumentTemplateVersionRetire : action === "archive" ? organizationsDocumentTemplateVersionArchive : organizationsDocumentTemplateVersionClone;
-  return runMutation((options) => request(safeKey(templateVersionKeys.get(item)), payload, options), key, signal);
+export function updateGuidanceTemplateVersion(item: PortalDocumentTemplateVersion, payload: DocumentTemplateVersionUpdateSchema, key: IdempotencyKey, signal?: AbortSignal) { return runMutation((options) => organizationsDocumentTemplateVersionUpdate(safeKey(templateVersionKeys.get(item)), { ...payload, expected_resource_version: payload.expected_resource_version ?? item.resource_version }, options), key, signal); }
+export function templateVersionLifecycle(item: PortalDocumentTemplateVersion, action: "publish" | "archive" | "clone", payload: LifecycleSchema, key: IdempotencyKey, signal?: AbortSignal) {
+  const id = safeKey(templateVersionKeys.get(item));
+  const lifecyclePayload = {
+    ...payload,
+    expected_status: payload.expected_status ?? item.status,
+    expected_resource_version: payload.expected_resource_version ?? item.resource_version,
+  };
+  if (action === "publish") {
+    return runMutation(
+      (options) => postLifecycle(`/api/v1/organizations/governance/document-template-versions/${id}/publish/`, lifecyclePayload, options),
+      key,
+      signal,
+    );
+  }
+  const request = action === "archive" ? organizationsDocumentTemplateVersionArchive : organizationsDocumentTemplateVersionClone;
+  return runMutation((options) => request(id, lifecyclePayload, options), key, signal);
 }
 
 export function createGuidanceCoverage(option: PortalCounselorOption, payload: Omit<CoverageCreateSchema, "counselor_id" | "counselor_selection_token">, key: IdempotencyKey, signal?: AbortSignal) {

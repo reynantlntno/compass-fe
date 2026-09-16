@@ -14,11 +14,13 @@ import type {
   CallSlipDetailSchema,
   CallSlipDraftSchema,
   CallSlipDraftUpdateSchema,
+  CallSlipFromAppointmentSchema,
   CallSlipFromReferralSchema,
   CallSlipIssueSchema,
   CallSlipMutationResponseSchema,
   CallSlipPageResultSchema,
   CallSlipReasonSchema,
+  CallSlipReferenceRescheduleRequestDetailSchema,
   CallSlipRescheduleRequestDetailSchema,
   CallSlipRescheduleSchema,
   CallSlipStaffQueuePageResultSchema,
@@ -226,6 +228,104 @@ return compassFetch<callSlipsCreateResponse>(getCallSlipsCreateUrl(),
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
     body: JSON.stringify(callSlipDraftSchema)
+  }
+);}
+
+
+export type callSlipsFromAppointmentResponse200 = {
+  data: CallSlipMutationResponseSchema
+  status: 200
+}
+
+export type callSlipsFromAppointmentResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type callSlipsFromAppointmentResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type callSlipsFromAppointmentResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type callSlipsFromAppointmentResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type callSlipsFromAppointmentResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type callSlipsFromAppointmentResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type callSlipsFromAppointmentResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type callSlipsFromAppointmentResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type callSlipsFromAppointmentResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type callSlipsFromAppointmentResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type callSlipsFromAppointmentResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type callSlipsFromAppointmentResponseSuccess = (callSlipsFromAppointmentResponse200) & {
+  headers: Record<string, string>;
+};
+export type callSlipsFromAppointmentResponseError = (callSlipsFromAppointmentResponse400 | callSlipsFromAppointmentResponse401 | callSlipsFromAppointmentResponse403 | callSlipsFromAppointmentResponse404 | callSlipsFromAppointmentResponse405 | callSlipsFromAppointmentResponse409 | callSlipsFromAppointmentResponse413 | callSlipsFromAppointmentResponse422 | callSlipsFromAppointmentResponse429 | callSlipsFromAppointmentResponse500 | callSlipsFromAppointmentResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type callSlipsFromAppointmentResponse = (callSlipsFromAppointmentResponseSuccess | callSlipsFromAppointmentResponseError)
+
+export const getCallSlipsFromAppointmentUrl = () => {
+
+
+
+
+  return `/api/v1/call-slips/from-appointment/`
+}
+
+/**
+ * @summary From Appointment
+ */
+export const callSlipsFromAppointment = async (callSlipFromAppointmentSchema: CallSlipFromAppointmentSchema, options?: Parameters<typeof compassFetch>[1]): Promise<callSlipsFromAppointmentResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return compassFetch<callSlipsFromAppointmentResponse>(getCallSlipsFromAppointmentUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(callSlipFromAppointmentSchema)
   }
 );}
 
@@ -2206,6 +2306,197 @@ return compassFetch<callSlipsRescheduleRequestResponse>(getCallSlipsRescheduleRe
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
     body: JSON.stringify(callSlipRescheduleSchema)
+  }
+);}
+
+
+export type callSlipsRescheduleCurrentResponse200 = {
+  data: CallSlipReferenceRescheduleRequestDetailSchema
+  status: 200
+}
+
+export type callSlipsRescheduleCurrentResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type callSlipsRescheduleCurrentResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type callSlipsRescheduleCurrentResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type callSlipsRescheduleCurrentResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type callSlipsRescheduleCurrentResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type callSlipsRescheduleCurrentResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type callSlipsRescheduleCurrentResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type callSlipsRescheduleCurrentResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type callSlipsRescheduleCurrentResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type callSlipsRescheduleCurrentResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type callSlipsRescheduleCurrentResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type callSlipsRescheduleCurrentResponseSuccess = (callSlipsRescheduleCurrentResponse200) & {
+  headers: Record<string, string>;
+};
+export type callSlipsRescheduleCurrentResponseError = (callSlipsRescheduleCurrentResponse400 | callSlipsRescheduleCurrentResponse401 | callSlipsRescheduleCurrentResponse403 | callSlipsRescheduleCurrentResponse404 | callSlipsRescheduleCurrentResponse405 | callSlipsRescheduleCurrentResponse409 | callSlipsRescheduleCurrentResponse413 | callSlipsRescheduleCurrentResponse422 | callSlipsRescheduleCurrentResponse429 | callSlipsRescheduleCurrentResponse500 | callSlipsRescheduleCurrentResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type callSlipsRescheduleCurrentResponse = (callSlipsRescheduleCurrentResponseSuccess | callSlipsRescheduleCurrentResponseError)
+
+export const getCallSlipsRescheduleCurrentUrl = (referenceCode: string,) => {
+
+
+
+
+  return `/api/v1/call-slips/${referenceCode}/reschedule/current/`
+}
+
+/**
+ * @summary Current Reschedule Detail
+ */
+export const callSlipsRescheduleCurrent = async (referenceCode: string, options?: Parameters<typeof compassFetch>[1]): Promise<callSlipsRescheduleCurrentResponse> => {
+
+  return compassFetch<callSlipsRescheduleCurrentResponse>(getCallSlipsRescheduleCurrentUrl(referenceCode),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+export type callSlipsRescheduleReferenceDecisionResponse200 = {
+  data: CallSlipMutationResponseSchema
+  status: 200
+}
+
+export type callSlipsRescheduleReferenceDecisionResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type callSlipsRescheduleReferenceDecisionResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type callSlipsRescheduleReferenceDecisionResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type callSlipsRescheduleReferenceDecisionResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type callSlipsRescheduleReferenceDecisionResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type callSlipsRescheduleReferenceDecisionResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type callSlipsRescheduleReferenceDecisionResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type callSlipsRescheduleReferenceDecisionResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type callSlipsRescheduleReferenceDecisionResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type callSlipsRescheduleReferenceDecisionResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type callSlipsRescheduleReferenceDecisionResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type callSlipsRescheduleReferenceDecisionResponseSuccess = (callSlipsRescheduleReferenceDecisionResponse200) & {
+  headers: Record<string, string>;
+};
+export type callSlipsRescheduleReferenceDecisionResponseError = (callSlipsRescheduleReferenceDecisionResponse400 | callSlipsRescheduleReferenceDecisionResponse401 | callSlipsRescheduleReferenceDecisionResponse403 | callSlipsRescheduleReferenceDecisionResponse404 | callSlipsRescheduleReferenceDecisionResponse405 | callSlipsRescheduleReferenceDecisionResponse409 | callSlipsRescheduleReferenceDecisionResponse413 | callSlipsRescheduleReferenceDecisionResponse422 | callSlipsRescheduleReferenceDecisionResponse429 | callSlipsRescheduleReferenceDecisionResponse500 | callSlipsRescheduleReferenceDecisionResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type callSlipsRescheduleReferenceDecisionResponse = (callSlipsRescheduleReferenceDecisionResponseSuccess | callSlipsRescheduleReferenceDecisionResponseError)
+
+export const getCallSlipsRescheduleReferenceDecisionUrl = (referenceCode: string,) => {
+
+
+
+
+  return `/api/v1/call-slips/${referenceCode}/reschedule/decision/`
+}
+
+/**
+ * @summary Decide Reference Reschedule
+ */
+export const callSlipsRescheduleReferenceDecision = async (referenceCode: string,
+    callSlipDecisionSchema: CallSlipDecisionSchema, options?: Parameters<typeof compassFetch>[1]): Promise<callSlipsRescheduleReferenceDecisionResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return compassFetch<callSlipsRescheduleReferenceDecisionResponse>(getCallSlipsRescheduleReferenceDecisionUrl(referenceCode),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(callSlipDecisionSchema)
   }
 );}
 

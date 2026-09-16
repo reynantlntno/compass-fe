@@ -24,6 +24,7 @@ export interface ReferralStaffQueueItemSchema {
   reason_category_label: string;
   received_at?: string | null;
   reference_code: string;
+  resource_version: string;
   source_type: string;
   source_type_label: string;
   status: string;

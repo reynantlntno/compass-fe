@@ -24,43 +24,37 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Textarea } from "@/components/ui/textarea";
 import {
   academicTermLifecycle,
   createGuidanceAcademicTerm,
   createGuidanceFamily,
-  createGuidanceInstitution,
   createGuidanceInstrument,
-  createGuidanceOffice,
   createGuidanceRevisionForFamily,
   downloadGuidanceRevisionSource,
   familyLifecycle,
   getGuidanceAcademicTerms,
   getGuidanceFamilies,
-  getGuidanceInstitutions,
+  getGuidanceInstitutionalIdentity,
   getGuidanceInstruments,
-  getGuidanceOffices,
   getGuidanceRevisionPreflight,
   getGuidanceRevisions,
   getGuidanceRolloverPreview,
   GuidanceSettingsApiError,
-  institutionLifecycle,
-  officeLifecycle,
   revisionLifecycle,
-  rollbackGuidanceAcademicTerm,
   setGuidanceInstrumentActive,
   updateGuidanceAcademicTerm,
   updateGuidanceFamily,
-  updateGuidanceInstitution,
   updateGuidanceInstrument,
-  updateGuidanceOffice,
   updateGuidanceRevision,
+  updateGuidanceInstitutionalIdentity,
   uploadGuidanceRevisionSource,
   type PortalAcademicTerm,
   type PortalAssessmentInstrument,
   type PortalFormFamily,
   type PortalFormRevision,
-  type PortalInstitutionProfile,
-  type PortalOfficeProfile,
+  type PortalInstitutionalIdentity,
+  type InstitutionalIdentityFields,
   type RevisionPreflight,
   type RolloverPreview,
 } from "@/lib/api/guidance-settings";
@@ -114,8 +108,6 @@ type LoadState<T> =
   | { kind: "error"; error: "permission" | "unavailable" };
 type AcademicData = {
   terms: PortalAcademicTerm[];
-  institutions: PortalInstitutionProfile[];
-  offices: PortalOfficeProfile[];
 };
 type FormsData = {
   families: PortalFormFamily[];
@@ -124,16 +116,12 @@ type FormsData = {
 };
 type DialogKind =
   | "term"
-  | "institution"
-  | "office"
   | "family"
   | "revision"
   | "instrument"
   | null;
 type EditableTarget =
   | { kind: "term"; item: PortalAcademicTerm }
-  | { kind: "institution"; item: PortalInstitutionProfile }
-  | { kind: "office"; item: PortalOfficeProfile }
   | { kind: "family"; item: PortalFormFamily }
   | { kind: "revision"; item: PortalFormRevision }
   | { kind: "instrument"; item: PortalAssessmentInstrument };
@@ -188,6 +176,226 @@ function StateFrame({ title, retry }: { title: string; retry?: () => void }) {
           Try again
         </Button>
       ) : null}
+    </PortalCollectionFrame>
+  );
+}
+
+const IDENTITY_INSTITUTION_FIELDS: Array<{
+  key: keyof InstitutionalIdentityFields;
+  label: string;
+  type?: "text" | "email" | "url";
+  maxLength: number;
+  required?: boolean;
+  multiline?: boolean;
+}> = [
+  { key: "institution_name", label: "Institution name", maxLength: 255, required: true },
+  { key: "institution_short_name", label: "Abbreviation or short name", maxLength: 50 },
+  { key: "institution_former_name", label: "Former institution name", maxLength: 255 },
+  { key: "institution_former_short_name", label: "Former abbreviation", maxLength: 50 },
+  { key: "main_campus", label: "Main campus", maxLength: 255 },
+  { key: "institution_address", label: "Institution address", maxLength: 4000, multiline: true },
+  { key: "official_website", label: "Official website", type: "url", maxLength: 2048 },
+  { key: "institutional_email", label: "Institutional email", type: "email", maxLength: 254 },
+  { key: "facebook_url", label: "Official Facebook page", type: "url", maxLength: 2048 },
+];
+
+const IDENTITY_OFFICE_FIELDS: Array<{
+  key: keyof InstitutionalIdentityFields;
+  label: string;
+  type?: "text" | "email" | "url";
+  maxLength: number;
+  required?: boolean;
+  multiline?: boolean;
+}> = [
+  { key: "office_name", label: "Office name", maxLength: 255, required: true },
+  { key: "office_short_name", label: "Office short name", maxLength: 50 },
+  { key: "document_header_name", label: "Document header name", maxLength: 255 },
+  { key: "office_address", label: "Office address", maxLength: 4000, multiline: true },
+  { key: "office_email", label: "Office email", type: "email", maxLength: 254 },
+  { key: "office_phone", label: "Office phone", type: "text", maxLength: 50 },
+  { key: "office_hours", label: "Office hours", maxLength: 255 },
+  { key: "document_footer_text", label: "Document footer text", maxLength: 4000, multiline: true },
+];
+
+function identityFieldsFromRecord(
+  identity: PortalInstitutionalIdentity,
+): InstitutionalIdentityFields {
+  return {
+    institution_name: identity.institution_name,
+    institution_short_name: identity.institution_short_name,
+    institution_former_name: identity.institution_former_name,
+    institution_former_short_name: identity.institution_former_short_name,
+    main_campus: identity.main_campus,
+    institution_address: identity.institution_address,
+    official_website: identity.official_website,
+    institutional_email: identity.institutional_email,
+    facebook_url: identity.facebook_url,
+    office_name: identity.office_name,
+    office_short_name: identity.office_short_name,
+    document_header_name: identity.document_header_name,
+    office_address: identity.office_address,
+    office_email: identity.office_email,
+    office_phone: identity.office_phone,
+    office_hours: identity.office_hours,
+    document_footer_text: identity.document_footer_text,
+  };
+}
+
+function GuidanceInstitutionalIdentityPanel() {
+  const [identity, setIdentity] = useState<LoadState<PortalInstitutionalIdentity>>({ kind: "loading" });
+  const [fields, setFields] = useState<InstitutionalIdentityFields | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [reloadKey, setReloadKey] = useState(0);
+  const mutationKey = useRef<{ fingerprint: string; key: IdempotencyKey } | null>(null);
+
+  const reload = () => {
+    setIdentity({ kind: "loading" });
+    setFields(null);
+    setError(null);
+    setMessage(null);
+    setReloadKey((value) => value + 1);
+  };
+
+  useEffect(() => {
+    const controller = new AbortController();
+    void getGuidanceInstitutionalIdentity(controller.signal)
+      .then((value) => {
+        if (controller.signal.aborted) return;
+        setIdentity({ kind: "ready", value });
+        setFields(identityFieldsFromRecord(value));
+      })
+      .catch((cause) => {
+        if (controller.signal.aborted) return;
+        setIdentity({
+          kind: "error",
+          error:
+            cause instanceof GuidanceSettingsApiError && cause.kind === "permission"
+              ? "permission"
+              : "unavailable",
+        });
+      });
+    return () => controller.abort();
+  }, [reloadKey]);
+
+  const save = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (identity.kind !== "ready" || !fields || busy) return;
+    const fingerprint = JSON.stringify({ resourceVersion: identity.value.resource_version, fields });
+    const key = mutationKey.current?.fingerprint === fingerprint
+      ? mutationKey.current.key
+      : createIdempotencyKey();
+    mutationKey.current = { fingerprint, key };
+    setBusy(true);
+    setError(null);
+    setMessage(null);
+    try {
+      const saved = await updateGuidanceInstitutionalIdentity(identity.value, fields, key);
+      setIdentity({ kind: "ready", value: saved });
+      setFields(identityFieldsFromRecord(saved));
+      mutationKey.current = null;
+      setMessage("Institutional identity saved.");
+    } catch (cause) {
+      setError(
+        cause instanceof GuidanceSettingsApiError && cause.kind === "conflict"
+          ? "This identity was changed in another session. Reload it before saving again."
+          : cause instanceof GuidanceSettingsApiError && cause.kind === "validation"
+            ? "Check the values above and try again."
+            : cause instanceof GuidanceSettingsApiError && cause.kind === "permission"
+              ? "This action is not available for this account."
+              : "Institutional identity could not be saved. Try again.",
+      );
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const updateField = (key: keyof InstitutionalIdentityFields, value: string) => {
+    setFields((current) => current ? { ...current, [key]: value } : current);
+    setMessage(null);
+    setError(null);
+  };
+
+  if (identity.kind === "loading") {
+    return (
+      <PortalCollectionFrame aria-labelledby="guidance-institutional-identity-heading" className="portal-counseling__frame">
+        <p className="portal-counseling__kicker">Official details</p>
+        <h2 id="guidance-institutional-identity-heading">Institutional identity</h2>
+        <Skeleton as="span" />
+        <Skeleton as="span" />
+      </PortalCollectionFrame>
+    );
+  }
+
+  if (identity.kind === "error" || !fields) {
+    return (
+      <StateFrame
+        retry={reload}
+        title={identity.kind === "error" && identity.error === "permission"
+          ? "Institutional identity is not available for this account."
+          : "Institutional identity is temporarily unavailable."}
+      />
+    );
+  }
+
+  const renderFields = (definitions: typeof IDENTITY_INSTITUTION_FIELDS) =>
+    definitions.map((definition) => {
+      const id = `institutional-identity-${definition.key}`;
+      return (
+        <div className="portal-counseling__dialog-field" key={definition.key}>
+          <Label htmlFor={id}>{definition.label}</Label>
+          {definition.multiline ? (
+            <Textarea
+              id={id}
+              maxLength={definition.maxLength}
+              onChange={(event) => updateField(definition.key, event.target.value)}
+              required={definition.required}
+              value={fields[definition.key]}
+            />
+          ) : (
+            <Input
+              autoComplete="off"
+              id={id}
+              maxLength={definition.maxLength}
+              onChange={(event) => updateField(definition.key, event.target.value)}
+              required={definition.required}
+              type={definition.type ?? "text"}
+              value={fields[definition.key]}
+            />
+          )}
+        </div>
+      );
+    });
+
+  const changed = JSON.stringify(fields) !== JSON.stringify(identityFieldsFromRecord(identity.value));
+  return (
+    <PortalCollectionFrame aria-labelledby="guidance-institutional-identity-heading" className="portal-counseling__frame">
+      <div className="portal-counseling__frame-heading">
+        <div>
+          <p className="portal-counseling__kicker">Official details</p>
+          <h2 id="guidance-institutional-identity-heading">Institutional identity</h2>
+        </div>
+      </div>
+      <p>These details support public office information and backend-rendered documents. Previously issued documents keep their saved identity.</p>
+      <form onSubmit={save}>
+        <div className="portal-counseling__dialog-fields">
+          <fieldset className="portal-counseling__identity-group">
+            <legend>Institution</legend>
+            {renderFields(IDENTITY_INSTITUTION_FIELDS)}
+          </fieldset>
+          <fieldset className="portal-counseling__identity-group">
+            <legend>Guidance and Counseling Office</legend>
+            {renderFields(IDENTITY_OFFICE_FIELDS)}
+          </fieldset>
+        </div>
+        {error ? <p className="portal-counseling__dialog-error" role="alert">{error}</p> : null}
+        {message ? <p className="portal-counseling__mutation portal-counseling__mutation--success" role="status">{message}</p> : null}
+        <div className="portal-counseling__frame-actions">
+          <Button disabled={!changed || busy} type="submit">{busy ? "Saving…" : "Save identity"}</Button>
+          <Button disabled={busy} onClick={reload} type="button" variant="outline">Reload</Button>
+        </div>
+      </form>
     </PortalCollectionFrame>
   );
 }
@@ -318,42 +526,10 @@ function AcademicContext({
                             />
                             <ActionButton
                               disabled={busy !== null}
-                              label="Submit"
-                              onClick={() =>
-                                action(
-                                  `term-submit-${item.academic_year}`,
-                                  (key) =>
-                                    academicTermLifecycle(item, "submit", {}, key),
-                                )
-                              }
+                              label="Preview activation"
+                              onClick={() => onPreviewRollover(item)}
                             />
                           </>
-                        ) : null}
-                        {item.status === "PENDING_APPROVAL" ? (
-                          <ActionButton
-                            disabled={busy !== null}
-                            label="Approve"
-                            onClick={() =>
-                              action(
-                                `term-approve-${item.academic_year}`,
-                                (key) =>
-                                  academicTermLifecycle(item, "approve", {}, key),
-                              )
-                            }
-                          />
-                        ) : null}
-                        {item.status === "APPROVED" ? (
-                          <ActionButton
-                            disabled={busy !== null}
-                            label="Activate"
-                            onClick={() =>
-                              action(
-                                `term-activate-${item.academic_year}`,
-                                (key) =>
-                                  academicTermLifecycle(item, "activate", {}, key),
-                              )
-                            }
-                          />
                         ) : null}
                         {item.status === "ACTIVE" ? (
                           <ActionButton
@@ -369,121 +545,14 @@ function AcademicContext({
                           />
                         ) : null}
                         {item.status === "CLOSED" ? (
-                          <>
-                            <ActionButton
-                              disabled={busy !== null}
-                              label="Archive"
-                              onClick={() =>
-                                action(
-                                  `term-archive-${item.academic_year}`,
-                                  (key) =>
-                                    academicTermLifecycle(item, "archive", {}, key),
-                                )
-                              }
-                            />
-                            <ActionButton
-                              disabled={busy !== null}
-                              label="Preview rollover"
-                              onClick={() => onPreviewRollover(item)}
-                            />
-                          </>
-                        ) : null}
-                      </div>
-                    </Cell>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </PortalCollectionFrame>
-
-      <PortalCollectionFrame
-        aria-labelledby="guidance-institutions-heading"
-        className="portal-counseling__frame"
-      >
-        <FrameHeading
-          count={data.institutions.length}
-          headingId="guidance-institutions-heading"
-          kicker="Institution"
-          newLabel="New profile"
-          onNew={() => openDialog("institution")}
-          title="Institution profiles"
-        />
-        {data.institutions.length === 0 ? (
-          <p>No institution profiles are available.</p>
-        ) : (
-          <div className="portal-counseling__table-wrap">
-            <table className="portal-counseling__table">
-              <thead>
-                <tr>
-                  <th scope="col">Institution</th>
-                  <th scope="col">Campus</th>
-                  <th scope="col">Effective dates</th>
-                  <th scope="col">Status</th>
-                  <th scope="col">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.institutions.map((item) => (
-                  <tr key={item.short_name}>
-                    <Cell label="Institution">
-                      <strong>{item.legal_name}</strong>
-                      <span className="portal-counseling__secondary">
-                        {item.short_name}
-                      </span>
-                    </Cell>
-                    <Cell label="Campus">{item.main_campus || "Not set"}</Cell>
-                    <Cell label="Effective dates">
-                      {formatDate(item.effective_from)} – {formatDate(item.effective_until)}
-                    </Cell>
-                    <Cell label="Status">
-                      <Badge>{statusLabel(item.status)}</Badge>
-                    </Cell>
-                    <Cell label="Actions">
-                      <div className="portal-counseling__row-actions">
-                        {item.status === "DRAFT" ? (
-                          <>
-                            <ActionButton
-                              disabled={busy !== null}
-                              label="Edit"
-                              onClick={() => onEdit({ kind: "institution", item })}
-                            />
-                            <ActionButton
-                              disabled={busy !== null}
-                              label="Activate"
-                              onClick={() =>
-                                action(
-                                  `institution-activate-${item.short_name}`,
-                                  (key) =>
-                                    institutionLifecycle(item, "activate", {}, key),
-                                )
-                              }
-                            />
-                          </>
-                        ) : null}
-                        {item.status === "ACTIVE" ? (
-                          <ActionButton
-                            disabled={busy !== null}
-                            label="Retire"
-                            onClick={() =>
-                              action(
-                                `institution-retire-${item.short_name}`,
-                                (key) =>
-                                  institutionLifecycle(item, "retire", {}, key),
-                              )
-                            }
-                          />
-                        ) : null}
-                        {item.status === "RETIRED" ? (
                           <ActionButton
                             disabled={busy !== null}
                             label="Archive"
                             onClick={() =>
                               action(
-                                `institution-archive-${item.short_name}`,
+                                `term-archive-${item.academic_year}`,
                                 (key) =>
-                                  institutionLifecycle(item, "archive", {}, key),
+                                  academicTermLifecycle(item, "archive", {}, key),
                               )
                             }
                           />
@@ -498,100 +567,7 @@ function AcademicContext({
         )}
       </PortalCollectionFrame>
 
-      <PortalCollectionFrame
-        aria-labelledby="guidance-offices-heading"
-        className="portal-counseling__frame"
-      >
-        <FrameHeading
-          count={data.offices.length}
-          headingId="guidance-offices-heading"
-          kicker="Office"
-          newLabel="New profile"
-          onNew={() => openDialog("office")}
-          title="Office profiles"
-        />
-        {data.offices.length === 0 ? (
-          <p>No office profiles are available.</p>
-        ) : (
-          <div className="portal-counseling__table-wrap">
-            <table className="portal-counseling__table">
-              <thead>
-                <tr>
-                  <th scope="col">Office</th>
-                  <th scope="col">Contact</th>
-                  <th scope="col">Status</th>
-                  <th scope="col">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {data.offices.map((item) => (
-                  <tr key={item.office_short_name}>
-                    <Cell label="Office">
-                      <strong>{item.office_name}</strong>
-                      <span className="portal-counseling__secondary">
-                        {item.office_short_name}
-                      </span>
-                    </Cell>
-                    <Cell label="Contact">
-                      {item.contact_email || item.contact_number || "Not set"}
-                    </Cell>
-                    <Cell label="Status">
-                      <Badge>{statusLabel(item.status)}</Badge>
-                    </Cell>
-                    <Cell label="Actions">
-                      <div className="portal-counseling__row-actions">
-                        {item.status === "DRAFT" ? (
-                          <>
-                            <ActionButton
-                              disabled={busy !== null}
-                              label="Edit"
-                              onClick={() => onEdit({ kind: "office", item })}
-                            />
-                            <ActionButton
-                              disabled={busy !== null}
-                              label="Activate"
-                              onClick={() =>
-                                action(
-                                  `office-activate-${item.office_short_name}`,
-                                  (key) => officeLifecycle(item, "activate", {}, key),
-                                )
-                              }
-                            />
-                          </>
-                        ) : null}
-                        {item.status === "ACTIVE" ? (
-                          <ActionButton
-                            disabled={busy !== null}
-                            label="Retire"
-                            onClick={() =>
-                              action(
-                                `office-retire-${item.office_short_name}`,
-                                (key) => officeLifecycle(item, "retire", {}, key),
-                              )
-                            }
-                          />
-                        ) : null}
-                        {item.status === "RETIRED" ? (
-                          <ActionButton
-                            disabled={busy !== null}
-                            label="Archive"
-                            onClick={() =>
-                              action(
-                                `office-archive-${item.office_short_name}`,
-                                (key) => officeLifecycle(item, "archive", {}, key),
-                              )
-                            }
-                          />
-                        ) : null}
-                      </div>
-                    </Cell>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </PortalCollectionFrame>
+
     </div>
   );
 }
@@ -605,6 +581,7 @@ function FormsInstruments({
   onDownload,
   onPreflight,
   onEdit,
+  preflightRevision,
 }: {
   data: FormsData;
   busy: string | null;
@@ -614,6 +591,7 @@ function FormsInstruments({
   onDownload: (item: PortalFormRevision) => void;
   onPreflight: (item: PortalFormRevision) => void;
   onEdit: (target: EditableTarget) => void;
+  preflightRevision: PortalFormRevision | null;
 }) {
   return (
     <div className="portal-counseling__stack">
@@ -763,11 +741,16 @@ function FormsInstruments({
                             />
                             <ActionButton
                               disabled={busy !== null}
-                              label="Submit"
+                              label="Preflight"
+                              onClick={() => onPreflight(item)}
+                            />
+                            <ActionButton
+                              disabled={busy !== null || preflightRevision !== item}
+                              label="Publish"
                               onClick={() =>
                                 action(
-                                  `revision-submit-${item.official_form_code}`,
-                                  (key) => revisionLifecycle(item, "submit", {}, key),
+                                  `revision-publish-${item.official_form_code}`,
+                                  (key) => revisionLifecycle(item, "publish", {}, key),
                                 )
                               }
                             />
@@ -786,61 +769,13 @@ function FormsInstruments({
                             </label>
                           </>
                         ) : null}
-                        {item.status === "PENDING_APPROVAL" ? (
-                          <ActionButton
-                            disabled={busy !== null}
-                            label="Approve"
-                            onClick={() =>
-                              action(
-                                `revision-approve-${item.official_form_code}`,
-                                (key) => revisionLifecycle(item, "approve", {}, key),
-                              )
-                            }
-                          />
-                        ) : null}
-                        {item.status === "APPROVED" ? (
-                          <ActionButton
-                            disabled={busy !== null}
-                            label="Activate"
-                            onClick={() =>
-                              action(
-                                `revision-activate-${item.official_form_code}`,
-                                (key) => revisionLifecycle(item, "activate", {}, key),
-                              )
-                            }
-                          />
-                        ) : null}
-                        {item.status === "ACTIVE" ? (
+                        {item.status === "PUBLISHED" ? (
                           <>
                             <ActionButton
                               disabled={busy !== null}
                               label="Preflight"
                               onClick={() => onPreflight(item)}
                             />
-                            <ActionButton
-                              disabled={busy !== null}
-                              label="Retire"
-                              onClick={() =>
-                                action(
-                                  `revision-retire-${item.official_form_code}`,
-                                  (key) => revisionLifecycle(item, "retire", {}, key),
-                                )
-                              }
-                            />
-                            <ActionButton
-                              disabled={busy !== null}
-                              label="Clone"
-                              onClick={() =>
-                                action(
-                                  `revision-clone-${item.official_form_code}`,
-                                  (key) => revisionLifecycle(item, "clone", {}, key),
-                                )
-                              }
-                            />
-                          </>
-                        ) : null}
-                        {item.status === "RETIRED" ? (
-                          <>
                             <ActionButton
                               disabled={busy !== null}
                               label="Archive"
@@ -862,6 +797,30 @@ function FormsInstruments({
                               }
                             />
                           </>
+                        ) : null}
+                        {item.status === "ARCHIVED" ? (
+                          <ActionButton
+                            disabled={busy !== null}
+                            label="Clone"
+                            onClick={() =>
+                              action(
+                                `revision-clone-${item.official_form_code}`,
+                                (key) => revisionLifecycle(item, "clone", {}, key),
+                              )
+                            }
+                          />
+                        ) : null}
+                        {item.status === "PUBLISHED" ? (
+                          <ActionButton
+                            disabled={busy !== null}
+                            label="Clone"
+                            onClick={() =>
+                              action(
+                                `revision-clone-${item.official_form_code}`,
+                                (key) => revisionLifecycle(item, "clone", {}, key),
+                              )
+                            }
+                          />
                         ) : null}
                         {item.has_source ? (
                           <ActionButton
@@ -979,11 +938,18 @@ export function PortalGuidanceSettingsLoading() {
       role="status"
     >
       <GuidanceHeader headingId="portal-guidance-settings-loading-heading" />
-      <PortalCollectionFrame className="portal-counseling__frame">
-        <Skeleton as="span" />
-        <Skeleton as="span" />
-        <Skeleton as="span" />
-      </PortalCollectionFrame>
+      <div className="portal-counseling__workspace">
+        <div aria-hidden="true" className="compass-surface portal-workspace-nav portal-counseling__nav-skeleton" data-tone="subtle">
+          {NAV_ITEMS.map((item) => <Skeleton className="portal-counseling__nav-skeleton-line" key={item.value} />)}
+        </div>
+        <div className="portal-counseling__active-content">
+          <PortalCollectionFrame className="portal-counseling__frame">
+            <Skeleton as="span" />
+            <Skeleton as="span" />
+            <Skeleton as="span" />
+          </PortalCollectionFrame>
+        </div>
+      </div>
     </section>
   );
 }
@@ -993,6 +959,9 @@ export function PortalGuidanceSettingsPage() {
   const router = useRouter();
   const { status: accessStatus, hasCapability } = usePortalAccess();
   const requestedSection = searchParams.get("section");
+  const canInstitutionalIdentity = hasCapability(
+    PORTAL_CAPABILITIES.institutionalIdentityManage,
+  );
   const canOrganizationGovernance = hasCapability(
     PORTAL_CAPABILITIES.organizationGovernanceManage,
   );
@@ -1015,7 +984,7 @@ export function PortalGuidanceSettingsPage() {
     ...(canOrganizationGovernance
       ? (["academic-context", "forms-instruments"] as const)
       : []),
-    ...(canOrganizationGovernance || canDocumentTemplates
+    ...(canInstitutionalIdentity || canOrganizationGovernance || canDocumentTemplates
       ? (["institution-documents"] as const)
       : []),
     ...(canCounselorCoverage ? (["counselor-coverage"] as const) : []),
@@ -1043,7 +1012,6 @@ export function PortalGuidanceSettingsPage() {
   } | null>(null);
   const [rolloverPreview, setRolloverPreview] = useState<{
     term: PortalAcademicTerm;
-    prior: PortalAcademicTerm | null;
     result: RolloverPreview;
   } | null>(null);
   const [termFields, setTermFields] = useState({
@@ -1052,11 +1020,6 @@ export function PortalGuidanceSettingsPage() {
     start: "",
     end: "",
     config: "",
-  });
-  const [profileFields, setProfileFields] = useState({
-    name: "",
-    shortName: "",
-    campus: "",
   });
   const [familyFields, setFamilyFields] = useState({
     key: "",
@@ -1109,16 +1072,12 @@ export function PortalGuidanceSettingsPage() {
       });
       Promise.all([
         getGuidanceAcademicTerms(controller.signal),
-        getGuidanceInstitutions(controller.signal),
-        getGuidanceOffices(controller.signal),
       ])
-        .then(([terms, institutions, offices]) => {
+        .then(([terms]) => {
           setAcademic({
             kind: "ready",
             value: {
               terms: terms.items,
-              institutions: institutions.items,
-              offices: offices.items,
             },
           });
         })
@@ -1199,9 +1158,6 @@ export function PortalGuidanceSettingsPage() {
         config: "",
       });
     }
-    if (kind === "institution" || kind === "office") {
-      setProfileFields({ name: "", shortName: "", campus: "" });
-    }
     if (kind === "family") {
       setFamilyFields({ key: "", name: "", description: "" });
     }
@@ -1250,20 +1206,6 @@ export function PortalGuidanceSettingsPage() {
         config: target.item.configuration_identifier,
       });
     }
-    if (target.kind === "institution") {
-      setProfileFields({
-        name: target.item.legal_name,
-        shortName: target.item.short_name,
-        campus: target.item.main_campus,
-      });
-    }
-    if (target.kind === "office") {
-      setProfileFields({
-        name: target.item.office_name,
-        shortName: target.item.office_short_name,
-        campus: target.item.office_address,
-      });
-    }
     if (target.kind === "family") {
       setFamilyFields({
         key: target.item.stable_key,
@@ -1306,7 +1248,6 @@ export function PortalGuidanceSettingsPage() {
           ? editTarget.kind + JSON.stringify(editTarget.item)
           : null,
       termFields,
-      profileFields,
       familyFields,
       revisionFields,
       instrumentFields,
@@ -1332,30 +1273,6 @@ export function PortalGuidanceSettingsPage() {
           await updateGuidanceAcademicTerm(editTarget.item, payload, key);
         } else {
           await createGuidanceAcademicTerm(payload, key);
-        }
-      }
-      if (dialog === "institution") {
-        const payload = {
-          legal_name: profileFields.name,
-          short_name: profileFields.shortName,
-          main_campus: profileFields.campus,
-        };
-        if (editTarget?.kind === "institution") {
-          await updateGuidanceInstitution(editTarget.item, payload, key);
-        } else {
-          await createGuidanceInstitution(payload, key);
-        }
-      }
-      if (dialog === "office") {
-        const payload = {
-          office_name: profileFields.name,
-          office_short_name: profileFields.shortName,
-          office_address: profileFields.campus,
-        };
-        if (editTarget?.kind === "office") {
-          await updateGuidanceOffice(editTarget.item, payload, key);
-        } else {
-          await createGuidanceOffice(payload, key);
         }
       }
       if (dialog === "family") {
@@ -1465,21 +1382,9 @@ export function PortalGuidanceSettingsPage() {
     setBusy(`term-preview-${item.academic_year}`);
     setError(null);
     try {
-      const prior =
-        academic.kind === "ready"
-          ? academic.value.terms
-              .filter(
-                (candidate) =>
-                  candidate !== item && candidate.end_date < item.start_date,
-              )
-              .sort((left, right) =>
-                right.end_date.localeCompare(left.end_date),
-              )[0] ?? null
-          : null;
       setRolloverPreview({
         term: item,
-        prior,
-        result: await getGuidanceRolloverPreview(item, prior ?? undefined),
+        result: await getGuidanceRolloverPreview(item),
       });
     } catch (cause) {
       setError(errorCopy(cause));
@@ -1488,20 +1393,12 @@ export function PortalGuidanceSettingsPage() {
     }
   };
 
-  const rollbackPreview = () => {
-    if (!rolloverPreview?.prior) {
-      setError("A prior closed term is required before rollback can be requested.");
-      return;
-    }
-    void doAction(
-      `term-rollback-${rolloverPreview.term.academic_year}`,
-      (key) =>
-        rollbackGuidanceAcademicTerm(
-          rolloverPreview.term,
-          rolloverPreview.prior as PortalAcademicTerm,
-          { reason_code: "TERM_ROLLBACK" },
-          key,
-        ),
+  const activatePreview = () => {
+    if (!rolloverPreview || rolloverPreview.term.status !== "DRAFT") return;
+    const { term } = rolloverPreview;
+    setRolloverPreview(null);
+    void doAction(`term-activate-${term.academic_year}`, (key) =>
+      academicTermLifecycle(term, "activate", {}, key),
     );
   };
 
@@ -1525,17 +1422,21 @@ export function PortalGuidanceSettingsPage() {
         className="portal-counseling portal-guidance-settings"
       >
         <GuidanceHeader />
-        <PortalWorkspaceNav
-          activeValue={section}
-          ariaLabel="Guidance settings sections"
-          items={NAV_ITEMS.filter((item) =>
-            authorizedSections.includes(item.value),
-          )}
-        />
-        <GuidanceInstitutionDocuments
-          canBranding={canOrganizationGovernance}
-          canTemplates={canDocumentTemplates}
-        />
+        <div className="portal-counseling__workspace">
+          <PortalWorkspaceNav
+            activeValue={section}
+            ariaLabel="Guidance settings sections"
+            items={NAV_ITEMS.filter((item) =>
+              authorizedSections.includes(item.value),
+            )}
+          />
+          <div className="portal-counseling__active-content">
+            {canInstitutionalIdentity ? <GuidanceInstitutionalIdentityPanel /> : null}
+            {canDocumentTemplates ? (
+              <GuidanceInstitutionDocuments canTemplates={canDocumentTemplates} />
+            ) : null}
+          </div>
+        </div>
       </section>
     );
   }
@@ -1547,14 +1448,18 @@ export function PortalGuidanceSettingsPage() {
         className="portal-counseling portal-guidance-settings"
       >
         <GuidanceHeader />
-        <PortalWorkspaceNav
-          activeValue={section}
-          ariaLabel="Guidance settings sections"
-          items={NAV_ITEMS.filter((item) =>
-            authorizedSections.includes(item.value),
-          )}
-        />
-        <GuidanceCounselorCoverage />
+        <div className="portal-counseling__workspace">
+          <PortalWorkspaceNav
+            activeValue={section}
+            ariaLabel="Guidance settings sections"
+            items={NAV_ITEMS.filter((item) =>
+              authorizedSections.includes(item.value),
+            )}
+          />
+          <div className="portal-counseling__active-content">
+            <GuidanceCounselorCoverage />
+          </div>
+        </div>
       </section>
     );
   }
@@ -1566,14 +1471,18 @@ export function PortalGuidanceSettingsPage() {
         className="portal-counseling portal-guidance-settings"
       >
         <GuidanceHeader />
-        <PortalWorkspaceNav
-          activeValue={section}
-          ariaLabel="Guidance settings sections"
-          items={NAV_ITEMS.filter((item) =>
-            authorizedSections.includes(item.value),
-          )}
-        />
-        <GuidanceWorkflowAccess canManage={canWorkflowAccess} />
+        <div className="portal-counseling__workspace">
+          <PortalWorkspaceNav
+            activeValue={section}
+            ariaLabel="Guidance settings sections"
+            items={NAV_ITEMS.filter((item) =>
+              authorizedSections.includes(item.value),
+            )}
+          />
+          <div className="portal-counseling__active-content">
+            <GuidanceWorkflowAccess canManage={canWorkflowAccess} />
+          </div>
+        </div>
       </section>
     );
   }
@@ -1585,18 +1494,22 @@ export function PortalGuidanceSettingsPage() {
         className="portal-counseling portal-guidance-settings"
       >
         <GuidanceHeader />
-        <PortalWorkspaceNav
-          activeValue={section}
-          ariaLabel="Guidance settings sections"
-          items={NAV_ITEMS.filter((item) =>
-            authorizedSections.includes(item.value),
-          )}
-        />
-        <GuidanceScheduling
-          canAvailability={canAvailability}
-          canClosures={canOfficeClosures}
-          canViewClosures={canAvailability || canOfficeClosures}
-        />
+        <div className="portal-counseling__workspace">
+          <PortalWorkspaceNav
+            activeValue={section}
+            ariaLabel="Guidance settings sections"
+            items={NAV_ITEMS.filter((item) =>
+              authorizedSections.includes(item.value),
+            )}
+          />
+          <div className="portal-counseling__active-content">
+            <GuidanceScheduling
+              canAvailability={canAvailability}
+              canClosures={canOfficeClosures}
+              canViewClosures={canAvailability || canOfficeClosures}
+            />
+          </div>
+        </div>
       </section>
     );
   }
@@ -1608,110 +1521,114 @@ export function PortalGuidanceSettingsPage() {
       className="portal-counseling portal-guidance-settings"
     >
       <GuidanceHeader />
-      <PortalWorkspaceNav
-        activeValue={section}
-        ariaLabel="Guidance settings sections"
-        items={NAV_ITEMS.filter((item) => authorizedSections.includes(item.value))}
-      />
-      {error ? (
-        <p className="portal-counseling__inline-error" role="alert">
-          {error}
-        </p>
-      ) : null}
-      {currentLoad.kind === "loading" ? (
-        <PortalCollectionFrame className="portal-counseling__frame">
-          <Skeleton as="span" />
-          <Skeleton as="span" />
-          <Skeleton as="span" />
-        </PortalCollectionFrame>
-      ) : null}
-      {currentLoad.kind === "error" ? (
-        <StateFrame
-          retry={reload}
-          title="Guidance settings are temporarily unavailable."
+      <div className="portal-counseling__workspace">
+        <PortalWorkspaceNav
+          activeValue={section}
+          ariaLabel="Guidance settings sections"
+          items={NAV_ITEMS.filter((item) => authorizedSections.includes(item.value))}
         />
-      ) : null}
-      {section === "academic-context" && academic.kind === "ready" ? (
-        <AcademicContext
-          action={doAction}
-          busy={busy}
-          data={academic.value}
-          onEdit={openEdit}
-          onPreviewRollover={(item) => void loadRolloverPreview(item)}
-          openDialog={openDialog}
-        />
-      ) : null}
-      {section === "forms-instruments" && forms.kind === "ready" ? (
-        <FormsInstruments
-          action={doAction}
-          busy={busy}
-          data={forms.value}
-          onDownload={(item) => void downloadSource(item)}
-          onEdit={openEdit}
-          onPreflight={(item) => void loadPreflight(item)}
-          onUpload={(item, file) => void uploadSource(item, file)}
-          openDialog={openDialog}
-        />
-      ) : null}
-      {preflight ? (
-        <PortalCollectionFrame className="portal-counseling__frame">
-          <div className="portal-counseling__frame-heading">
-            <div>
-              <p className="portal-counseling__kicker">Activation preflight</p>
-              <h2>{preflight.revision.display_title}</h2>
-            </div>
-            <Badge>{preflight.result.ready ? "Ready" : "Blocked"}</Badge>
-          </div>
-          {preflight.result.blockers.length ? (
-            <ul>
-              {preflight.result.blockers.map((blocker) => (
-                <li key={blocker}>{statusLabel(blocker)}</li>
-              ))}
-            </ul>
-          ) : (
-            <p>This revision passed the current activation checks.</p>
-          )}
-        </PortalCollectionFrame>
-      ) : null}
-      {rolloverPreview ? (
-        <PortalCollectionFrame className="portal-counseling__frame">
-          <div className="portal-counseling__frame-heading">
-            <div>
-              <p className="portal-counseling__kicker">Rollover preview</p>
-              <h2>
-                {rolloverPreview.result.academic_year} ·{" "}
-                {rolloverPreview.result.semester}
-              </h2>
-            </div>
-            <Badge>{statusLabel(rolloverPreview.result.rollback.status)}</Badge>
-          </div>
-          <p>{rolloverPreview.result.rollback.condition}</p>
-          <ul>
-            {rolloverPreview.result.providers.map((provider) => (
-              <li key={provider.key}>
-                {statusLabel(provider.key)}: {provider.count} ·{" "}
-                {statusLabel(provider.status)}
-                {provider.reason_code
-                  ? ` · ${statusLabel(provider.reason_code)}`
-                  : ""}
-              </li>
-            ))}
-          </ul>
-          {rolloverPreview.prior ? (
-            <Button
-              disabled={busy !== null}
-              onClick={rollbackPreview}
-              size="sm"
-              type="button"
-              variant="outline"
-            >
-              Request rollback
-            </Button>
-          ) : (
-            <p>No prior closed term was found for this preview.</p>
-          )}
-        </PortalCollectionFrame>
-      ) : null}
+        <div className="portal-counseling__active-content">
+          {error ? (
+            <p className="portal-counseling__inline-error" role="alert">
+              {error}
+            </p>
+          ) : null}
+          {currentLoad.kind === "loading" ? (
+            <PortalCollectionFrame className="portal-counseling__frame">
+              <Skeleton as="span" />
+              <Skeleton as="span" />
+              <Skeleton as="span" />
+            </PortalCollectionFrame>
+          ) : null}
+          {currentLoad.kind === "error" ? (
+            <StateFrame
+              retry={reload}
+              title="Guidance settings are temporarily unavailable."
+            />
+          ) : null}
+          {section === "academic-context" && academic.kind === "ready" ? (
+            <AcademicContext
+              action={doAction}
+              busy={busy}
+              data={academic.value}
+              onEdit={openEdit}
+              onPreviewRollover={(item) => void loadRolloverPreview(item)}
+              openDialog={openDialog}
+            />
+          ) : null}
+          {section === "forms-instruments" && forms.kind === "ready" ? (
+            <FormsInstruments
+              action={doAction}
+              busy={busy}
+              data={forms.value}
+              onDownload={(item) => void downloadSource(item)}
+              onEdit={openEdit}
+              onPreflight={(item) => void loadPreflight(item)}
+              preflightRevision={preflight?.result.ready ? preflight.revision : null}
+              onUpload={(item, file) => void uploadSource(item, file)}
+              openDialog={openDialog}
+            />
+          ) : null}
+          {preflight ? (
+            <PortalCollectionFrame className="portal-counseling__frame">
+              <div className="portal-counseling__frame-heading">
+                <div>
+                  <p className="portal-counseling__kicker">Publication preflight</p>
+                  <h2>{preflight.revision.display_title}</h2>
+                </div>
+                <Badge>{preflight.result.ready ? "Ready" : "Blocked"}</Badge>
+              </div>
+              {preflight.result.blockers.length ? (
+                <ul>
+                  {preflight.result.blockers.map((blocker) => (
+                    <li key={blocker}>{statusLabel(blocker)}</li>
+                  ))}
+                </ul>
+              ) : (
+                <p>This revision passed the current activation checks.</p>
+              )}
+            </PortalCollectionFrame>
+          ) : null}
+          {rolloverPreview ? (
+            <PortalCollectionFrame className="portal-counseling__frame">
+              <div className="portal-counseling__frame-heading">
+                <div>
+                  <p className="portal-counseling__kicker">Activation preview</p>
+                  <h2>
+                    {rolloverPreview.result.academic_year} ·{" "}
+                    {rolloverPreview.result.semester}
+                  </h2>
+                </div>
+                <Badge>Read-only</Badge>
+              </div>
+              <p>
+                {rolloverPreview.result.prior_term
+                  ? `Activating this term closes ${rolloverPreview.result.prior_term}.`
+                  : "No active term will be closed."}
+              </p>
+              <ul>
+                {rolloverPreview.result.providers.map((provider) => (
+                  <li key={provider.key}>
+                    {statusLabel(provider.key)}: {provider.count} ·{" "}
+                    {statusLabel(provider.status)}
+                    {provider.reason_code
+                      ? ` · ${statusLabel(provider.reason_code)}`
+                      : ""}
+                  </li>
+                ))}
+              </ul>
+              <Button
+                disabled={busy !== null || rolloverPreview.term.status !== "DRAFT"}
+                onClick={activatePreview}
+                size="sm"
+                type="button"
+              >
+                Activate term
+              </Button>
+            </PortalCollectionFrame>
+          ) : null}
+        </div>
+      </div>
       <AlertDialog
         onOpenChange={(open) => {
           if (!open && busy !== "dialog") {
@@ -1727,18 +1644,14 @@ export function PortalGuidanceSettingsPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>
               {editTarget
-                ? `Edit ${dialog === "term" ? "academic term" : dialog === "institution" ? "institution profile" : dialog === "office" ? "office profile" : dialog === "family" ? "form family" : dialog === "revision" ? "form revision" : "assessment instrument"}`
+                ? `Edit ${dialog === "term" ? "academic term" : dialog === "family" ? "form family" : dialog === "revision" ? "form revision" : "assessment instrument"}`
                 : dialog === "term"
                   ? "New academic term"
-                  : dialog === "institution"
-                    ? "New institution profile"
-                    : dialog === "office"
-                      ? "New office profile"
-                      : dialog === "family"
-                        ? "New form family"
-                        : dialog === "revision"
-                          ? "New form revision"
-                          : "New assessment instrument"}
+                  : dialog === "family"
+                    ? "New form family"
+                    : dialog === "revision"
+                      ? "New form revision"
+                      : "New assessment instrument"}
             </AlertDialogTitle>
             <AlertDialogDescription>
               Save a governed draft. Activation and publication remain separate actions.
@@ -1811,50 +1724,6 @@ export function PortalGuidanceSettingsPage() {
                         setTermFields((value) => ({
                           ...value,
                           config: event.target.value,
-                        }))
-                      }
-                    />
-                  </Label>
-                </>
-              ) : null}
-              {dialog === "institution" || dialog === "office" ? (
-                <>
-                  <Label>
-                    {dialog === "institution" ? "Legal name" : "Office name"}
-                    <Input
-                      required
-                      value={profileFields.name}
-                      onChange={(event) =>
-                        setProfileFields((value) => ({
-                          ...value,
-                          name: event.target.value,
-                        }))
-                      }
-                    />
-                  </Label>
-                  <Label>
-                    {dialog === "institution"
-                      ? "Short name"
-                      : "Office short name"}
-                    <Input
-                      required
-                      value={profileFields.shortName}
-                      onChange={(event) =>
-                        setProfileFields((value) => ({
-                          ...value,
-                          shortName: event.target.value,
-                        }))
-                      }
-                    />
-                  </Label>
-                  <Label>
-                    {dialog === "institution" ? "Main campus" : "Office address"}
-                    <Input
-                      value={profileFields.campus}
-                      onChange={(event) =>
-                        setProfileFields((value) => ({
-                          ...value,
-                          campus: event.target.value,
                         }))
                       }
                     />

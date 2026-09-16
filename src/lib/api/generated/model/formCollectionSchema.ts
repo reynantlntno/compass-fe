@@ -21,6 +21,7 @@ export interface FormCollectionSchema {
   id: string;
   launched_at?: string | null;
   name: string;
+  resource_version: string;
   start_at: string;
   status: string;
 }

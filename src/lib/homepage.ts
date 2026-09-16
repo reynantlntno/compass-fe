@@ -4,8 +4,7 @@ import {
   contentPublicAnnouncements,
   contentPublicResources,
 } from "@/lib/api/generated/content/content";
-import type { ContentPageResultSchema } from "@/lib/api/generated/model";
-import { getPublicServiceGuide } from "@/lib/public-service-guide";
+import type { ContentListResultSchema } from "@/lib/api/generated/model";
 
 function pageResult(
   result:
@@ -16,26 +15,17 @@ function pageResult(
     return null;
   }
 
-  return result.value.data as ContentPageResultSchema;
+  return result.value.data as ContentListResultSchema;
 }
 
 export const getHomepageContent = cache(async () => {
-  const [announcementsResult, resourcesResult, serviceGuideResult] =
-    await Promise.allSettled([
-      contentPublicAnnouncements({ page: 1, page_size: 2 }),
-      contentPublicResources({ page: 1, page_size: 3 }),
-      getPublicServiceGuide(),
-    ]);
-
-  const serviceGuide =
-    serviceGuideResult.status === "fulfilled" &&
-    serviceGuideResult.value.state === "ready"
-      ? serviceGuideResult.value.data
-      : null;
+  const [announcementsResult, resourcesResult] = await Promise.allSettled([
+    contentPublicAnnouncements({ page: 1, page_size: 2 }),
+    contentPublicResources({ page: 1, page_size: 3 }),
+  ]);
 
   return {
     announcements: pageResult(announcementsResult)?.items ?? [],
     resources: pageResult(resourcesResult)?.items ?? [],
-    serviceGuide,
   };
 });

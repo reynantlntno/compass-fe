@@ -33,6 +33,7 @@ import {
   COUNSELING_SESSION_TYPES,
   CounselingApiError,
 } from "@/lib/api/counseling";
+import { isOptionalResourceVersion } from "@/lib/api/resource-version";
 
 export type PortalCounselingSessionWorkspace = {
   reference_code: string;
@@ -58,6 +59,7 @@ export type PortalCounselingSessionWorkspace = {
   recording_consent_status: string | null;
   recording_requested: boolean | null;
   recording_controls_enabled: boolean;
+  resource_version: string | null;
 };
 
 export type PortalCounselingNote = {
@@ -188,7 +190,8 @@ function parseWorkspace(value: unknown): PortalCounselingSessionWorkspace | null
     !optionalBoundedString(value.ecounseling_next_action, 80) ||
     !optionalBoundedString(value.recording_consent_status, 40) ||
     (value.recording_requested !== null && value.recording_requested !== undefined && typeof value.recording_requested !== "boolean") ||
-    typeof value.recording_controls_enabled !== "boolean"
+    typeof value.recording_controls_enabled !== "boolean" ||
+    !isOptionalResourceVersion(value.resource_version)
   ) return null;
   return {
     reference_code: value.reference_code,
@@ -214,6 +217,7 @@ function parseWorkspace(value: unknown): PortalCounselingSessionWorkspace | null
     recording_consent_status: value.recording_consent_status ?? null,
     recording_requested: value.recording_requested ?? null,
     recording_controls_enabled: value.recording_controls_enabled,
+    resource_version: value.resource_version ?? null,
   };
 }
 

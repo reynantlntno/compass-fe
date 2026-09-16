@@ -49,6 +49,7 @@ export interface RoutineInterviewSensitiveDetailSchema {
   reason_for_coming?: string | null;
   recommendations?: string | null;
   reopened_at?: string | null;
+  resource_version?: string | null;
   session_reference_code: string;
   special_concern?: string | null;
   status: string;

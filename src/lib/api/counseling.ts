@@ -25,6 +25,7 @@ import {
 } from "@/lib/api/auth";
 import { withIdempotencyKey, type IdempotencyKey } from "@/lib/api/idempotency";
 import { profilesStaffStudents } from "@/lib/api/generated/profiles/profiles";
+import { isOptionalResourceVersion } from "@/lib/api/resource-version";
 
 export const COUNSELING_SESSIONS_PAGE_SIZE = 20;
 
@@ -97,6 +98,7 @@ export type PortalCounselingSession = {
   student_display_name: string | null;
   student_number: string | null;
   assignment_state: "Assigned to you" | "Assigned" | "Unassigned" | null;
+  resource_version: string | null;
 };
 
 export type PortalCounselingSessionPage = {
@@ -198,7 +200,8 @@ function isSession(value: unknown): value is CounselingSessionProjectionSchema {
     optionalDisplay(value.student_display_name, MAX_DISPLAY_NAME_LENGTH) &&
     optionalDisplay(value.student_number, MAX_STUDENT_NUMBER_LENGTH) &&
     (value.assignment_state === null || value.assignment_state === undefined ||
-      (typeof value.assignment_state === "string" && ASSIGNMENT_STATES.has(value.assignment_state)))
+      (typeof value.assignment_state === "string" && ASSIGNMENT_STATES.has(value.assignment_state))) &&
+    isOptionalResourceVersion(value.resource_version)
   );
 }
 
@@ -220,6 +223,7 @@ function parseSession(value: unknown): PortalCounselingSession | null {
     student_display_name: value.student_display_name ?? null,
     student_number: value.student_number ?? null,
     assignment_state: (value.assignment_state as PortalCounselingSession["assignment_state"]) ?? null,
+    resource_version: value.resource_version ?? null,
   };
 }
 

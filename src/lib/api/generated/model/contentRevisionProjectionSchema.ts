@@ -5,16 +5,20 @@
  * The canonical backend API for COMPASS clients.
  * OpenAPI spec version: 1.0.0
  */
+import type { ContentRevisionProjectionSchemaSnapshot } from './contentRevisionProjectionSchemaSnapshot';
 
 /**
- * Output-only metadata for the latest review revision.
+ * Output-only metadata and allowlisted source for review/correction revisions.
  */
 export interface ContentRevisionProjectionSchema {
   body_markdown?: string | null;
   created_at?: string | null;
   id: string;
   published_at?: string | null;
+  return_feedback?: string | null;
+  returned_at?: string | null;
   reviewed_at?: string | null;
   revision_number: number;
+  snapshot?: ContentRevisionProjectionSchemaSnapshot;
   status: string;
 }

@@ -26,6 +26,7 @@ export interface CallSlipStaffQueueItemSchema {
   purpose_label: string;
   reference_code: string;
   referral_reference?: string | null;
+  resource_version: string;
   schedule_bucket: string;
   scheduled_end_at?: string | null;
   scheduled_start_at?: string | null;

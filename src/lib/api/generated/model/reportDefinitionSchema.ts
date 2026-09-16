@@ -16,6 +16,7 @@ export interface ReportDefinitionSchema {
   id: string;
   is_active: boolean;
   key: string;
+  resource_version?: string | null;
   sensitivity_level: string;
   title: string;
   updated_at?: string | null;

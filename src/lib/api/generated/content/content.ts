@@ -16,7 +16,6 @@ import type {
   ContactNoResponseProjectionSchema,
   ContactNoResponseSchema,
   ContactReplyCommandSchema,
-  ContactReplyOptionalSchema,
   ContactReplyPageSchema,
   ContactReplySchema,
   ContactStatusSchema,
@@ -25,11 +24,10 @@ import type {
   ContentContactDeliveryMetadataParams,
   ContentContactQueueParams,
   ContentContactRepliesParams,
-  ContentPageCreateSchema,
-  ContentPageResultSchema,
-  ContentPageUpdateSchema,
+  ContentListResultSchema,
   ContentPublicAnnouncementsParams,
   ContentPublicResourcesParams,
+  ContentReviewReturnSchema,
   ContentVisibleAnnouncementsParams,
   ContentVisibleResourcesParams,
   ContentWorkspacePageSchema,
@@ -37,18 +35,14 @@ import type {
   ContentWorkspaceProjectionSchema,
   ContentWorkspaceReplaySchema,
   PublicContentSchema,
-  PublicPageSchema,
-  PublicServiceGuideSchema,
   ResourceCreateSchema,
-  ResourceUpdateSchema,
-  ServiceGuideCreateSchema,
-  ServiceGuideUpdateSchema
+  ResourceUpdateSchema
 } from '../model';
 
 import { compassFetch } from '../../client';
 
 export type contentPublicAnnouncementsResponse200 = {
-  data: ContentPageResultSchema
+  data: ContentListResultSchema
   status: 200
 }
 
@@ -523,6 +517,105 @@ export const contentAnnouncementPublish = async (announcementId: string, options
     method: 'POST'
 
 
+  }
+);}
+
+
+export type contentAnnouncementReturnReviewResponse200 = {
+  data: ContentWorkspaceReplaySchema
+  status: 200
+}
+
+export type contentAnnouncementReturnReviewResponse400 = {
+  data: ApiErrorSchema
+  status: 400
+}
+
+export type contentAnnouncementReturnReviewResponse401 = {
+  data: ApiErrorSchema
+  status: 401
+}
+
+export type contentAnnouncementReturnReviewResponse403 = {
+  data: ApiErrorSchema
+  status: 403
+}
+
+export type contentAnnouncementReturnReviewResponse404 = {
+  data: ApiErrorSchema
+  status: 404
+}
+
+export type contentAnnouncementReturnReviewResponse405 = {
+  data: ApiErrorSchema
+  status: 405
+}
+
+export type contentAnnouncementReturnReviewResponse409 = {
+  data: ApiErrorSchema
+  status: 409
+}
+
+export type contentAnnouncementReturnReviewResponse413 = {
+  data: ApiErrorSchema
+  status: 413
+}
+
+export type contentAnnouncementReturnReviewResponse422 = {
+  data: ApiErrorSchema
+  status: 422
+}
+
+export type contentAnnouncementReturnReviewResponse429 = {
+  data: ApiErrorSchema
+  status: 429
+}
+
+export type contentAnnouncementReturnReviewResponse500 = {
+  data: ApiErrorSchema
+  status: 500
+}
+
+export type contentAnnouncementReturnReviewResponse503 = {
+  data: ApiErrorSchema
+  status: 503
+}
+
+export type contentAnnouncementReturnReviewResponseSuccess = (contentAnnouncementReturnReviewResponse200) & {
+  headers: Record<string, string>;
+};
+export type contentAnnouncementReturnReviewResponseError = (contentAnnouncementReturnReviewResponse400 | contentAnnouncementReturnReviewResponse401 | contentAnnouncementReturnReviewResponse403 | contentAnnouncementReturnReviewResponse404 | contentAnnouncementReturnReviewResponse405 | contentAnnouncementReturnReviewResponse409 | contentAnnouncementReturnReviewResponse413 | contentAnnouncementReturnReviewResponse422 | contentAnnouncementReturnReviewResponse429 | contentAnnouncementReturnReviewResponse500 | contentAnnouncementReturnReviewResponse503) & {
+  headers: Record<string, string>;
+};
+
+export type contentAnnouncementReturnReviewResponse = (contentAnnouncementReturnReviewResponseSuccess | contentAnnouncementReturnReviewResponseError)
+
+export const getContentAnnouncementReturnReviewUrl = (announcementId: string,) => {
+
+
+
+
+  return `/api/v1/content/announcements/${announcementId}/return-review/`
+}
+
+/**
+ * @summary Return Announcement Review Api
+ */
+export const contentAnnouncementReturnReview = async (announcementId: string,
+    contentReviewReturnSchema: ContentReviewReturnSchema, options?: Parameters<typeof compassFetch>[1]): Promise<contentAnnouncementReturnReviewResponse> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Array.isArray(h)) return Object.fromEntries(h);
+    return h;
+  };
+return compassFetch<contentAnnouncementReturnReviewResponse>(getContentAnnouncementReturnReviewUrl(announcementId),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(contentReviewReturnSchema)
   }
 );}
 
@@ -1008,98 +1101,6 @@ return compassFetch<contentContactReplyUpdateResponse>(getContentContactReplyUpd
 );}
 
 
-export type contentContactReplyApproveResponse200 = {
-  data: ContactReplySchema
-  status: 200
-}
-
-export type contentContactReplyApproveResponse400 = {
-  data: ApiErrorSchema
-  status: 400
-}
-
-export type contentContactReplyApproveResponse401 = {
-  data: ApiErrorSchema
-  status: 401
-}
-
-export type contentContactReplyApproveResponse403 = {
-  data: ApiErrorSchema
-  status: 403
-}
-
-export type contentContactReplyApproveResponse404 = {
-  data: ApiErrorSchema
-  status: 404
-}
-
-export type contentContactReplyApproveResponse405 = {
-  data: ApiErrorSchema
-  status: 405
-}
-
-export type contentContactReplyApproveResponse409 = {
-  data: ApiErrorSchema
-  status: 409
-}
-
-export type contentContactReplyApproveResponse413 = {
-  data: ApiErrorSchema
-  status: 413
-}
-
-export type contentContactReplyApproveResponse422 = {
-  data: ApiErrorSchema
-  status: 422
-}
-
-export type contentContactReplyApproveResponse429 = {
-  data: ApiErrorSchema
-  status: 429
-}
-
-export type contentContactReplyApproveResponse500 = {
-  data: ApiErrorSchema
-  status: 500
-}
-
-export type contentContactReplyApproveResponse503 = {
-  data: ApiErrorSchema
-  status: 503
-}
-
-export type contentContactReplyApproveResponseSuccess = (contentContactReplyApproveResponse200) & {
-  headers: Record<string, string>;
-};
-export type contentContactReplyApproveResponseError = (contentContactReplyApproveResponse400 | contentContactReplyApproveResponse401 | contentContactReplyApproveResponse403 | contentContactReplyApproveResponse404 | contentContactReplyApproveResponse405 | contentContactReplyApproveResponse409 | contentContactReplyApproveResponse413 | contentContactReplyApproveResponse422 | contentContactReplyApproveResponse429 | contentContactReplyApproveResponse500 | contentContactReplyApproveResponse503) & {
-  headers: Record<string, string>;
-};
-
-export type contentContactReplyApproveResponse = (contentContactReplyApproveResponseSuccess | contentContactReplyApproveResponseError)
-
-export const getContentContactReplyApproveUrl = (replyId: string,) => {
-
-
-
-
-  return `/api/v1/content/contact-replies/${replyId}/approve/`
-}
-
-/**
- * @summary Approve Reply Api
- */
-export const contentContactReplyApprove = async (replyId: string, options?: Parameters<typeof compassFetch>[1]): Promise<contentContactReplyApproveResponse> => {
-
-  return compassFetch<contentContactReplyApproveResponse>(getContentContactReplyApproveUrl(replyId),
-  {
-    ...options,
-    method: 'POST'
-
-
-  }
-);}
-
-
 export type contentContactReplyCancelResponse200 = {
   data: ContactReplySchema
   status: 200
@@ -1183,98 +1184,6 @@ export const getContentContactReplyCancelUrl = (replyId: string,) => {
 export const contentContactReplyCancel = async (replyId: string, options?: Parameters<typeof compassFetch>[1]): Promise<contentContactReplyCancelResponse> => {
 
   return compassFetch<contentContactReplyCancelResponse>(getContentContactReplyCancelUrl(replyId),
-  {
-    ...options,
-    method: 'POST'
-
-
-  }
-);}
-
-
-export type contentContactReplyRejectResponse200 = {
-  data: ContactReplySchema
-  status: 200
-}
-
-export type contentContactReplyRejectResponse400 = {
-  data: ApiErrorSchema
-  status: 400
-}
-
-export type contentContactReplyRejectResponse401 = {
-  data: ApiErrorSchema
-  status: 401
-}
-
-export type contentContactReplyRejectResponse403 = {
-  data: ApiErrorSchema
-  status: 403
-}
-
-export type contentContactReplyRejectResponse404 = {
-  data: ApiErrorSchema
-  status: 404
-}
-
-export type contentContactReplyRejectResponse405 = {
-  data: ApiErrorSchema
-  status: 405
-}
-
-export type contentContactReplyRejectResponse409 = {
-  data: ApiErrorSchema
-  status: 409
-}
-
-export type contentContactReplyRejectResponse413 = {
-  data: ApiErrorSchema
-  status: 413
-}
-
-export type contentContactReplyRejectResponse422 = {
-  data: ApiErrorSchema
-  status: 422
-}
-
-export type contentContactReplyRejectResponse429 = {
-  data: ApiErrorSchema
-  status: 429
-}
-
-export type contentContactReplyRejectResponse500 = {
-  data: ApiErrorSchema
-  status: 500
-}
-
-export type contentContactReplyRejectResponse503 = {
-  data: ApiErrorSchema
-  status: 503
-}
-
-export type contentContactReplyRejectResponseSuccess = (contentContactReplyRejectResponse200) & {
-  headers: Record<string, string>;
-};
-export type contentContactReplyRejectResponseError = (contentContactReplyRejectResponse400 | contentContactReplyRejectResponse401 | contentContactReplyRejectResponse403 | contentContactReplyRejectResponse404 | contentContactReplyRejectResponse405 | contentContactReplyRejectResponse409 | contentContactReplyRejectResponse413 | contentContactReplyRejectResponse422 | contentContactReplyRejectResponse429 | contentContactReplyRejectResponse500 | contentContactReplyRejectResponse503) & {
-  headers: Record<string, string>;
-};
-
-export type contentContactReplyRejectResponse = (contentContactReplyRejectResponseSuccess | contentContactReplyRejectResponseError)
-
-export const getContentContactReplyRejectUrl = (replyId: string,) => {
-
-
-
-
-  return `/api/v1/content/contact-replies/${replyId}/reject/`
-}
-
-/**
- * @summary Reject Reply Api
- */
-export const contentContactReplyReject = async (replyId: string, options?: Parameters<typeof compassFetch>[1]): Promise<contentContactReplyRejectResponse> => {
-
-  return compassFetch<contentContactReplyRejectResponse>(getContentContactReplyRejectUrl(replyId),
   {
     ...options,
     method: 'POST'
@@ -1376,101 +1285,94 @@ export const contentContactReplyRetry = async (replyId: string, options?: Parame
 );}
 
 
-export type contentContactReplySubmitResponse200 = {
+export type contentContactReplySendResponse200 = {
   data: ContactReplySchema
   status: 200
 }
 
-export type contentContactReplySubmitResponse400 = {
+export type contentContactReplySendResponse400 = {
   data: ApiErrorSchema
   status: 400
 }
 
-export type contentContactReplySubmitResponse401 = {
+export type contentContactReplySendResponse401 = {
   data: ApiErrorSchema
   status: 401
 }
 
-export type contentContactReplySubmitResponse403 = {
+export type contentContactReplySendResponse403 = {
   data: ApiErrorSchema
   status: 403
 }
 
-export type contentContactReplySubmitResponse404 = {
+export type contentContactReplySendResponse404 = {
   data: ApiErrorSchema
   status: 404
 }
 
-export type contentContactReplySubmitResponse405 = {
+export type contentContactReplySendResponse405 = {
   data: ApiErrorSchema
   status: 405
 }
 
-export type contentContactReplySubmitResponse409 = {
+export type contentContactReplySendResponse409 = {
   data: ApiErrorSchema
   status: 409
 }
 
-export type contentContactReplySubmitResponse413 = {
+export type contentContactReplySendResponse413 = {
   data: ApiErrorSchema
   status: 413
 }
 
-export type contentContactReplySubmitResponse422 = {
+export type contentContactReplySendResponse422 = {
   data: ApiErrorSchema
   status: 422
 }
 
-export type contentContactReplySubmitResponse429 = {
+export type contentContactReplySendResponse429 = {
   data: ApiErrorSchema
   status: 429
 }
 
-export type contentContactReplySubmitResponse500 = {
+export type contentContactReplySendResponse500 = {
   data: ApiErrorSchema
   status: 500
 }
 
-export type contentContactReplySubmitResponse503 = {
+export type contentContactReplySendResponse503 = {
   data: ApiErrorSchema
   status: 503
 }
 
-export type contentContactReplySubmitResponseSuccess = (contentContactReplySubmitResponse200) & {
+export type contentContactReplySendResponseSuccess = (contentContactReplySendResponse200) & {
   headers: Record<string, string>;
 };
-export type contentContactReplySubmitResponseError = (contentContactReplySubmitResponse400 | contentContactReplySubmitResponse401 | contentContactReplySubmitResponse403 | contentContactReplySubmitResponse404 | contentContactReplySubmitResponse405 | contentContactReplySubmitResponse409 | contentContactReplySubmitResponse413 | contentContactReplySubmitResponse422 | contentContactReplySubmitResponse429 | contentContactReplySubmitResponse500 | contentContactReplySubmitResponse503) & {
+export type contentContactReplySendResponseError = (contentContactReplySendResponse400 | contentContactReplySendResponse401 | contentContactReplySendResponse403 | contentContactReplySendResponse404 | contentContactReplySendResponse405 | contentContactReplySendResponse409 | contentContactReplySendResponse413 | contentContactReplySendResponse422 | contentContactReplySendResponse429 | contentContactReplySendResponse500 | contentContactReplySendResponse503) & {
   headers: Record<string, string>;
 };
 
-export type contentContactReplySubmitResponse = (contentContactReplySubmitResponseSuccess | contentContactReplySubmitResponseError)
+export type contentContactReplySendResponse = (contentContactReplySendResponseSuccess | contentContactReplySendResponseError)
 
-export const getContentContactReplySubmitUrl = (replyId: string,) => {
-
-
+export const getContentContactReplySendUrl = (replyId: string,) => {
 
 
-  return `/api/v1/content/contact-replies/${replyId}/submit/`
+
+
+  return `/api/v1/content/contact-replies/${replyId}/send/`
 }
 
 /**
- * @summary Submit Reply Api
+ * @summary Send Reply Api
  */
-export const contentContactReplySubmit = async (replyId: string,
-    contactReplyOptionalSchemaNull?: ContactReplyOptionalSchema | null, options?: Parameters<typeof compassFetch>[1]): Promise<contentContactReplySubmitResponse> => {
+export const contentContactReplySend = async (replyId: string, options?: Parameters<typeof compassFetch>[1]): Promise<contentContactReplySendResponse> => {
 
-    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Array.isArray(h)) return Object.fromEntries(h);
-    return h;
-  };
-return compassFetch<contentContactReplySubmitResponse>(getContentContactReplySubmitUrl(replyId),
+  return compassFetch<contentContactReplySendResponse>(getContentContactReplySendUrl(replyId),
   {
     ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(contactReplyOptionalSchemaNull)
+    method: 'POST'
+
+
   }
 );}
 
@@ -2354,7 +2256,7 @@ return compassFetch<contentContactStatusResponse>(getContentContactStatusUrl(sub
 
 
 export type contentVisibleAnnouncementsResponse200 = {
-  data: ContentPageResultSchema
+  data: ContentListResultSchema
   status: 200
 }
 
@@ -2453,7 +2355,7 @@ export const contentVisibleAnnouncements = async (params?: ContentVisibleAnnounc
 
 
 export type contentVisibleResourcesResponse200 = {
-  data: ContentPageResultSchema
+  data: ContentListResultSchema
   status: 200
 }
 
@@ -2551,573 +2453,8 @@ export const contentVisibleResources = async (params?: ContentVisibleResourcesPa
 );}
 
 
-export type contentPageCreateResponse200 = {
-  data: ContentWorkspaceReplaySchema
-  status: 200
-}
-
-export type contentPageCreateResponse400 = {
-  data: ApiErrorSchema
-  status: 400
-}
-
-export type contentPageCreateResponse401 = {
-  data: ApiErrorSchema
-  status: 401
-}
-
-export type contentPageCreateResponse403 = {
-  data: ApiErrorSchema
-  status: 403
-}
-
-export type contentPageCreateResponse404 = {
-  data: ApiErrorSchema
-  status: 404
-}
-
-export type contentPageCreateResponse405 = {
-  data: ApiErrorSchema
-  status: 405
-}
-
-export type contentPageCreateResponse409 = {
-  data: ApiErrorSchema
-  status: 409
-}
-
-export type contentPageCreateResponse413 = {
-  data: ApiErrorSchema
-  status: 413
-}
-
-export type contentPageCreateResponse422 = {
-  data: ApiErrorSchema
-  status: 422
-}
-
-export type contentPageCreateResponse429 = {
-  data: ApiErrorSchema
-  status: 429
-}
-
-export type contentPageCreateResponse500 = {
-  data: ApiErrorSchema
-  status: 500
-}
-
-export type contentPageCreateResponse503 = {
-  data: ApiErrorSchema
-  status: 503
-}
-
-export type contentPageCreateResponseSuccess = (contentPageCreateResponse200) & {
-  headers: Record<string, string>;
-};
-export type contentPageCreateResponseError = (contentPageCreateResponse400 | contentPageCreateResponse401 | contentPageCreateResponse403 | contentPageCreateResponse404 | contentPageCreateResponse405 | contentPageCreateResponse409 | contentPageCreateResponse413 | contentPageCreateResponse422 | contentPageCreateResponse429 | contentPageCreateResponse500 | contentPageCreateResponse503) & {
-  headers: Record<string, string>;
-};
-
-export type contentPageCreateResponse = (contentPageCreateResponseSuccess | contentPageCreateResponseError)
-
-export const getContentPageCreateUrl = () => {
-
-
-
-
-  return `/api/v1/content/pages/`
-}
-
-/**
- * @summary Create Page Api
- */
-export const contentPageCreate = async (contentPageCreateSchema: ContentPageCreateSchema, options?: Parameters<typeof compassFetch>[1]): Promise<contentPageCreateResponse> => {
-
-    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Array.isArray(h)) return Object.fromEntries(h);
-    return h;
-  };
-return compassFetch<contentPageCreateResponse>(getContentPageCreateUrl(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(contentPageCreateSchema)
-  }
-);}
-
-
-export type contentPageUpdateResponse200 = {
-  data: ContentWorkspaceReplaySchema
-  status: 200
-}
-
-export type contentPageUpdateResponse400 = {
-  data: ApiErrorSchema
-  status: 400
-}
-
-export type contentPageUpdateResponse401 = {
-  data: ApiErrorSchema
-  status: 401
-}
-
-export type contentPageUpdateResponse403 = {
-  data: ApiErrorSchema
-  status: 403
-}
-
-export type contentPageUpdateResponse404 = {
-  data: ApiErrorSchema
-  status: 404
-}
-
-export type contentPageUpdateResponse405 = {
-  data: ApiErrorSchema
-  status: 405
-}
-
-export type contentPageUpdateResponse409 = {
-  data: ApiErrorSchema
-  status: 409
-}
-
-export type contentPageUpdateResponse413 = {
-  data: ApiErrorSchema
-  status: 413
-}
-
-export type contentPageUpdateResponse422 = {
-  data: ApiErrorSchema
-  status: 422
-}
-
-export type contentPageUpdateResponse429 = {
-  data: ApiErrorSchema
-  status: 429
-}
-
-export type contentPageUpdateResponse500 = {
-  data: ApiErrorSchema
-  status: 500
-}
-
-export type contentPageUpdateResponse503 = {
-  data: ApiErrorSchema
-  status: 503
-}
-
-export type contentPageUpdateResponseSuccess = (contentPageUpdateResponse200) & {
-  headers: Record<string, string>;
-};
-export type contentPageUpdateResponseError = (contentPageUpdateResponse400 | contentPageUpdateResponse401 | contentPageUpdateResponse403 | contentPageUpdateResponse404 | contentPageUpdateResponse405 | contentPageUpdateResponse409 | contentPageUpdateResponse413 | contentPageUpdateResponse422 | contentPageUpdateResponse429 | contentPageUpdateResponse500 | contentPageUpdateResponse503) & {
-  headers: Record<string, string>;
-};
-
-export type contentPageUpdateResponse = (contentPageUpdateResponseSuccess | contentPageUpdateResponseError)
-
-export const getContentPageUpdateUrl = (pageId: string,) => {
-
-
-
-
-  return `/api/v1/content/pages/${pageId}/`
-}
-
-/**
- * @summary Update Page Api
- */
-export const contentPageUpdate = async (pageId: string,
-    contentPageUpdateSchema: ContentPageUpdateSchema, options?: Parameters<typeof compassFetch>[1]): Promise<contentPageUpdateResponse> => {
-
-    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Array.isArray(h)) return Object.fromEntries(h);
-    return h;
-  };
-return compassFetch<contentPageUpdateResponse>(getContentPageUpdateUrl(pageId),
-  {
-    ...options,
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(contentPageUpdateSchema)
-  }
-);}
-
-
-export type contentPageArchiveResponse200 = {
-  data: ContentWorkspaceReplaySchema
-  status: 200
-}
-
-export type contentPageArchiveResponse400 = {
-  data: ApiErrorSchema
-  status: 400
-}
-
-export type contentPageArchiveResponse401 = {
-  data: ApiErrorSchema
-  status: 401
-}
-
-export type contentPageArchiveResponse403 = {
-  data: ApiErrorSchema
-  status: 403
-}
-
-export type contentPageArchiveResponse404 = {
-  data: ApiErrorSchema
-  status: 404
-}
-
-export type contentPageArchiveResponse405 = {
-  data: ApiErrorSchema
-  status: 405
-}
-
-export type contentPageArchiveResponse409 = {
-  data: ApiErrorSchema
-  status: 409
-}
-
-export type contentPageArchiveResponse413 = {
-  data: ApiErrorSchema
-  status: 413
-}
-
-export type contentPageArchiveResponse422 = {
-  data: ApiErrorSchema
-  status: 422
-}
-
-export type contentPageArchiveResponse429 = {
-  data: ApiErrorSchema
-  status: 429
-}
-
-export type contentPageArchiveResponse500 = {
-  data: ApiErrorSchema
-  status: 500
-}
-
-export type contentPageArchiveResponse503 = {
-  data: ApiErrorSchema
-  status: 503
-}
-
-export type contentPageArchiveResponseSuccess = (contentPageArchiveResponse200) & {
-  headers: Record<string, string>;
-};
-export type contentPageArchiveResponseError = (contentPageArchiveResponse400 | contentPageArchiveResponse401 | contentPageArchiveResponse403 | contentPageArchiveResponse404 | contentPageArchiveResponse405 | contentPageArchiveResponse409 | contentPageArchiveResponse413 | contentPageArchiveResponse422 | contentPageArchiveResponse429 | contentPageArchiveResponse500 | contentPageArchiveResponse503) & {
-  headers: Record<string, string>;
-};
-
-export type contentPageArchiveResponse = (contentPageArchiveResponseSuccess | contentPageArchiveResponseError)
-
-export const getContentPageArchiveUrl = (pageId: string,) => {
-
-
-
-
-  return `/api/v1/content/pages/${pageId}/archive/`
-}
-
-/**
- * @summary Archive Page Api
- */
-export const contentPageArchive = async (pageId: string, options?: Parameters<typeof compassFetch>[1]): Promise<contentPageArchiveResponse> => {
-
-  return compassFetch<contentPageArchiveResponse>(getContentPageArchiveUrl(pageId),
-  {
-    ...options,
-    method: 'POST'
-
-
-  }
-);}
-
-
-export type contentPagePublishResponse200 = {
-  data: ContentWorkspaceReplaySchema
-  status: 200
-}
-
-export type contentPagePublishResponse400 = {
-  data: ApiErrorSchema
-  status: 400
-}
-
-export type contentPagePublishResponse401 = {
-  data: ApiErrorSchema
-  status: 401
-}
-
-export type contentPagePublishResponse403 = {
-  data: ApiErrorSchema
-  status: 403
-}
-
-export type contentPagePublishResponse404 = {
-  data: ApiErrorSchema
-  status: 404
-}
-
-export type contentPagePublishResponse405 = {
-  data: ApiErrorSchema
-  status: 405
-}
-
-export type contentPagePublishResponse409 = {
-  data: ApiErrorSchema
-  status: 409
-}
-
-export type contentPagePublishResponse413 = {
-  data: ApiErrorSchema
-  status: 413
-}
-
-export type contentPagePublishResponse422 = {
-  data: ApiErrorSchema
-  status: 422
-}
-
-export type contentPagePublishResponse429 = {
-  data: ApiErrorSchema
-  status: 429
-}
-
-export type contentPagePublishResponse500 = {
-  data: ApiErrorSchema
-  status: 500
-}
-
-export type contentPagePublishResponse503 = {
-  data: ApiErrorSchema
-  status: 503
-}
-
-export type contentPagePublishResponseSuccess = (contentPagePublishResponse200) & {
-  headers: Record<string, string>;
-};
-export type contentPagePublishResponseError = (contentPagePublishResponse400 | contentPagePublishResponse401 | contentPagePublishResponse403 | contentPagePublishResponse404 | contentPagePublishResponse405 | contentPagePublishResponse409 | contentPagePublishResponse413 | contentPagePublishResponse422 | contentPagePublishResponse429 | contentPagePublishResponse500 | contentPagePublishResponse503) & {
-  headers: Record<string, string>;
-};
-
-export type contentPagePublishResponse = (contentPagePublishResponseSuccess | contentPagePublishResponseError)
-
-export const getContentPagePublishUrl = (pageId: string,) => {
-
-
-
-
-  return `/api/v1/content/pages/${pageId}/publish/`
-}
-
-/**
- * @summary Publish Page Api
- */
-export const contentPagePublish = async (pageId: string, options?: Parameters<typeof compassFetch>[1]): Promise<contentPagePublishResponse> => {
-
-  return compassFetch<contentPagePublishResponse>(getContentPagePublishUrl(pageId),
-  {
-    ...options,
-    method: 'POST'
-
-
-  }
-);}
-
-
-export type contentPageSubmitReviewResponse200 = {
-  data: ContentWorkspaceReplaySchema
-  status: 200
-}
-
-export type contentPageSubmitReviewResponse400 = {
-  data: ApiErrorSchema
-  status: 400
-}
-
-export type contentPageSubmitReviewResponse401 = {
-  data: ApiErrorSchema
-  status: 401
-}
-
-export type contentPageSubmitReviewResponse403 = {
-  data: ApiErrorSchema
-  status: 403
-}
-
-export type contentPageSubmitReviewResponse404 = {
-  data: ApiErrorSchema
-  status: 404
-}
-
-export type contentPageSubmitReviewResponse405 = {
-  data: ApiErrorSchema
-  status: 405
-}
-
-export type contentPageSubmitReviewResponse409 = {
-  data: ApiErrorSchema
-  status: 409
-}
-
-export type contentPageSubmitReviewResponse413 = {
-  data: ApiErrorSchema
-  status: 413
-}
-
-export type contentPageSubmitReviewResponse422 = {
-  data: ApiErrorSchema
-  status: 422
-}
-
-export type contentPageSubmitReviewResponse429 = {
-  data: ApiErrorSchema
-  status: 429
-}
-
-export type contentPageSubmitReviewResponse500 = {
-  data: ApiErrorSchema
-  status: 500
-}
-
-export type contentPageSubmitReviewResponse503 = {
-  data: ApiErrorSchema
-  status: 503
-}
-
-export type contentPageSubmitReviewResponseSuccess = (contentPageSubmitReviewResponse200) & {
-  headers: Record<string, string>;
-};
-export type contentPageSubmitReviewResponseError = (contentPageSubmitReviewResponse400 | contentPageSubmitReviewResponse401 | contentPageSubmitReviewResponse403 | contentPageSubmitReviewResponse404 | contentPageSubmitReviewResponse405 | contentPageSubmitReviewResponse409 | contentPageSubmitReviewResponse413 | contentPageSubmitReviewResponse422 | contentPageSubmitReviewResponse429 | contentPageSubmitReviewResponse500 | contentPageSubmitReviewResponse503) & {
-  headers: Record<string, string>;
-};
-
-export type contentPageSubmitReviewResponse = (contentPageSubmitReviewResponseSuccess | contentPageSubmitReviewResponseError)
-
-export const getContentPageSubmitReviewUrl = (pageId: string,) => {
-
-
-
-
-  return `/api/v1/content/pages/${pageId}/submit-review/`
-}
-
-/**
- * @summary Submit Page Api
- */
-export const contentPageSubmitReview = async (pageId: string, options?: Parameters<typeof compassFetch>[1]): Promise<contentPageSubmitReviewResponse> => {
-
-  return compassFetch<contentPageSubmitReviewResponse>(getContentPageSubmitReviewUrl(pageId),
-  {
-    ...options,
-    method: 'POST'
-
-
-  }
-);}
-
-
-export type contentPublicPageResponse200 = {
-  data: PublicPageSchema
-  status: 200
-}
-
-export type contentPublicPageResponse400 = {
-  data: ApiErrorSchema
-  status: 400
-}
-
-export type contentPublicPageResponse401 = {
-  data: ApiErrorSchema
-  status: 401
-}
-
-export type contentPublicPageResponse403 = {
-  data: ApiErrorSchema
-  status: 403
-}
-
-export type contentPublicPageResponse404 = {
-  data: ApiErrorSchema
-  status: 404
-}
-
-export type contentPublicPageResponse405 = {
-  data: ApiErrorSchema
-  status: 405
-}
-
-export type contentPublicPageResponse409 = {
-  data: ApiErrorSchema
-  status: 409
-}
-
-export type contentPublicPageResponse413 = {
-  data: ApiErrorSchema
-  status: 413
-}
-
-export type contentPublicPageResponse422 = {
-  data: ApiErrorSchema
-  status: 422
-}
-
-export type contentPublicPageResponse429 = {
-  data: ApiErrorSchema
-  status: 429
-}
-
-export type contentPublicPageResponse500 = {
-  data: ApiErrorSchema
-  status: 500
-}
-
-export type contentPublicPageResponse503 = {
-  data: ApiErrorSchema
-  status: 503
-}
-
-export type contentPublicPageResponseSuccess = (contentPublicPageResponse200) & {
-  headers: Record<string, string>;
-};
-export type contentPublicPageResponseError = (contentPublicPageResponse400 | contentPublicPageResponse401 | contentPublicPageResponse403 | contentPublicPageResponse404 | contentPublicPageResponse405 | contentPublicPageResponse409 | contentPublicPageResponse413 | contentPublicPageResponse422 | contentPublicPageResponse429 | contentPublicPageResponse500 | contentPublicPageResponse503) & {
-  headers: Record<string, string>;
-};
-
-export type contentPublicPageResponse = (contentPublicPageResponseSuccess | contentPublicPageResponseError)
-
-export const getContentPublicPageUrl = (pageKey: string,) => {
-
-
-
-
-  return `/api/v1/content/pages/${pageKey}/`
-}
-
-/**
- * @summary Get Public Page
- */
-export const contentPublicPage = async (pageKey: string, options?: Parameters<typeof compassFetch>[1]): Promise<contentPublicPageResponse> => {
-
-  return compassFetch<contentPublicPageResponse>(getContentPublicPageUrl(pageKey),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
 export type contentPublicResourcesResponse200 = {
-  data: ContentPageResultSchema
+  data: ContentListResultSchema
   status: 200
 }
 
@@ -3596,88 +2933,88 @@ export const contentResourcePublish = async (resourceId: string, options?: Param
 );}
 
 
-export type contentResourceScheduleResponse200 = {
+export type contentResourceReturnReviewResponse200 = {
   data: ContentWorkspaceReplaySchema
   status: 200
 }
 
-export type contentResourceScheduleResponse400 = {
+export type contentResourceReturnReviewResponse400 = {
   data: ApiErrorSchema
   status: 400
 }
 
-export type contentResourceScheduleResponse401 = {
+export type contentResourceReturnReviewResponse401 = {
   data: ApiErrorSchema
   status: 401
 }
 
-export type contentResourceScheduleResponse403 = {
+export type contentResourceReturnReviewResponse403 = {
   data: ApiErrorSchema
   status: 403
 }
 
-export type contentResourceScheduleResponse404 = {
+export type contentResourceReturnReviewResponse404 = {
   data: ApiErrorSchema
   status: 404
 }
 
-export type contentResourceScheduleResponse405 = {
+export type contentResourceReturnReviewResponse405 = {
   data: ApiErrorSchema
   status: 405
 }
 
-export type contentResourceScheduleResponse409 = {
+export type contentResourceReturnReviewResponse409 = {
   data: ApiErrorSchema
   status: 409
 }
 
-export type contentResourceScheduleResponse413 = {
+export type contentResourceReturnReviewResponse413 = {
   data: ApiErrorSchema
   status: 413
 }
 
-export type contentResourceScheduleResponse422 = {
+export type contentResourceReturnReviewResponse422 = {
   data: ApiErrorSchema
   status: 422
 }
 
-export type contentResourceScheduleResponse429 = {
+export type contentResourceReturnReviewResponse429 = {
   data: ApiErrorSchema
   status: 429
 }
 
-export type contentResourceScheduleResponse500 = {
+export type contentResourceReturnReviewResponse500 = {
   data: ApiErrorSchema
   status: 500
 }
 
-export type contentResourceScheduleResponse503 = {
+export type contentResourceReturnReviewResponse503 = {
   data: ApiErrorSchema
   status: 503
 }
 
-export type contentResourceScheduleResponseSuccess = (contentResourceScheduleResponse200) & {
+export type contentResourceReturnReviewResponseSuccess = (contentResourceReturnReviewResponse200) & {
   headers: Record<string, string>;
 };
-export type contentResourceScheduleResponseError = (contentResourceScheduleResponse400 | contentResourceScheduleResponse401 | contentResourceScheduleResponse403 | contentResourceScheduleResponse404 | contentResourceScheduleResponse405 | contentResourceScheduleResponse409 | contentResourceScheduleResponse413 | contentResourceScheduleResponse422 | contentResourceScheduleResponse429 | contentResourceScheduleResponse500 | contentResourceScheduleResponse503) & {
+export type contentResourceReturnReviewResponseError = (contentResourceReturnReviewResponse400 | contentResourceReturnReviewResponse401 | contentResourceReturnReviewResponse403 | contentResourceReturnReviewResponse404 | contentResourceReturnReviewResponse405 | contentResourceReturnReviewResponse409 | contentResourceReturnReviewResponse413 | contentResourceReturnReviewResponse422 | contentResourceReturnReviewResponse429 | contentResourceReturnReviewResponse500 | contentResourceReturnReviewResponse503) & {
   headers: Record<string, string>;
 };
 
-export type contentResourceScheduleResponse = (contentResourceScheduleResponseSuccess | contentResourceScheduleResponseError)
+export type contentResourceReturnReviewResponse = (contentResourceReturnReviewResponseSuccess | contentResourceReturnReviewResponseError)
 
-export const getContentResourceScheduleUrl = (resourceId: string,) => {
-
-
+export const getContentResourceReturnReviewUrl = (resourceId: string,) => {
 
 
-  return `/api/v1/content/resources/${resourceId}/schedule/`
+
+
+  return `/api/v1/content/resources/${resourceId}/return-review/`
 }
 
 /**
- * @summary Schedule Resource Api
+ * @summary Return Resource Review Api
  */
-export const contentResourceSchedule = async (resourceId: string,
-    resourceUpdateSchemaNull?: ResourceUpdateSchema | null, options?: Parameters<typeof compassFetch>[1]): Promise<contentResourceScheduleResponse> => {
+export const contentResourceReturnReview = async (resourceId: string,
+    contentReviewReturnSchema: ContentReviewReturnSchema, options?: Parameters<typeof compassFetch>[1]): Promise<contentResourceReturnReviewResponse> => {
 
     const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
     if (!h) return {};
@@ -3685,12 +3022,12 @@ export const contentResourceSchedule = async (resourceId: string,
     if (Array.isArray(h)) return Object.fromEntries(h);
     return h;
   };
-return compassFetch<contentResourceScheduleResponse>(getContentResourceScheduleUrl(resourceId),
+return compassFetch<contentResourceReturnReviewResponse>(getContentResourceReturnReviewUrl(resourceId),
   {
     ...options,
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(resourceUpdateSchemaNull)
+    body: JSON.stringify(contentReviewReturnSchema)
   }
 );}
 
@@ -3873,670 +3210,6 @@ export const contentPublicResource = async (slug: string, options?: Parameters<t
   {
     ...options,
     method: 'GET'
-
-
-  }
-);}
-
-
-export type contentPublicServiceGuideResponse200 = {
-  data: PublicServiceGuideSchema
-  status: 200
-}
-
-export type contentPublicServiceGuideResponse400 = {
-  data: ApiErrorSchema
-  status: 400
-}
-
-export type contentPublicServiceGuideResponse401 = {
-  data: ApiErrorSchema
-  status: 401
-}
-
-export type contentPublicServiceGuideResponse403 = {
-  data: ApiErrorSchema
-  status: 403
-}
-
-export type contentPublicServiceGuideResponse404 = {
-  data: ApiErrorSchema
-  status: 404
-}
-
-export type contentPublicServiceGuideResponse405 = {
-  data: ApiErrorSchema
-  status: 405
-}
-
-export type contentPublicServiceGuideResponse409 = {
-  data: ApiErrorSchema
-  status: 409
-}
-
-export type contentPublicServiceGuideResponse413 = {
-  data: ApiErrorSchema
-  status: 413
-}
-
-export type contentPublicServiceGuideResponse422 = {
-  data: ApiErrorSchema
-  status: 422
-}
-
-export type contentPublicServiceGuideResponse429 = {
-  data: ApiErrorSchema
-  status: 429
-}
-
-export type contentPublicServiceGuideResponse500 = {
-  data: ApiErrorSchema
-  status: 500
-}
-
-export type contentPublicServiceGuideResponse503 = {
-  data: ApiErrorSchema
-  status: 503
-}
-
-export type contentPublicServiceGuideResponseSuccess = (contentPublicServiceGuideResponse200) & {
-  headers: Record<string, string>;
-};
-export type contentPublicServiceGuideResponseError = (contentPublicServiceGuideResponse400 | contentPublicServiceGuideResponse401 | contentPublicServiceGuideResponse403 | contentPublicServiceGuideResponse404 | contentPublicServiceGuideResponse405 | contentPublicServiceGuideResponse409 | contentPublicServiceGuideResponse413 | contentPublicServiceGuideResponse422 | contentPublicServiceGuideResponse429 | contentPublicServiceGuideResponse500 | contentPublicServiceGuideResponse503) & {
-  headers: Record<string, string>;
-};
-
-export type contentPublicServiceGuideResponse = (contentPublicServiceGuideResponseSuccess | contentPublicServiceGuideResponseError)
-
-export const getContentPublicServiceGuideUrl = () => {
-
-
-
-
-  return `/api/v1/content/service-guide/`
-}
-
-/**
- * @summary Get Public Service Guide
- */
-export const contentPublicServiceGuide = async ( options?: Parameters<typeof compassFetch>[1]): Promise<contentPublicServiceGuideResponse> => {
-
-  return compassFetch<contentPublicServiceGuideResponse>(getContentPublicServiceGuideUrl(),
-  {
-    ...options,
-    method: 'GET'
-
-
-  }
-);}
-
-
-export type contentServiceGuideCreateResponse200 = {
-  data: ContentWorkspaceReplaySchema
-  status: 200
-}
-
-export type contentServiceGuideCreateResponse400 = {
-  data: ApiErrorSchema
-  status: 400
-}
-
-export type contentServiceGuideCreateResponse401 = {
-  data: ApiErrorSchema
-  status: 401
-}
-
-export type contentServiceGuideCreateResponse403 = {
-  data: ApiErrorSchema
-  status: 403
-}
-
-export type contentServiceGuideCreateResponse404 = {
-  data: ApiErrorSchema
-  status: 404
-}
-
-export type contentServiceGuideCreateResponse405 = {
-  data: ApiErrorSchema
-  status: 405
-}
-
-export type contentServiceGuideCreateResponse409 = {
-  data: ApiErrorSchema
-  status: 409
-}
-
-export type contentServiceGuideCreateResponse413 = {
-  data: ApiErrorSchema
-  status: 413
-}
-
-export type contentServiceGuideCreateResponse422 = {
-  data: ApiErrorSchema
-  status: 422
-}
-
-export type contentServiceGuideCreateResponse429 = {
-  data: ApiErrorSchema
-  status: 429
-}
-
-export type contentServiceGuideCreateResponse500 = {
-  data: ApiErrorSchema
-  status: 500
-}
-
-export type contentServiceGuideCreateResponse503 = {
-  data: ApiErrorSchema
-  status: 503
-}
-
-export type contentServiceGuideCreateResponseSuccess = (contentServiceGuideCreateResponse200) & {
-  headers: Record<string, string>;
-};
-export type contentServiceGuideCreateResponseError = (contentServiceGuideCreateResponse400 | contentServiceGuideCreateResponse401 | contentServiceGuideCreateResponse403 | contentServiceGuideCreateResponse404 | contentServiceGuideCreateResponse405 | contentServiceGuideCreateResponse409 | contentServiceGuideCreateResponse413 | contentServiceGuideCreateResponse422 | contentServiceGuideCreateResponse429 | contentServiceGuideCreateResponse500 | contentServiceGuideCreateResponse503) & {
-  headers: Record<string, string>;
-};
-
-export type contentServiceGuideCreateResponse = (contentServiceGuideCreateResponseSuccess | contentServiceGuideCreateResponseError)
-
-export const getContentServiceGuideCreateUrl = () => {
-
-
-
-
-  return `/api/v1/content/service-guide/`
-}
-
-/**
- * @summary Create Service Guide Api
- */
-export const contentServiceGuideCreate = async (serviceGuideCreateSchema: ServiceGuideCreateSchema, options?: Parameters<typeof compassFetch>[1]): Promise<contentServiceGuideCreateResponse> => {
-
-    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Array.isArray(h)) return Object.fromEntries(h);
-    return h;
-  };
-return compassFetch<contentServiceGuideCreateResponse>(getContentServiceGuideCreateUrl(),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(serviceGuideCreateSchema)
-  }
-);}
-
-
-export type contentServiceGuideUpdateResponse200 = {
-  data: ContentWorkspaceReplaySchema
-  status: 200
-}
-
-export type contentServiceGuideUpdateResponse400 = {
-  data: ApiErrorSchema
-  status: 400
-}
-
-export type contentServiceGuideUpdateResponse401 = {
-  data: ApiErrorSchema
-  status: 401
-}
-
-export type contentServiceGuideUpdateResponse403 = {
-  data: ApiErrorSchema
-  status: 403
-}
-
-export type contentServiceGuideUpdateResponse404 = {
-  data: ApiErrorSchema
-  status: 404
-}
-
-export type contentServiceGuideUpdateResponse405 = {
-  data: ApiErrorSchema
-  status: 405
-}
-
-export type contentServiceGuideUpdateResponse409 = {
-  data: ApiErrorSchema
-  status: 409
-}
-
-export type contentServiceGuideUpdateResponse413 = {
-  data: ApiErrorSchema
-  status: 413
-}
-
-export type contentServiceGuideUpdateResponse422 = {
-  data: ApiErrorSchema
-  status: 422
-}
-
-export type contentServiceGuideUpdateResponse429 = {
-  data: ApiErrorSchema
-  status: 429
-}
-
-export type contentServiceGuideUpdateResponse500 = {
-  data: ApiErrorSchema
-  status: 500
-}
-
-export type contentServiceGuideUpdateResponse503 = {
-  data: ApiErrorSchema
-  status: 503
-}
-
-export type contentServiceGuideUpdateResponseSuccess = (contentServiceGuideUpdateResponse200) & {
-  headers: Record<string, string>;
-};
-export type contentServiceGuideUpdateResponseError = (contentServiceGuideUpdateResponse400 | contentServiceGuideUpdateResponse401 | contentServiceGuideUpdateResponse403 | contentServiceGuideUpdateResponse404 | contentServiceGuideUpdateResponse405 | contentServiceGuideUpdateResponse409 | contentServiceGuideUpdateResponse413 | contentServiceGuideUpdateResponse422 | contentServiceGuideUpdateResponse429 | contentServiceGuideUpdateResponse500 | contentServiceGuideUpdateResponse503) & {
-  headers: Record<string, string>;
-};
-
-export type contentServiceGuideUpdateResponse = (contentServiceGuideUpdateResponseSuccess | contentServiceGuideUpdateResponseError)
-
-export const getContentServiceGuideUpdateUrl = (guideId: string,) => {
-
-
-
-
-  return `/api/v1/content/service-guide/${guideId}/`
-}
-
-/**
- * @summary Update Service Guide Api
- */
-export const contentServiceGuideUpdate = async (guideId: string,
-    serviceGuideUpdateSchema: ServiceGuideUpdateSchema, options?: Parameters<typeof compassFetch>[1]): Promise<contentServiceGuideUpdateResponse> => {
-
-    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Array.isArray(h)) return Object.fromEntries(h);
-    return h;
-  };
-return compassFetch<contentServiceGuideUpdateResponse>(getContentServiceGuideUpdateUrl(guideId),
-  {
-    ...options,
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(serviceGuideUpdateSchema)
-  }
-);}
-
-
-export type contentServiceGuideArchiveResponse200 = {
-  data: ContentWorkspaceReplaySchema
-  status: 200
-}
-
-export type contentServiceGuideArchiveResponse400 = {
-  data: ApiErrorSchema
-  status: 400
-}
-
-export type contentServiceGuideArchiveResponse401 = {
-  data: ApiErrorSchema
-  status: 401
-}
-
-export type contentServiceGuideArchiveResponse403 = {
-  data: ApiErrorSchema
-  status: 403
-}
-
-export type contentServiceGuideArchiveResponse404 = {
-  data: ApiErrorSchema
-  status: 404
-}
-
-export type contentServiceGuideArchiveResponse405 = {
-  data: ApiErrorSchema
-  status: 405
-}
-
-export type contentServiceGuideArchiveResponse409 = {
-  data: ApiErrorSchema
-  status: 409
-}
-
-export type contentServiceGuideArchiveResponse413 = {
-  data: ApiErrorSchema
-  status: 413
-}
-
-export type contentServiceGuideArchiveResponse422 = {
-  data: ApiErrorSchema
-  status: 422
-}
-
-export type contentServiceGuideArchiveResponse429 = {
-  data: ApiErrorSchema
-  status: 429
-}
-
-export type contentServiceGuideArchiveResponse500 = {
-  data: ApiErrorSchema
-  status: 500
-}
-
-export type contentServiceGuideArchiveResponse503 = {
-  data: ApiErrorSchema
-  status: 503
-}
-
-export type contentServiceGuideArchiveResponseSuccess = (contentServiceGuideArchiveResponse200) & {
-  headers: Record<string, string>;
-};
-export type contentServiceGuideArchiveResponseError = (contentServiceGuideArchiveResponse400 | contentServiceGuideArchiveResponse401 | contentServiceGuideArchiveResponse403 | contentServiceGuideArchiveResponse404 | contentServiceGuideArchiveResponse405 | contentServiceGuideArchiveResponse409 | contentServiceGuideArchiveResponse413 | contentServiceGuideArchiveResponse422 | contentServiceGuideArchiveResponse429 | contentServiceGuideArchiveResponse500 | contentServiceGuideArchiveResponse503) & {
-  headers: Record<string, string>;
-};
-
-export type contentServiceGuideArchiveResponse = (contentServiceGuideArchiveResponseSuccess | contentServiceGuideArchiveResponseError)
-
-export const getContentServiceGuideArchiveUrl = (guideId: string,) => {
-
-
-
-
-  return `/api/v1/content/service-guide/${guideId}/archive/`
-}
-
-/**
- * @summary Archive Service Guide Api
- */
-export const contentServiceGuideArchive = async (guideId: string, options?: Parameters<typeof compassFetch>[1]): Promise<contentServiceGuideArchiveResponse> => {
-
-  return compassFetch<contentServiceGuideArchiveResponse>(getContentServiceGuideArchiveUrl(guideId),
-  {
-    ...options,
-    method: 'POST'
-
-
-  }
-);}
-
-
-export type contentServiceGuidePublishResponse200 = {
-  data: ContentWorkspaceReplaySchema
-  status: 200
-}
-
-export type contentServiceGuidePublishResponse400 = {
-  data: ApiErrorSchema
-  status: 400
-}
-
-export type contentServiceGuidePublishResponse401 = {
-  data: ApiErrorSchema
-  status: 401
-}
-
-export type contentServiceGuidePublishResponse403 = {
-  data: ApiErrorSchema
-  status: 403
-}
-
-export type contentServiceGuidePublishResponse404 = {
-  data: ApiErrorSchema
-  status: 404
-}
-
-export type contentServiceGuidePublishResponse405 = {
-  data: ApiErrorSchema
-  status: 405
-}
-
-export type contentServiceGuidePublishResponse409 = {
-  data: ApiErrorSchema
-  status: 409
-}
-
-export type contentServiceGuidePublishResponse413 = {
-  data: ApiErrorSchema
-  status: 413
-}
-
-export type contentServiceGuidePublishResponse422 = {
-  data: ApiErrorSchema
-  status: 422
-}
-
-export type contentServiceGuidePublishResponse429 = {
-  data: ApiErrorSchema
-  status: 429
-}
-
-export type contentServiceGuidePublishResponse500 = {
-  data: ApiErrorSchema
-  status: 500
-}
-
-export type contentServiceGuidePublishResponse503 = {
-  data: ApiErrorSchema
-  status: 503
-}
-
-export type contentServiceGuidePublishResponseSuccess = (contentServiceGuidePublishResponse200) & {
-  headers: Record<string, string>;
-};
-export type contentServiceGuidePublishResponseError = (contentServiceGuidePublishResponse400 | contentServiceGuidePublishResponse401 | contentServiceGuidePublishResponse403 | contentServiceGuidePublishResponse404 | contentServiceGuidePublishResponse405 | contentServiceGuidePublishResponse409 | contentServiceGuidePublishResponse413 | contentServiceGuidePublishResponse422 | contentServiceGuidePublishResponse429 | contentServiceGuidePublishResponse500 | contentServiceGuidePublishResponse503) & {
-  headers: Record<string, string>;
-};
-
-export type contentServiceGuidePublishResponse = (contentServiceGuidePublishResponseSuccess | contentServiceGuidePublishResponseError)
-
-export const getContentServiceGuidePublishUrl = (guideId: string,) => {
-
-
-
-
-  return `/api/v1/content/service-guide/${guideId}/publish/`
-}
-
-/**
- * @summary Publish Service Guide Api
- */
-export const contentServiceGuidePublish = async (guideId: string, options?: Parameters<typeof compassFetch>[1]): Promise<contentServiceGuidePublishResponse> => {
-
-  return compassFetch<contentServiceGuidePublishResponse>(getContentServiceGuidePublishUrl(guideId),
-  {
-    ...options,
-    method: 'POST'
-
-
-  }
-);}
-
-
-export type contentServiceGuideScheduleResponse200 = {
-  data: ContentWorkspaceReplaySchema
-  status: 200
-}
-
-export type contentServiceGuideScheduleResponse400 = {
-  data: ApiErrorSchema
-  status: 400
-}
-
-export type contentServiceGuideScheduleResponse401 = {
-  data: ApiErrorSchema
-  status: 401
-}
-
-export type contentServiceGuideScheduleResponse403 = {
-  data: ApiErrorSchema
-  status: 403
-}
-
-export type contentServiceGuideScheduleResponse404 = {
-  data: ApiErrorSchema
-  status: 404
-}
-
-export type contentServiceGuideScheduleResponse405 = {
-  data: ApiErrorSchema
-  status: 405
-}
-
-export type contentServiceGuideScheduleResponse409 = {
-  data: ApiErrorSchema
-  status: 409
-}
-
-export type contentServiceGuideScheduleResponse413 = {
-  data: ApiErrorSchema
-  status: 413
-}
-
-export type contentServiceGuideScheduleResponse422 = {
-  data: ApiErrorSchema
-  status: 422
-}
-
-export type contentServiceGuideScheduleResponse429 = {
-  data: ApiErrorSchema
-  status: 429
-}
-
-export type contentServiceGuideScheduleResponse500 = {
-  data: ApiErrorSchema
-  status: 500
-}
-
-export type contentServiceGuideScheduleResponse503 = {
-  data: ApiErrorSchema
-  status: 503
-}
-
-export type contentServiceGuideScheduleResponseSuccess = (contentServiceGuideScheduleResponse200) & {
-  headers: Record<string, string>;
-};
-export type contentServiceGuideScheduleResponseError = (contentServiceGuideScheduleResponse400 | contentServiceGuideScheduleResponse401 | contentServiceGuideScheduleResponse403 | contentServiceGuideScheduleResponse404 | contentServiceGuideScheduleResponse405 | contentServiceGuideScheduleResponse409 | contentServiceGuideScheduleResponse413 | contentServiceGuideScheduleResponse422 | contentServiceGuideScheduleResponse429 | contentServiceGuideScheduleResponse500 | contentServiceGuideScheduleResponse503) & {
-  headers: Record<string, string>;
-};
-
-export type contentServiceGuideScheduleResponse = (contentServiceGuideScheduleResponseSuccess | contentServiceGuideScheduleResponseError)
-
-export const getContentServiceGuideScheduleUrl = (guideId: string,) => {
-
-
-
-
-  return `/api/v1/content/service-guide/${guideId}/schedule/`
-}
-
-/**
- * @summary Schedule Service Guide Api
- */
-export const contentServiceGuideSchedule = async (guideId: string,
-    serviceGuideUpdateSchemaNull?: ServiceGuideUpdateSchema | null, options?: Parameters<typeof compassFetch>[1]): Promise<contentServiceGuideScheduleResponse> => {
-
-    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
-    if (!h) return {};
-    if (h instanceof Headers) return Object.fromEntries(h.entries());
-    if (Array.isArray(h)) return Object.fromEntries(h);
-    return h;
-  };
-return compassFetch<contentServiceGuideScheduleResponse>(getContentServiceGuideScheduleUrl(guideId),
-  {
-    ...options,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
-    body: JSON.stringify(serviceGuideUpdateSchemaNull)
-  }
-);}
-
-
-export type contentServiceGuideSubmitReviewResponse200 = {
-  data: ContentWorkspaceReplaySchema
-  status: 200
-}
-
-export type contentServiceGuideSubmitReviewResponse400 = {
-  data: ApiErrorSchema
-  status: 400
-}
-
-export type contentServiceGuideSubmitReviewResponse401 = {
-  data: ApiErrorSchema
-  status: 401
-}
-
-export type contentServiceGuideSubmitReviewResponse403 = {
-  data: ApiErrorSchema
-  status: 403
-}
-
-export type contentServiceGuideSubmitReviewResponse404 = {
-  data: ApiErrorSchema
-  status: 404
-}
-
-export type contentServiceGuideSubmitReviewResponse405 = {
-  data: ApiErrorSchema
-  status: 405
-}
-
-export type contentServiceGuideSubmitReviewResponse409 = {
-  data: ApiErrorSchema
-  status: 409
-}
-
-export type contentServiceGuideSubmitReviewResponse413 = {
-  data: ApiErrorSchema
-  status: 413
-}
-
-export type contentServiceGuideSubmitReviewResponse422 = {
-  data: ApiErrorSchema
-  status: 422
-}
-
-export type contentServiceGuideSubmitReviewResponse429 = {
-  data: ApiErrorSchema
-  status: 429
-}
-
-export type contentServiceGuideSubmitReviewResponse500 = {
-  data: ApiErrorSchema
-  status: 500
-}
-
-export type contentServiceGuideSubmitReviewResponse503 = {
-  data: ApiErrorSchema
-  status: 503
-}
-
-export type contentServiceGuideSubmitReviewResponseSuccess = (contentServiceGuideSubmitReviewResponse200) & {
-  headers: Record<string, string>;
-};
-export type contentServiceGuideSubmitReviewResponseError = (contentServiceGuideSubmitReviewResponse400 | contentServiceGuideSubmitReviewResponse401 | contentServiceGuideSubmitReviewResponse403 | contentServiceGuideSubmitReviewResponse404 | contentServiceGuideSubmitReviewResponse405 | contentServiceGuideSubmitReviewResponse409 | contentServiceGuideSubmitReviewResponse413 | contentServiceGuideSubmitReviewResponse422 | contentServiceGuideSubmitReviewResponse429 | contentServiceGuideSubmitReviewResponse500 | contentServiceGuideSubmitReviewResponse503) & {
-  headers: Record<string, string>;
-};
-
-export type contentServiceGuideSubmitReviewResponse = (contentServiceGuideSubmitReviewResponseSuccess | contentServiceGuideSubmitReviewResponseError)
-
-export const getContentServiceGuideSubmitReviewUrl = (guideId: string,) => {
-
-
-
-
-  return `/api/v1/content/service-guide/${guideId}/submit-review/`
-}
-
-/**
- * @summary Submit Service Guide Api
- */
-export const contentServiceGuideSubmitReview = async (guideId: string, options?: Parameters<typeof compassFetch>[1]): Promise<contentServiceGuideSubmitReviewResponse> => {
-
-  return compassFetch<contentServiceGuideSubmitReviewResponse>(getContentServiceGuideSubmitReviewUrl(guideId),
-  {
-    ...options,
-    method: 'POST'
 
 
   }

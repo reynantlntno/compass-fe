@@ -26,6 +26,7 @@ import {
   cookieSessionReadOptions,
 } from "@/lib/api/auth";
 import { withIdempotencyKey, type IdempotencyKey } from "@/lib/api/idempotency";
+import { isOptionalResourceVersion } from "@/lib/api/resource-version";
 
 export const APPOINTMENTS_PAGE_SIZE = 20;
 
@@ -95,6 +96,7 @@ export type PortalAppointment = {
   status: AppointmentStatus;
   student_display_name?: string | null;
   student_number?: string | null;
+  resource_version: string | null;
 };
 
 export type PortalAppointmentPage = {
@@ -199,7 +201,8 @@ function isAppointment(value: unknown): value is PortalAppointment {
       (typeof value.assignment_state === "string" && ASSIGNMENT_STATES.has(value.assignment_state))) &&
     isOptionalText(value.reason) &&
     isOptionalText(value.cancellation_reason) &&
-    isOptionalText(value.internal_notes)
+    isOptionalText(value.internal_notes) &&
+    isOptionalResourceVersion(value.resource_version)
   );
 }
 
@@ -221,6 +224,7 @@ function parseAppointment(value: unknown): PortalAppointment | null {
     status: value.status,
     student_display_name: value.student_display_name ?? null,
     student_number: value.student_number ?? null,
+    resource_version: value.resource_version ?? null,
   };
 }
 

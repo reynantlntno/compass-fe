@@ -20,6 +20,7 @@ export interface ImportBatchExecutionResponseSchema {
   execution_result?: ImportExecutionSummarySchema | null;
   execution_summary: ImportExecutionSummarySchema;
   id: string;
+  resource_version: string;
   row_count: number;
   source_name: string;
   status: string;

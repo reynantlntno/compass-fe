@@ -6,11 +6,9 @@
  * OpenAPI spec version: 1.0.0
  */
 import type { PublicInstitutionIdentitySchema } from './publicInstitutionIdentitySchema';
-import type { PublicLinksSchema } from './publicLinksSchema';
 import type { PublicOfficeIdentitySchema } from './publicOfficeIdentitySchema';
 
 export interface PublicIdentitySchema {
   institution: PublicInstitutionIdentitySchema;
   office: PublicOfficeIdentitySchema;
-  public_links: PublicLinksSchema;
 }

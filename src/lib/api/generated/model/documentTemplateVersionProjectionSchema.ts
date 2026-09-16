@@ -7,14 +7,15 @@
  */
 
 export interface DocumentTemplateVersionProjectionSchema {
-  approved_at?: string | null;
+  archived_at?: string | null;
   id: string;
   is_used: boolean;
   output_format: string;
   page_orientation: string;
   page_size: string;
+  published_at?: string | null;
   related_form_revision_label?: string;
-  retired_at?: string | null;
+  resource_version: string;
   status: string;
   template_stable_key: string;
   version_label: string;

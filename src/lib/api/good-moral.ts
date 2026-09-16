@@ -34,6 +34,7 @@ import type {
 } from "@/lib/api/generated/model";
 import { cookieSessionMutationOptions, cookieSessionReadOptions } from "@/lib/api/auth";
 import { withIdempotencyKey, type IdempotencyKey } from "@/lib/api/idempotency";
+import { isResourceVersion } from "@/lib/api/resource-version";
 
 export const GOOD_MORAL_PAGE_SIZE = 20;
 export const GOOD_MORAL_ORDERS = ["recent", "oldest"] as const;
@@ -85,6 +86,7 @@ export type PortalGoodMoral = {
   dry_seal_confirmation_method: string | null;
   created_at: string;
   updated_at: string;
+  resource_version: string;
   approved_at: string | null;
   generated_at: string | null;
   printed_at: string | null;
@@ -193,7 +195,7 @@ function parseItem(value: unknown): PortalGoodMoral | null {
       !optionalText(value.applicant_department) || !optionalText(value.applicant_program_degree) || !optionalText(value.applicant_year_level) ||
       typeof value.status !== "string" || !STATUS_SET.has(value.status) || !bounded(value.receipt_status, 40) ||
       !bounded(value.ossd_verification_status, 40) || !bounded(value.dry_seal_status, 40) || !optionalText(value.dry_seal_confirmation_method, 60) ||
-      !timestamp(value.created_at) || !timestamp(value.updated_at) || !optionalTimestamp(value.approved_at) || !optionalTimestamp(value.generated_at) ||
+      !timestamp(value.created_at) || !timestamp(value.updated_at) || !isResourceVersion(value.resource_version) || !optionalTimestamp(value.approved_at) || !optionalTimestamp(value.generated_at) ||
       !optionalTimestamp(value.printed_at) || !optionalTimestamp(value.released_at) || typeof value.document_available !== "boolean" ||
       !optionalText(value.document_status, 60) || !optionalTimestamp(value.document_generated_at) || !optionalTimestamp(value.document_released_at) ||
       typeof value.reviewer_assigned !== "boolean") return null;
@@ -205,7 +207,7 @@ function parseItem(value: unknown): PortalGoodMoral | null {
     applicant_program_degree: value.applicant_program_degree ?? null, applicant_year_level: value.applicant_year_level ?? null,
     status: value.status as GoodMoralStatus, receipt_status: value.receipt_status, ossd_verification_status: value.ossd_verification_status,
     dry_seal_status: value.dry_seal_status, dry_seal_confirmation_method: value.dry_seal_confirmation_method ?? null,
-    created_at: value.created_at, updated_at: value.updated_at, approved_at: value.approved_at ?? null, generated_at: value.generated_at ?? null,
+    created_at: value.created_at, updated_at: value.updated_at, resource_version: value.resource_version, approved_at: value.approved_at ?? null, generated_at: value.generated_at ?? null,
     printed_at: value.printed_at ?? null, released_at: value.released_at ?? null, document_available: value.document_available,
     document_status: value.document_status ?? null, document_generated_at: value.document_generated_at ?? null,
     document_released_at: value.document_released_at ?? null, reviewer_assigned: value.reviewer_assigned,
@@ -291,8 +293,8 @@ async function runMutation(request: (options: RequestInit) => Promise<GeneratedR
     throw new GoodMoralApiError("unavailable");
   }
 }
-function safePayloadReason(reasonCode: string, note = "", expectedUpdatedAt: string | null = null) {
-  const value = { reason_code: reasonCode.trim().slice(0, 64), ...(note.trim() ? { note: note.trim().slice(0, 1000) } : {}), ...(expectedUpdatedAt ? { expected_updated_at: expectedUpdatedAt } : {}) };
+function safePayloadReason(reasonCode: string, note = "", expectedResourceVersion: string | null = null) {
+  const value = { reason_code: reasonCode.trim().slice(0, 64), ...(note.trim() ? { note: note.trim().slice(0, 1000) } : {}), ...(expectedResourceVersion ? { expected_resource_version: expectedResourceVersion } : {}) };
   return value as unknown as ReasonSchema;
 }
 export async function createPortalGoodMoral(input: { student_selection_token: string; purpose_text: string; graduation_date: string | null }, key: IdempotencyKey, signal?: AbortSignal) {

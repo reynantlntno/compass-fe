@@ -20,6 +20,7 @@ export interface ReferralLinkedCallSlipSchema {
   permissions: ReferralLinkedCallSlipPermissionSchema;
   reference_code: string;
   reissued_from_reference: string;
+  resource_version: string;
   scheduled_end_at: string | null;
   scheduled_start_at: string | null;
   status_code: string;

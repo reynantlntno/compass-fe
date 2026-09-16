@@ -7,7 +7,7 @@
  */
 
 export interface SupersedeSchema {
-  expected_updated_at?: string | null;
+  expected_resource_version?: string | null;
   reason_code?: string | null;
   replacement_record_id: number;
 }

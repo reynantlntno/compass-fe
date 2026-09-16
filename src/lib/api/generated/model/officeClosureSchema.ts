@@ -13,6 +13,7 @@ export interface OfficeClosureSchema {
   is_all_day: boolean;
   public_reference: string;
   reason?: string;
+  resource_version?: string | null;
   start_time?: string | null;
   state?: string;
   state_label?: string;

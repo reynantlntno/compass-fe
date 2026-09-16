@@ -9,5 +9,5 @@ import type { DraftSaveSchemaAnswers } from './draftSaveSchemaAnswers';
 
 export interface DraftSaveSchema {
   answers: DraftSaveSchemaAnswers;
-  expected_updated_at?: string | null;
+  expected_resource_version?: string | null;
 }

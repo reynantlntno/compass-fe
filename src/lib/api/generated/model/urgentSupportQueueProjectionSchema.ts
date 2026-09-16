@@ -19,6 +19,7 @@ export interface UrgentSupportQueueProjectionSchema {
   expires_at?: string | null;
   originating_session_reference?: string | null;
   reference_code: string;
+  resource_version?: string | null;
   review_status?: string | null;
   reviewed_at?: string | null;
   source_type: string;

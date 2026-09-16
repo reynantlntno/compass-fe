@@ -19,6 +19,7 @@ import {
 import { cookieSessionMutationOptions, cookieSessionReadOptions } from "@/lib/api/auth";
 import { CounselingApiError } from "@/lib/api/counseling";
 import { withIdempotencyKey, type IdempotencyKey } from "@/lib/api/idempotency";
+import { isOptionalResourceVersion } from "@/lib/api/resource-version";
 
 export const COUNSELING_CASE_PAGE_SIZE = 20;
 
@@ -81,6 +82,7 @@ export type PortalCounselingCase = {
   student_display_name: string | null;
   student_number: string | null;
   assignment_state: "Assigned to you" | "Assigned" | "Unassigned" | null;
+  resource_version: string | null;
 };
 
 export type PortalCounselingCasePage = {
@@ -101,6 +103,7 @@ export type PortalCounselingCaseDetail = Pick<
   | "resolved_at"
   | "closed_at"
   | "reopened_at"
+  | "resource_version"
 >;
 
 type GeneratedResponse = { data: unknown; status: number };
@@ -202,7 +205,8 @@ function isCaseProjection(value: unknown): value is Record<string, unknown> {
     optionalTimestamp(value.created_at) && optionalTimestamp(value.updated_at) &&
     optionalTimestamp(value.resolved_at) && optionalTimestamp(value.closed_at) && optionalTimestamp(value.reopened_at) &&
     optionalString(value.student_display_name, 160) && optionalString(value.student_number, 50) &&
-    (value.assignment_state === null || value.assignment_state === undefined || (typeof value.assignment_state === "string" && ASSIGNMENT_STATE_SET.has(value.assignment_state)));
+    (value.assignment_state === null || value.assignment_state === undefined || (typeof value.assignment_state === "string" && ASSIGNMENT_STATE_SET.has(value.assignment_state))) &&
+    isOptionalResourceVersion(value.resource_version);
 }
 
 function parseCaseProjection(value: unknown): PortalCounselingCase | null {
@@ -220,6 +224,7 @@ function parseCaseProjection(value: unknown): PortalCounselingCase | null {
     student_display_name: value.student_display_name as string | null | undefined ?? null,
     student_number: value.student_number as string | null | undefined ?? null,
     assignment_state: (value.assignment_state as PortalCounselingCase["assignment_state"]) ?? null,
+    resource_version: (value.resource_version as string | null | undefined) ?? null,
   };
 }
 
@@ -253,6 +258,7 @@ function parseDetail(value: unknown): PortalCounselingCaseDetail | null {
     resolved_at: projection.resolved_at,
     closed_at: projection.closed_at,
     reopened_at: projection.reopened_at,
+    resource_version: projection.resource_version,
   };
 }
 

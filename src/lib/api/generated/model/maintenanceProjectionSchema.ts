@@ -15,6 +15,7 @@ export interface MaintenanceProjectionSchema {
   id: string;
   internal_reason_code: string;
   is_expired: boolean;
+  resource_version?: string | null;
   safe_public_message: string;
   starts_at?: string | null;
   status: string;

@@ -17,6 +17,7 @@ export interface AssessmentSensitiveProjectionSchema {
   raw_score: string | null;
   released_at: string | null;
   released_to_student: boolean;
+  resource_version?: string | null;
   reviewed_at: string | null;
   scaled_score: string | null;
   score_label: string | null;

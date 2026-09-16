@@ -11,7 +11,7 @@ export interface FormFamilyProjectionSchema {
   description: string;
   display_name: string;
   id: string;
-  owner_office_id?: string | null;
+  resource_version: string;
   stable_key: string;
   status: string;
 }

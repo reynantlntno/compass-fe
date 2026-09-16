@@ -21,6 +21,7 @@ export interface CounselingSessionProjectionSchema {
   finalized_at?: string | null;
   locked_at?: string | null;
   reference_code: string;
+  resource_version?: string | null;
   scheduled_end_at?: string | null;
   scheduled_start_at?: string | null;
   session_mode: string;

@@ -9,10 +9,12 @@
 export interface CapabilityProjectionSchema {
   authority_sources: string[];
   capability: string;
+  enforcement_category: string;
   expiry_required: boolean;
   grant_eligible_roles: string[];
   grant_scope_modes: string[];
   impact_scope: string;
+  label: string;
   office_wide_grant_allowed: boolean;
   sensitivity: string;
   ui_bundle: string;

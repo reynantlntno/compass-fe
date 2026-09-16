@@ -1,14 +1,17 @@
 import Link from "next/link";
 import { ArrowUpRight, Clock3, Mail, MapPin, Phone } from "lucide-react";
 
-import { ContentRetryButton } from "@/components/public/content-retry-button";
 import { PublicContactPageLink } from "@/components/public/public-contact-page";
-import { PublicRichText } from "@/components/public/public-content-pages";
+import { ExternalLink } from "@/components/public/external-link";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Spinner } from "@/components/ui/spinner";
-import type { BrandingConfig } from "@/lib/branding";
-import type { PublicAboutPageState } from "@/lib/public-about";
+import type { PublicIdentityConfig } from "@/lib/public-identity";
+import {
+  ABOUT_PAGE_CONTENT,
+  type AboutSection,
+  type PublicCopySegment,
+} from "@/lib/public-site-copy";
 
 function phoneHref(value: string | null) {
   if (!value) return null;
@@ -17,25 +20,25 @@ function phoneHref(value: string | null) {
   return normalized ? `tel:${normalized}` : null;
 }
 
-function officeLocation(branding: BrandingConfig) {
-  return branding.officeLocation || branding.address;
+function officeLocation(identity: PublicIdentityConfig) {
+  return identity.officeLocation || identity.address;
 }
 
-function hasOfficeDetails(branding: BrandingConfig) {
+function hasOfficeDetails(identity: PublicIdentityConfig) {
   return Boolean(
-    branding.campus ||
-      officeLocation(branding) ||
-      branding.officeHours ||
-      branding.email ||
-      branding.phone,
+    identity.campus ||
+      officeLocation(identity) ||
+      identity.officeHours ||
+      identity.email ||
+      identity.phone,
   );
 }
 
-function AboutOfficeDetails({ branding }: { branding: BrandingConfig }) {
-  const location = officeLocation(branding);
-  const phone = phoneHref(branding.phone);
+function AboutOfficeDetails({ identity }: { identity: PublicIdentityConfig }) {
+  const location = officeLocation(identity);
+  const phone = phoneHref(identity.phone);
 
-  if (!hasOfficeDetails(branding)) return null;
+  if (!hasOfficeDetails(identity)) return null;
 
   return (
     <aside
@@ -43,10 +46,10 @@ function AboutOfficeDetails({ branding }: { branding: BrandingConfig }) {
       className="public-about-page__office"
     >
       <p className="public-eyebrow">Office details</p>
-      <h2 id="about-office-details-heading">{branding.officeName}</h2>
+      <h2 id="about-office-details-heading">{identity.officeName}</h2>
       <p className="public-about-page__office-institution">
-        {branding.institutionName}
-        {branding.campus ? ` · ${branding.campus}` : ""}
+        {identity.institutionName}
+        {identity.campus ? ` · ${identity.campus}` : ""}
       </p>
 
       <dl className="public-about-page__office-list">
@@ -59,34 +62,34 @@ function AboutOfficeDetails({ branding }: { branding: BrandingConfig }) {
             <dd>{location}</dd>
           </div>
         ) : null}
-        {branding.officeHours ? (
+        {identity.officeHours ? (
           <div>
             <dt>
               <Clock3 aria-hidden="true" />
               Office hours
             </dt>
-            <dd>{branding.officeHours}</dd>
+            <dd>{identity.officeHours}</dd>
           </div>
         ) : null}
-        {branding.email ? (
+        {identity.email ? (
           <div>
             <dt>
               <Mail aria-hidden="true" />
               Email
             </dt>
             <dd>
-              <a href={`mailto:${branding.email}`}>{branding.email}</a>
+              <a href={`mailto:${identity.email}`}>{identity.email}</a>
             </dd>
           </div>
         ) : null}
-        {branding.phone && phone ? (
+        {identity.phone && phone ? (
           <div>
             <dt>
               <Phone aria-hidden="true" />
               Phone
             </dt>
             <dd>
-              <a href={phone}>{branding.phone}</a>
+              <a href={phone}>{identity.phone}</a>
             </dd>
           </div>
         ) : null}
@@ -98,68 +101,89 @@ function AboutOfficeDetails({ branding }: { branding: BrandingConfig }) {
   );
 }
 
-export function PublicAboutContent({
-  branding,
-  page,
-  showServicesLink,
+function AboutCopySegment({
+  segment,
+  identity,
 }: {
-  branding: BrandingConfig;
-  page: Extract<PublicAboutPageState, { state: "ready" }>;
-  showServicesLink: boolean;
+  segment: PublicCopySegment;
+  identity: PublicIdentityConfig;
 }) {
-  const summary = page.data.summary.trim();
+  if (typeof segment === "string") return segment;
+  if (segment.href.startsWith("/")) {
+    return <Link href={segment.href}>{segment.text}</Link>;
+  }
+  if (segment.href === "identity:official_website") {
+    return identity.officialWebsite ? (
+      <ExternalLink href={identity.officialWebsite} showArrow={false}>
+        {segment.text}
+      </ExternalLink>
+    ) : segment.text;
+  }
+
+  return <ExternalLink href={segment.href} showArrow={false}>{segment.text}</ExternalLink>;
+}
+
+function AboutSectionContent({
+  section,
+  identity,
+}: {
+  section: AboutSection;
+  identity: PublicIdentityConfig;
+}) {
+  return (
+    <section className="public-about-page__copy-section">
+      <h2>{section.heading}</h2>
+      {section.paragraphs?.map((paragraph, index) => (
+        <p key={`${section.heading}-paragraph-${index}`}>
+            {paragraph.map((segment, segmentIndex) => (
+            <AboutCopySegment
+              identity={identity}
+              key={`${segmentIndex}`}
+              segment={segment}
+            />
+          ))}
+        </p>
+      ))}
+      {section.list ? (
+        <ul>
+          {section.list.map((item) => <li key={item}>{item}</li>)}
+        </ul>
+      ) : null}
+    </section>
+  );
+}
+
+export function PublicAboutContent({ identity }: { identity: PublicIdentityConfig }) {
+  const summary = ABOUT_PAGE_CONTENT.summary.trim();
 
   return (
     <div className="public-about-page__grid">
       <div className="public-about-page__main">
         <header className="public-content-detail__header public-about-page__header">
-          <p className="public-eyebrow">About the office</p>
-          <h1 id="about-heading">{page.data.title}</h1>
+          <p className="public-eyebrow">{ABOUT_PAGE_CONTENT.statusLabel}</p>
+          <h1 id="about-heading">{ABOUT_PAGE_CONTENT.title}</h1>
           {summary ? <p>{summary}</p> : null}
         </header>
 
-        <PublicRichText html={page.data.body_html} />
+        <div className="public-rich-text public-about-page__copy">
+          {ABOUT_PAGE_CONTENT.sections.map((section) => (
+            <AboutSectionContent
+              identity={identity}
+              key={section.heading}
+              section={section}
+            />
+          ))}
+        </div>
 
-        {showServicesLink ? (
-          <div className="public-about-page__actions">
-            <Link className="public-content-link" href="/services">
-              View service guide
-              <ArrowUpRight aria-hidden="true" className="public-content-link__icon" />
-            </Link>
-          </div>
-        ) : null}
+        <div className="public-about-page__actions">
+          <Link className="public-content-link" href="/services">
+            View services
+            <ArrowUpRight aria-hidden="true" className="public-content-link__icon" />
+          </Link>
+        </div>
       </div>
 
-      <AboutOfficeDetails branding={branding} />
-    </div>
-  );
-}
-
-export function PublicAboutState({
-  state,
-}: {
-  state: Exclude<PublicAboutPageState["state"], "ready">;
-}) {
-  const copy =
-    state === "empty"
-      ? {
-          title: "About information isn’t available yet",
-          description: "Please check back later.",
-        }
-      : {
-          title: "We can’t show this right now",
-          description: "Please try again later.",
-        };
-
-  return (
-    <div
-      aria-live="polite"
-      className="public-content-state public-about-page__state"
-      role="status"
-    >
-      <h1 id="about-heading">{copy.title}</h1>
-      <p>{copy.description}</p>
-      {state === "unavailable" ? <ContentRetryButton /> : null}
+      <AboutOfficeDetails identity={identity} />
     </div>
   );
 }

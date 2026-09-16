@@ -26,7 +26,9 @@ export interface AppointmentProjectionSchema {
   reference_code: string;
   requested_date?: string | null;
   requested_start_time?: string | null;
+  resource_version?: string | null;
   status: string;
   student_display_name?: string | null;
   student_number?: string | null;
+  updated_at?: string | null;
 }

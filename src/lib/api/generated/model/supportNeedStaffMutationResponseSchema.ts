@@ -13,6 +13,7 @@ export interface SupportNeedStaffMutationResponseSchema {
   effective_from?: string | null;
   effective_until?: string | null;
   reference_code: string;
+  resource_version: string;
   review_due_at?: string | null;
   reviewed_at?: string | null;
   source_snapshot_label?: string | null;

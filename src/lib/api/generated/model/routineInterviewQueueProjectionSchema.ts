@@ -38,6 +38,7 @@ export interface RoutineInterviewQueueProjectionSchema {
   rating_socially?: number | null;
   rating_spiritually?: number | null;
   reopened_at?: string | null;
+  resource_version?: string | null;
   session_reference_code: string;
   status: string;
   student_display_name?: string | null;

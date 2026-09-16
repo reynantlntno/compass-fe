@@ -231,7 +231,7 @@ function SafeDetails({ detail, onRetry, onSensitive, sensitive }: { detail: Port
   return (
     <div className="portal-counseling__detail-content">
       <dl>{facts.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>
-      <RoutineInterviewDocumentActions referenceCode={detail.session_reference_code} />
+      <RoutineInterviewDocumentActions referenceCode={detail.session_reference_code} resourceVersion={detail.resource_version} />
       {!sensitive ? <Button onClick={onSensitive} size="sm" type="button" variant="outline">View intake and evaluation details</Button> : null}
       {sensitive?.kind === "loading" ? <div className="portal-counseling__detail-state" role="status"><Skeleton as="span" /><Skeleton as="span" /></div> : null}
       {sensitive?.kind === "error" ? <div className="portal-counseling__detail-state" role="status"><p>Additional interview details are unavailable right now.</p><Button onClick={onRetry} size="sm" type="button" variant="outline"><RefreshCw aria-hidden="true" />Try again</Button></div> : null}
@@ -240,17 +240,17 @@ function SafeDetails({ detail, onRetry, onSensitive, sensitive }: { detail: Port
   );
 }
 
-export function RoutineInterviewDocumentActions({ referenceCode }: { referenceCode: string }) {
+export function RoutineInterviewDocumentActions({ referenceCode, resourceVersion }: { referenceCode: string; resourceVersion: string | null }) {
   const [state, setState] = useState<{ kind: "idle" | "pending" | "success" | "error"; message?: string }>({ kind: "idle" });
   const mutationKeyRef = useRef<{ fingerprint: string; key: IdempotencyKey } | null>(null);
 
   const generate = () => {
-    const fingerprint = `routine-document-generate:${referenceCode}`;
+    const fingerprint = `routine-document-generate:${referenceCode}:${resourceVersion ?? ""}`;
     const current = mutationKeyRef.current;
     const key = current?.fingerprint === fingerprint ? current.key : createIdempotencyKey();
     mutationKeyRef.current = { fingerprint, key };
     setState({ kind: "pending", message: "Generating document…" });
-    void generatePortalRoutineInterviewDocument(referenceCode, null, key).then(() => {
+    void generatePortalRoutineInterviewDocument(referenceCode, resourceVersion, key).then(() => {
       mutationKeyRef.current = null;
       setState({ kind: "success", message: "Document generated." });
     }).catch(() => setState({ kind: "error", message: "The document could not be generated right now." }));

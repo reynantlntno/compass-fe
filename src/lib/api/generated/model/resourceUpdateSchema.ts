@@ -5,17 +5,16 @@
  * The canonical backend API for COMPASS clients.
  * OpenAPI spec version: 1.0.0
  */
+import type { ResourceUpdateSchemaStatus } from './resourceUpdateSchemaStatus';
 
 export interface ResourceUpdateSchema {
   audience?: string | null;
   body_markdown?: string | null;
   category?: string | null;
   external_url?: string | null;
-  publish_end?: string | null;
-  publish_start?: string | null;
   resource_type?: string | null;
   slug?: string | null;
-  status?: string | null;
+  status?: ResourceUpdateSchemaStatus;
   summary?: string | null;
   target_campus?: string | null;
   target_college?: string | null;

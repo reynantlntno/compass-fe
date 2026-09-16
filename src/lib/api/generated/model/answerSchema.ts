@@ -9,6 +9,6 @@ import type { AnswerSchemaAnswers } from './answerSchemaAnswers';
 
 export interface AnswerSchema {
   answers: AnswerSchemaAnswers;
-  expected_updated_at?: string | null;
+  expected_resource_version?: string | null;
   form_revision_id: number;
 }

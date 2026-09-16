@@ -404,14 +404,14 @@ export function GuidanceWorkflowAccess({ canManage }: { canManage: boolean }) {
       setError("Select a revocation reason.");
       return;
     }
-    const fingerprint = JSON.stringify({ target: target.grant_reference, updated: target.updated_at, revocationReason });
+    const fingerprint = JSON.stringify({ target: target.grant_reference, resourceVersion: target.resource_version, revocationReason });
     const existing = mutationKeys.current.get("workflow-revoke");
     const key = existing?.fingerprint === fingerprint ? existing.key : createIdempotencyKey();
     mutationKeys.current.set("workflow-revoke", { fingerprint, key });
     setBusy("workflow-revoke");
     setError(null);
     try {
-      await revokeGuidanceWorkflowAccess(target, { reason_code: revocationReason, expected_updated_at: target.updated_at }, key);
+      await revokeGuidanceWorkflowAccess(target, { reason_code: revocationReason, expected_resource_version: target.resource_version }, key);
       mutationKeys.current.delete("workflow-revoke");
       setDialog(null);
       setTarget(null);

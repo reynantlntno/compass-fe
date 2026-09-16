@@ -14,9 +14,10 @@ import { HomepageCharacter } from "@/components/public/homepage-character";
 import { HomepageAccountAction } from "@/components/public/homepage-account-action";
 import { PaperSheet } from "@/components/public/paper-sheet";
 import { StickyNote } from "@/components/public/sticky-note";
-import { getPublicBranding } from "@/lib/branding";
+import { getPublicIdentity } from "@/lib/public-identity";
 import { getHomepageContent } from "@/lib/homepage";
 import { formatPublicDate } from "@/lib/public-date";
+import { PUBLIC_SERVICE_PAGE_CONTENT } from "@/lib/public-site-copy";
 
 function phoneHref(value: string | null) {
   if (!value) return null;
@@ -55,18 +56,18 @@ function HomepageAction({
 }
 
 function OfficeDetails({
-  branding,
+  identity,
 }: {
-  branding: Awaited<ReturnType<typeof getPublicBranding>>;
+  identity: Awaited<ReturnType<typeof getPublicIdentity>>;
 }) {
-  const location = branding.officeLocation || branding.address;
-  const phone = phoneHref(branding.phone);
+  const location = identity.officeLocation || identity.address;
+  const phone = phoneHref(identity.phone);
   const hasDetails = Boolean(
-    branding.campus ||
+    identity.campus ||
       location ||
-      branding.officeHours ||
-      branding.email ||
-      branding.phone,
+      identity.officeHours ||
+      identity.email ||
+      identity.phone,
   );
 
   if (!hasDetails) return null;
@@ -84,10 +85,10 @@ function OfficeDetails({
         />
         <div className="homepage-office__intro-copy">
           <p className="homepage-kicker">Office details</p>
-          <h2 id="office-details-heading">Reach the {branding.officeName}</h2>
+          <h2 id="office-details-heading">Reach the {identity.officeName}</h2>
           <p>
-            {branding.institutionName}
-            {branding.campus ? " · " + branding.campus : ""}
+            {identity.institutionName}
+            {identity.campus ? " · " + identity.campus : ""}
           </p>
         </div>
       </div>
@@ -101,34 +102,34 @@ function OfficeDetails({
             <dd>{location}</dd>
           </div>
         ) : null}
-        {branding.officeHours ? (
+        {identity.officeHours ? (
           <div className="homepage-office__detail">
             <dt>
               <Clock3 aria-hidden="true" />
               Office hours
             </dt>
-            <dd>{branding.officeHours}</dd>
+            <dd>{identity.officeHours}</dd>
           </div>
         ) : null}
-        {branding.email ? (
+        {identity.email ? (
           <div className="homepage-office__detail">
             <dt>
               <Mail aria-hidden="true" />
               Email
             </dt>
             <dd>
-              <a href={"mailto:" + branding.email}>{branding.email}</a>
+              <a href={"mailto:" + identity.email}>{identity.email}</a>
             </dd>
           </div>
         ) : null}
-        {branding.phone && phone ? (
+        {identity.phone && phone ? (
           <div className="homepage-office__detail">
             <dt>
               <Phone aria-hidden="true" />
               Phone
             </dt>
             <dd>
-              <a href={phone}>{branding.phone}</a>
+              <a href={phone}>{identity.phone}</a>
             </dd>
           </div>
         ) : null}
@@ -138,12 +139,10 @@ function OfficeDetails({
 }
 
 export default async function Home() {
-  const [branding, content] = await Promise.all([
-    getPublicBranding(),
+  const [identity, content] = await Promise.all([
+    getPublicIdentity(),
     getHomepageContent(),
   ]);
-  const serviceGuide = content.serviceGuide;
-  const hasServices = Boolean(serviceGuide?.entries.length);
   const contact = "/contact";
   const actions = [
     contact
@@ -152,12 +151,10 @@ export default async function Home() {
           label: "Contact the office",
         }
       : null,
-    hasServices
-      ? {
-          href: "/services",
-          label: "View service guide",
-        }
-      : null,
+    {
+      href: "/services",
+      label: "View service guide",
+    },
     content.announcements.length > 0
       ? {
           href: "#announcements",
@@ -188,7 +185,7 @@ export default async function Home() {
               Navigating your journey, <span>together.</span>
             </h1>
             <p className="homepage-hero__summary">
-              Start with what is available here, or reach the {branding.officeName} directly
+              Start with what is available here, or reach the {identity.officeName} directly
               if you are not sure where to begin.
             </p>
             <div className="homepage-hero__actions">
@@ -267,7 +264,7 @@ export default async function Home() {
             ) : null}
             <div>
               <h2 id="announcements-heading">What’s new</h2>
-              <p>Announcements from the {branding.officeName}.</p>
+              <p>Announcements from the {identity.officeName}.</p>
             </div>
           </div>
           <div className="homepage-notes-grid">
@@ -308,27 +305,25 @@ export default async function Home() {
         </section>
       ) : null}
 
-      {hasServices && serviceGuide ? (
-        <section
-          id="services"
-          className="homepage-section public-shell"
-          aria-labelledby="services-heading"
-        >
-          <div className="homepage-service-preview">
-            <div className="homepage-service-preview__copy">
-              <h2 id="services-heading">{serviceGuide.title}</h2>
-              {serviceGuide.summary ? <p>{serviceGuide.summary}</p> : null}
-            </div>
-            <Link
-              className="public-content-link homepage-service-preview__link"
-              href="/services"
-            >
-              Read the service guide
-              <ArrowRight aria-hidden="true" />
-            </Link>
+      <section
+        id="services"
+        className="homepage-section public-shell"
+        aria-labelledby="services-heading"
+      >
+        <div className="homepage-service-preview">
+          <div className="homepage-service-preview__copy">
+            <h2 id="services-heading">{PUBLIC_SERVICE_PAGE_CONTENT.title}</h2>
+            <p>{PUBLIC_SERVICE_PAGE_CONTENT.introduction}</p>
           </div>
-        </section>
-      ) : null}
+          <Link
+            className="public-content-link homepage-service-preview__link"
+            href="/services"
+          >
+            View services
+            <ArrowRight aria-hidden="true" />
+          </Link>
+        </div>
+      </section>
 
       {content.resources.length > 0 ? (
         <section
@@ -353,7 +348,7 @@ export default async function Home() {
             <div>
               <p className="homepage-kicker">Resources</p>
               <h2 id="resources-heading">Information to keep close.</h2>
-              <p>Public resources from the {branding.officeName}.</p>
+              <p>Public resources from the {identity.officeName}.</p>
             </div>
           </div>
           <div className="homepage-resources-grid">
@@ -385,7 +380,7 @@ export default async function Home() {
       ) : null}
 
       <div className="public-shell">
-        <OfficeDetails branding={branding} />
+        <OfficeDetails identity={identity} />
       </div>
     </div>
   );

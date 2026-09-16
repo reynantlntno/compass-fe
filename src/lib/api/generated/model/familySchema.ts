@@ -9,8 +9,7 @@
 export interface FamilySchema {
   description?: string;
   display_name: string;
-  expected_updated_at?: string | null;
-  owner_office_id?: number | null;
+  expected_resource_version?: string | null;
   source_notes?: string;
   stable_key: string;
 }

@@ -7,15 +7,26 @@ import {
   callSlipsDetail,
   callSlipsExpire,
   callSlipsFromReferral,
+  callSlipsFromAppointment,
   callSlipsIssue,
   callSlipsNoShow,
   callSlipsQueueList,
   callSlipsReassign,
+  callSlipsDocumentDownload,
+  callSlipsDocumentGenerate,
+  callSlipsDocumentPreview,
+  callSlipsPrintable,
+  callSlipsUpdate,
+  callSlipsRescheduleCurrent,
+  callSlipsRescheduleReferenceDecision,
 } from "@/lib/api/generated/call-slips/call-slips";
 import type {
   CallSlipAssignmentSchema,
   CallSlipAttendanceSchema,
   CallSlipDraftSchema,
+  CallSlipDraftUpdateSchema,
+  CallSlipDecisionSchema,
+  CallSlipFromAppointmentSchema,
   CallSlipFromReferralSchema,
   CallSlipIssueSchema,
   CallSlipReasonSchema,
@@ -27,6 +38,8 @@ import {
   cookieSessionReadOptions,
 } from "@/lib/api/auth";
 import { withIdempotencyKey, type IdempotencyKey } from "@/lib/api/idempotency";
+import { isOptionalResourceVersion, isResourceVersion } from "@/lib/api/resource-version";
+import type { PortalGeneratedDocumentMetadata } from "@/lib/api/forms";
 
 export const CALL_SLIPS_PAGE_SIZE = 20;
 
@@ -99,19 +112,56 @@ export type CallSlipStaffQueueItem = {
   acknowledged_at: string | null;
   created_at: string;
   updated_at: string;
+  resource_version: string;
 };
 
 export type PortalCallSlipDetail = {
   reference_code: string;
+  status_code: string | null;
   status_label: string;
   student_label: string;
   purpose_label: string;
   destination_label: string;
   mode_label: string;
   scheduled_start_at: string | null;
+  scheduled_end_at: string | null;
   appointment_reference: string | null;
   referral_reference: string | null;
+  source_type_label: string | null;
+  assignment_state: string | null;
+  student_safe_location: string | null;
+  student_safe_instructions: string | null;
+  report_to_destination: string | null;
+  office_only_remarks: string | null;
+  is_printable: boolean;
+  updated_at: string | null;
+  resource_version: string | null;
 };
+
+export type PortalCallSlipReschedule = {
+  reference_code: string;
+  status: string;
+  student_reason: string;
+  previous_start_at: string;
+  previous_end_at: string;
+  proposed_start_at: string;
+  proposed_end_at: string;
+  decision_code: string;
+  decision_detail: string;
+};
+
+export type PortalPrintableCallSlip = {
+  reference_code: string;
+  status_label: string;
+  purpose_label: string;
+  safe_destination: string;
+  mode_label: string;
+  scheduled_start_at: string | null;
+  scheduled_end_at: string | null;
+  student_safe_instructions: string;
+};
+
+export type PortalCallSlipDraftUpdate = Pick<CallSlipDraftUpdateSchema, "destination_code" | "mode" | "office_only_remarks" | "purpose_code" | "report_to_destination" | "source_type" | "student_safe_instructions" | "student_safe_location">;
 
 export type PortalCallSlipsPage = {
   items: CallSlipStaffQueueItem[];
@@ -210,7 +260,8 @@ function isCallSlipProjection(value: unknown): value is CallSlipStaffQueueItemSc
     optionalTimestamp(value.issued_at) &&
     optionalTimestamp(value.acknowledged_at) &&
     requiredTimestamp(value.created_at) &&
-    requiredTimestamp(value.updated_at)
+    requiredTimestamp(value.updated_at) &&
+    isResourceVersion(value.resource_version)
   );
 }
 
@@ -240,6 +291,7 @@ function parseCallSlipItem(value: unknown): CallSlipStaffQueueItem | null {
     acknowledged_at: value.acknowledged_at ?? null,
     created_at: value.created_at,
     updated_at: value.updated_at,
+    resource_version: value.resource_version,
   };
 }
 function isCallSlipPage(value: unknown): value is { items: unknown[]; page: number; page_size: number; total: number } {
@@ -391,20 +443,42 @@ function parseCallSlipDetail(value: unknown): PortalCallSlipDetail | null {
     !boundedString(value.destination_label, 80) ||
     !boundedString(value.mode_label, 40) ||
     !optionalTimestamp(value.scheduled_start_at) ||
+    !optionalTimestamp(value.scheduled_end_at) ||
     !optionalString(value.referral_reference, MAX_REFERENCE_LENGTH) ||
-    !optionalString(value.appointment_reference, MAX_REFERENCE_LENGTH)
+    !optionalString(value.appointment_reference, MAX_REFERENCE_LENGTH) ||
+    !optionalString(value.status_code, 40) ||
+    !optionalString(value.source_type_label, 80) ||
+    !optionalString(value.assignment_state, 40) ||
+    !optionalString(value.student_safe_location, 500) ||
+    !optionalString(value.student_safe_instructions, 2_000) ||
+    !optionalString(value.report_to_destination, 500) ||
+    !optionalString(value.office_only_remarks, 2_000) ||
+    !optionalTimestamp(value.updated_at) ||
+    !isOptionalResourceVersion(value.resource_version) ||
+    !(value.is_printable === undefined || value.is_printable === null || typeof value.is_printable === "boolean")
   ) return null;
 
   return {
     reference_code: value.reference_code,
+    status_code: value.status_code ?? null,
     status_label: value.status_label,
     student_label: value.student_label,
     purpose_label: value.purpose_label,
     destination_label: value.destination_label,
     mode_label: value.mode_label,
     scheduled_start_at: value.scheduled_start_at ?? null,
+    scheduled_end_at: value.scheduled_end_at ?? null,
     appointment_reference: value.appointment_reference ?? null,
     referral_reference: value.referral_reference ?? null,
+    source_type_label: value.source_type_label ?? null,
+    assignment_state: value.assignment_state ?? null,
+    student_safe_location: value.student_safe_location ?? null,
+    student_safe_instructions: value.student_safe_instructions ?? null,
+    report_to_destination: value.report_to_destination ?? null,
+    office_only_remarks: value.office_only_remarks ?? null,
+    is_printable: value.is_printable === true,
+    updated_at: value.updated_at ?? null,
+    resource_version: value.resource_version ?? null,
   };
 }
 
@@ -519,6 +593,166 @@ export function reassignPortalCallSlip(
 ) {
   const payload = { counselor_selection_token: selectionToken, reason_code: reasonCode.trim().slice(0, 50) } as unknown as CallSlipAssignmentSchema;
   return runMutation((options) => callSlipsReassign(safeReference(referenceCode), payload, options), key, signal);
+}
+
+function readDocumentMetadata(value: unknown): PortalGeneratedDocumentMetadata | null {
+  if (!isRecord(value)) return null;
+  if (
+    !boundedString(value.content_type, 120) ||
+    !boundedString(value.document_status, 60) ||
+    !optionalTimestamp(value.generated_at) ||
+    !boundedString(value.output_format, 30) ||
+    !boundedString(value.reference_code, MAX_REFERENCE_LENGTH) ||
+    !optionalTimestamp(value.released_at) ||
+    !boundedString(value.template_key, 120) ||
+    !boundedString(value.template_version, 60)
+  ) return null;
+  return {
+    content_type: value.content_type,
+    document_status: value.document_status,
+    generated_at: value.generated_at ?? null,
+    output_format: value.output_format,
+    reference_code: value.reference_code,
+    released_at: value.released_at ?? null,
+    template_key: value.template_key,
+    template_version: value.template_version,
+  };
+}
+
+async function readBlobRequest(request: Promise<GeneratedResponse>) {
+  try {
+    const response = await request;
+    if (response.status === 200 && typeof Blob !== "undefined" && response.data instanceof Blob) return response.data;
+    throw new CallSlipsApiError(errorKind(response.status));
+  } catch (error) {
+    if (isAbortError(error)) throw error;
+    if (error instanceof CallSlipsApiError) throw error;
+    throw new CallSlipsApiError("unavailable");
+  }
+}
+
+async function readDocumentMetadataRequest(request: Promise<GeneratedResponse>) {
+  try {
+    const response = await request;
+    if (response.status === 200) {
+      const value = readDocumentMetadata(response.data);
+      if (value) return value;
+    }
+    throw new CallSlipsApiError(errorKind(response.status));
+  } catch (error) {
+    if (isAbortError(error)) throw error;
+    if (error instanceof CallSlipsApiError) throw error;
+    throw new CallSlipsApiError("unavailable");
+  }
+}
+
+export function previewPortalCallSlipDocument(referenceCode: string, signal?: AbortSignal) {
+  return readBlobRequest(callSlipsDocumentPreview(safeReference(referenceCode), cookieSessionReadOptions(signal)));
+}
+
+export function downloadPortalCallSlipDocument(referenceCode: string, signal?: AbortSignal) {
+  return readBlobRequest(callSlipsDocumentDownload(safeReference(referenceCode), cookieSessionReadOptions(signal)));
+}
+
+export function getPortalPrintableCallSlip(referenceCode: string, signal?: AbortSignal) {
+  return (async () => {
+    try {
+      const response = await callSlipsPrintable(safeReference(referenceCode), cookieSessionReadOptions(signal));
+      if (response.status !== 200 || !isRecord(response.data) ||
+        !boundedString(response.data.reference_code, MAX_REFERENCE_LENGTH) ||
+        !boundedString(response.data.status_label, 120) ||
+        !boundedString(response.data.purpose_label, 120) ||
+        !boundedString(response.data.safe_destination, 500) ||
+        !boundedString(response.data.mode_label, 60) ||
+        !optionalTimestamp(response.data.scheduled_start_at) ||
+        !optionalTimestamp(response.data.scheduled_end_at) ||
+        !boundedString(response.data.student_safe_instructions, 2_000, true)) {
+        throw new CallSlipsApiError(errorKind(response.status));
+      }
+      const value: PortalPrintableCallSlip = {
+        reference_code: response.data.reference_code,
+        status_label: response.data.status_label,
+        purpose_label: response.data.purpose_label,
+        safe_destination: response.data.safe_destination,
+        mode_label: response.data.mode_label,
+        scheduled_start_at: response.data.scheduled_start_at ?? null,
+        scheduled_end_at: response.data.scheduled_end_at ?? null,
+        student_safe_instructions: response.data.student_safe_instructions,
+      };
+      const escapeHtml = (text: string) => text.replace(/[&<>"']/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;" }[character] ?? character));
+      const html = `<!doctype html><meta charset="utf-8"><title>Call Slip ${escapeHtml(value.reference_code)}</title><main><h1>Call Slip</h1><dl><dt>Reference</dt><dd>${escapeHtml(value.reference_code)}</dd><dt>Status</dt><dd>${escapeHtml(value.status_label)}</dd><dt>Purpose</dt><dd>${escapeHtml(value.purpose_label)}</dd><dt>Destination</dt><dd>${escapeHtml(value.safe_destination)}</dd><dt>Mode</dt><dd>${escapeHtml(value.mode_label)}</dd><dt>Schedule</dt><dd>${escapeHtml(value.scheduled_start_at ?? "Unscheduled")}</dd><dt>Instructions</dt><dd>${escapeHtml(value.student_safe_instructions || "None recorded")}</dd></dl></main>`;
+      return new Blob([html], { type: "text/html" });
+    } catch (error) {
+      if (isAbortError(error)) throw error;
+      if (error instanceof CallSlipsApiError) throw error;
+      throw new CallSlipsApiError("unavailable");
+    }
+  })();
+}
+
+export async function generatePortalCallSlipDocument(referenceCode: string, expectedResourceVersion: string | null, key: IdempotencyKey, signal?: AbortSignal) {
+  return readDocumentMetadataRequest(
+    callSlipsDocumentGenerate(
+      safeReference(referenceCode),
+      { expected_resource_version: expectedResourceVersion ?? "" },
+      withIdempotencyKey(key, await cookieSessionMutationOptions(signal)),
+    ),
+  );
+}
+
+export function updatePortalCallSlipDraft(referenceCode: string, payload: PortalCallSlipDraftUpdate, key: IdempotencyKey, signal?: AbortSignal) {
+  return runMutation((options) => callSlipsUpdate(safeReference(referenceCode), payload as CallSlipDraftUpdateSchema, options), key, signal);
+}
+
+export async function createPortalCallSlipFromAppointment(payload: CallSlipFromAppointmentSchema, key: IdempotencyKey, signal?: AbortSignal) {
+  try {
+    const response = await callSlipsFromAppointment(
+      payload,
+      withIdempotencyKey(key, await cookieSessionMutationOptions(signal)),
+    );
+    if (response.status === 200 && isRecord(response.data) && typeof response.data.reference_code === "string") {
+      return response.data.reference_code;
+    }
+    throw new CallSlipsApiError(errorKind(response.status));
+  } catch (error) {
+    if (isAbortError(error)) throw error;
+    if (error instanceof CallSlipsApiError) throw error;
+    throw new CallSlipsApiError("unavailable");
+  }
+}
+
+export function getPortalCallSlipReschedule(referenceCode: string, signal?: AbortSignal) {
+  return readRequest(
+    callSlipsRescheduleCurrent(safeReference(referenceCode), cookieSessionReadOptions(signal)),
+    (value): PortalCallSlipReschedule | null => {
+      if (!isRecord(value) ||
+        !boundedString(value.reference_code, MAX_REFERENCE_LENGTH) ||
+        !boundedString(value.status, 40) ||
+        !boundedString(value.student_reason, 2_000) ||
+        !requiredTimestamp(value.previous_start_at) || !requiredTimestamp(value.previous_end_at) ||
+        !requiredTimestamp(value.proposed_start_at) || !requiredTimestamp(value.proposed_end_at) ||
+        !boundedString(value.decision_code, 80) || !boundedString(value.decision_detail, 2_000, true)) return null;
+      return {
+        reference_code: value.reference_code,
+        status: value.status,
+        student_reason: value.student_reason,
+        previous_start_at: value.previous_start_at,
+        previous_end_at: value.previous_end_at,
+        proposed_start_at: value.proposed_start_at,
+        proposed_end_at: value.proposed_end_at,
+        decision_code: value.decision_code,
+        decision_detail: value.decision_detail,
+      };
+    },
+  );
+}
+
+export function decidePortalCallSlipReschedule(referenceCode: string, payload: CallSlipDecisionSchema, key: IdempotencyKey, signal?: AbortSignal) {
+  return runMutation(
+    (options) => callSlipsRescheduleReferenceDecision(safeReference(referenceCode), payload, options),
+    key,
+    signal,
+  );
 }
 
 export function rememberCallSlipOptions(item: CallSlipStaffQueueItem, referenceCode: string) {

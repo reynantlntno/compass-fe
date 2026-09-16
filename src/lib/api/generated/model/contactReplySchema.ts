@@ -5,9 +5,9 @@
  * The canonical backend API for COMPASS clients.
  * OpenAPI spec version: 1.0.0
  */
+import type { ContactReplySchemaStatus } from './contactReplySchemaStatus';
 
 export interface ContactReplySchema {
-  approved_at?: string | null;
   body?: string | null;
   created_at: string;
   delivery_state: string;
@@ -16,7 +16,7 @@ export interface ContactReplySchema {
   id: string;
   last_failure_code: string;
   sent_at?: string | null;
-  status: string;
+  status: ContactReplySchemaStatus;
   submission_id: string;
   updated_at: string;
 }

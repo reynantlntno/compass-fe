@@ -617,7 +617,7 @@ export function PortalSupportNeedsPage() {
     if (!actionIntent) return;
     const { action, item } = actionIntent;
     const scope = item.reference_code;
-    let fingerprint = `${action}:${item.updated_at}`;
+    let fingerprint = `${action}:${item.resource_version}`;
     if (action === "edit") fingerprint += `:${JSON.stringify(editValues)}`;
     else fingerprint += `:${actionReason}`;
     if (action !== "edit" && !actionReason) {

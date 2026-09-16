@@ -48,6 +48,7 @@ export interface RoutineInterviewProjectionSchema {
   rating_spiritually?: number | null;
   reason_for_coming?: string | null;
   reopened_at?: string | null;
+  resource_version?: string | null;
   session_reference_code: string;
   status: string;
   stress_anxiety_causes?: string | null;

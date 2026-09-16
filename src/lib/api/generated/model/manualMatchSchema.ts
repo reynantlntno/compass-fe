@@ -15,6 +15,7 @@ export interface ManualMatchSchema {
   matched_at?: string | null;
   name_snapshot?: string | null;
   program_snapshot?: string | null;
+  resource_version: string;
   reviewed_at?: string | null;
   source_collection_id?: string | null;
   source_invitation_id?: string | null;

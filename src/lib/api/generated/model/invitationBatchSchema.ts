@@ -15,6 +15,7 @@ export interface InvitationBatchSchema {
   id: string;
   issued_at?: string | null;
   name: string;
+  resource_version: string;
   source_type: string;
   status: string;
   total_failed: number;

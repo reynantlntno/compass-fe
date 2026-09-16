@@ -225,7 +225,7 @@ function RoutinePanel({ state, onLoad, onLoadSensitive }: { state: RoutineState;
       ["Interview time", detail.visit_time ?? "Not set"],
       ["Last submitted", formatTimestamp(detail.submitted_at)],
     ]} />
-    <RoutineInterviewDocumentActions referenceCode={detail.session_reference_code} />
+    <RoutineInterviewDocumentActions referenceCode={detail.session_reference_code} resourceVersion={detail.resource_version} />
     {sensitive ? <div className="portal-session-workspace__sensitive-copy">
       <h3>Intake and evaluation details</h3>
       <FactList facts={[

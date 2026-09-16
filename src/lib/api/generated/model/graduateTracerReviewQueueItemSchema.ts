@@ -21,6 +21,7 @@ export interface GraduateTracerReviewQueueItemSchema {
   program_snapshot: string;
   reference_code: string;
   reopened_at?: string | null;
+  resource_version?: string | null;
   review_state: string;
   status: string;
   student_display_name: string;

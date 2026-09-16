@@ -1,6 +1,9 @@
 import {
   exitInterviewsAcknowledge,
   exitInterviewsArchive,
+  exitInterviewsDocumentDownload,
+  exitInterviewsDocumentGenerate,
+  exitInterviewsDocumentPreview,
   exitInterviewsQueueDetail,
   exitInterviewsQueueList,
   exitInterviewsQueueSensitiveDetail,
@@ -11,6 +14,10 @@ import {
   inventoryQueueDetail,
   inventoryQueueList,
   inventoryQueueSensitiveDetail,
+  inventoryDocumentDownload,
+  inventoryDocumentGenerate,
+  inventoryDocumentPreview,
+  inventoryHistory,
   inventoryReopen,
 } from "@/lib/api/generated/inventory/inventory";
 import type {
@@ -23,6 +30,7 @@ import type {
 } from "@/lib/api/generated/model";
 import { cookieSessionMutationOptions, cookieSessionReadOptions } from "@/lib/api/auth";
 import { withIdempotencyKey, type IdempotencyKey } from "@/lib/api/idempotency";
+import { isOptionalResourceVersion, isResourceVersion } from "@/lib/api/resource-version";
 
 export const FORMS_PAGE_SIZE = 20;
 
@@ -64,11 +72,39 @@ export type PortalInventoryQueueItem = {
   submitted_at: string | null;
   reopened_at: string | null;
   updated_at: string | null;
+  resource_version: string | null;
   review_state: string;
 };
 
 export type PortalInventoryQueueDetail = PortalInventoryQueueItem & {
   answers: Record<string, unknown> | null;
+};
+
+export type PortalInventoryHistoryEvent = {
+  is_baseline: boolean;
+  schema_version: string;
+  status_from: string;
+  status_to: string;
+  submission_sequence: number | null;
+  transitioned_at: string;
+};
+
+export type PortalInventoryHistoryPage = {
+  items: PortalInventoryHistoryEvent[];
+  page: number;
+  page_size: number;
+  total: number;
+};
+
+export type PortalGeneratedDocumentMetadata = {
+  content_type: string;
+  document_status: string;
+  generated_at: string | null;
+  output_format: string;
+  reference_code: string;
+  released_at: string | null;
+  template_key: string;
+  template_version: string;
 };
 
 export type PortalExitInterviewQueueItem = {
@@ -85,6 +121,7 @@ export type PortalExitInterviewQueueItem = {
   counselor_acknowledged_at: string | null;
   created_at: string;
   updated_at: string;
+  resource_version: string;
 };
 
 export type PortalExitInterviewQueueDetail = PortalExitInterviewQueueItem & {
@@ -219,6 +256,60 @@ function parseAnswers(value: unknown): Record<string, unknown> | null {
   return value === null || value === undefined || isRecord(value) ? value as Record<string, unknown> | null : null;
 }
 
+function parseDocumentMetadata(value: unknown): PortalGeneratedDocumentMetadata | null {
+  if (!isRecord(value)) return null;
+  if (
+    !boundedString(value.content_type, 120) ||
+    !boundedString(value.document_status, 60) ||
+    !optionalTimestamp(value.generated_at) ||
+    !boundedString(value.output_format, 30) ||
+    !boundedString(value.reference_code, 80) ||
+    !optionalTimestamp(value.released_at) ||
+    !boundedString(value.template_key, 120) ||
+    !boundedString(value.template_version, 60)
+  ) return null;
+  return {
+    content_type: value.content_type,
+    document_status: value.document_status,
+    generated_at: value.generated_at ?? null,
+    output_format: value.output_format,
+    reference_code: value.reference_code,
+    released_at: value.released_at ?? null,
+    template_key: value.template_key,
+    template_version: value.template_version,
+  };
+}
+
+function parseInventoryHistory(value: unknown): PortalInventoryHistoryPage | null {
+  if (!isRecord(value) || !Array.isArray(value.items)) return null;
+  if (
+    typeof value.page !== "number" || !Number.isSafeInteger(value.page) || value.page < 1 ||
+    typeof value.page_size !== "number" || !Number.isSafeInteger(value.page_size) || value.page_size < 1 ||
+    typeof value.total !== "number" || !Number.isSafeInteger(value.total) || value.total < 0
+  ) return null;
+  const items = value.items.map((entry): PortalInventoryHistoryEvent | null => {
+    if (!isRecord(entry)) return null;
+    if (
+      typeof entry.is_baseline !== "boolean" ||
+      !boundedString(entry.schema_version, 60) ||
+      !boundedString(entry.status_from, 60, true) ||
+      !boundedString(entry.status_to, 60) ||
+      (entry.submission_sequence !== null && entry.submission_sequence !== undefined &&
+        (typeof entry.submission_sequence !== "number" || !Number.isSafeInteger(entry.submission_sequence))) ||
+      !requiredTimestamp(entry.transitioned_at)
+    ) return null;
+    return {
+      is_baseline: entry.is_baseline,
+      schema_version: entry.schema_version,
+      status_from: entry.status_from,
+      status_to: entry.status_to,
+      submission_sequence: entry.submission_sequence ?? null,
+      transitioned_at: entry.transitioned_at,
+    };
+  }).filter((entry): entry is PortalInventoryHistoryEvent => entry !== null);
+  return { items, page: value.page, page_size: value.page_size, total: value.total };
+}
+
 function isInventoryProjection(value: unknown): value is InventoryQueueItemSchema {
   if (!isRecord(value)) return false;
   return (
@@ -229,7 +320,7 @@ function isInventoryProjection(value: unknown): value is InventoryQueueItemSchem
     boundedString(value.schema_key, MAX_REVISION_LENGTH) &&
     boundedString(value.schema_version, MAX_REVISION_LENGTH) &&
     typeof value.status === "string" && INVENTORY_STATUS_SET.has(value.status) &&
-    optionalTimestamp(value.submitted_at) && optionalTimestamp(value.reopened_at) && optionalTimestamp(value.updated_at) &&
+    optionalTimestamp(value.submitted_at) && optionalTimestamp(value.reopened_at) && optionalTimestamp(value.updated_at) && isOptionalResourceVersion(value.resource_version) &&
     boundedString(value.review_state, 80)
   );
 }
@@ -246,6 +337,7 @@ function parseInventoryItem(value: unknown): PortalInventoryQueueItem | null {
     submitted_at: value.submitted_at ?? null,
     reopened_at: value.reopened_at ?? null,
     updated_at: value.updated_at ?? null,
+    resource_version: value.resource_version ?? null,
     review_state: value.review_state,
   };
   inventoryRequestKeys.set(item, value.snapshot_id);
@@ -288,7 +380,7 @@ function isExitProjection(value: unknown): value is ExitInterviewQueueItemSchema
     boundedString(value.form_title, 255) &&
     typeof value.status === "string" && EXIT_STATUS_SET.has(value.status) &&
     optionalTimestamp(value.submitted_at) && optionalTimestamp(value.counselor_acknowledged_at) &&
-    requiredTimestamp(value.created_at) && requiredTimestamp(value.updated_at)
+    requiredTimestamp(value.created_at) && requiredTimestamp(value.updated_at) && isResourceVersion(value.resource_version)
   );
 }
 
@@ -308,6 +400,7 @@ function parseExitItem(value: unknown): PortalExitInterviewQueueItem | null {
     counselor_acknowledged_at: value.counselor_acknowledged_at ?? null,
     created_at: value.created_at,
     updated_at: value.updated_at,
+    resource_version: value.resource_version,
   };
 }
 
@@ -421,6 +514,51 @@ export function getPortalInventorySubmittedAnswers(item: PortalInventoryQueueIte
   return readRequest(inventoryQueueSensitiveDetail(safeInventoryKey(item), cookieSessionReadOptions(signal)), parseInventoryDetail);
 }
 
+export function getPortalInventoryHistory(item: PortalInventoryQueueItem, page = 1, signal?: AbortSignal) {
+  return readRequest(
+    inventoryHistory(safeInventoryKey(item), { page: safePage(page), page_size: FORMS_PAGE_SIZE }, cookieSessionReadOptions(signal)),
+    parseInventoryHistory,
+  );
+}
+
+async function readBlobRequest(
+  request: Promise<{ data: unknown; status: number }>,
+  kind: FormsErrorKind = "unavailable",
+) {
+  try {
+    const response = await request;
+    if (response.status === 200 && typeof Blob !== "undefined" && response.data instanceof Blob) return response.data;
+    throw new FormsApiError(response.status === 403 || response.status === 404 ? "permission" : kind);
+  } catch (error) {
+    if (isAbortError(error)) throw error;
+    if (error instanceof FormsApiError) throw error;
+    throw new FormsApiError(kind);
+  }
+}
+
+async function readDocumentMetadata(request: Promise<{ data: unknown; status: number }>) {
+  const response = await request;
+  if (response.status === 200) {
+    const value = parseDocumentMetadata(response.data);
+    if (value) return value;
+  }
+  throw new FormsApiError(errorKind(response.status));
+}
+
+export function previewPortalInventoryDocument(item: PortalInventoryQueueItem, signal?: AbortSignal) {
+  return readBlobRequest(inventoryDocumentPreview(safeInventoryKey(item), cookieSessionReadOptions(signal)));
+}
+
+export function downloadPortalInventoryDocument(item: PortalInventoryQueueItem, signal?: AbortSignal) {
+  return readBlobRequest(inventoryDocumentDownload(safeInventoryKey(item), cookieSessionReadOptions(signal)));
+}
+
+export async function generatePortalInventoryDocument(item: PortalInventoryQueueItem, expectedResourceVersion: string | null, key: IdempotencyKey, signal?: AbortSignal) {
+  return readDocumentMetadata(
+    inventoryDocumentGenerate(safeInventoryKey(item), { expected_resource_version: expectedResourceVersion ?? "" }, withIdempotencyKey(key, await cookieSessionMutationOptions(signal))),
+  );
+}
+
 async function runMutation(
   request: (options: RequestInit) => Promise<GeneratedResponse>,
   key: IdempotencyKey,
@@ -466,17 +604,31 @@ export function getPortalExitInterviewAnswers(referenceCode: string, signal?: Ab
   return readRequest(exitInterviewsQueueSensitiveDetail(safeReference(referenceCode), cookieSessionReadOptions(signal)), parseExitDetail);
 }
 
-type LifecycleOptions = { expectedUpdatedAt?: string | null; reasonCode?: string };
+export function previewPortalExitInterviewDocument(referenceCode: string, signal?: AbortSignal) {
+  return readBlobRequest(exitInterviewsDocumentPreview(safeReference(referenceCode), cookieSessionReadOptions(signal)));
+}
+
+export function downloadPortalExitInterviewDocument(referenceCode: string, signal?: AbortSignal) {
+  return readBlobRequest(exitInterviewsDocumentDownload(safeReference(referenceCode), cookieSessionReadOptions(signal)));
+}
+
+export async function generatePortalExitInterviewDocument(referenceCode: string, expectedResourceVersion: string | null, key: IdempotencyKey, signal?: AbortSignal) {
+  return readDocumentMetadata(
+    exitInterviewsDocumentGenerate(safeReference(referenceCode), { expected_resource_version: expectedResourceVersion ?? "" }, withIdempotencyKey(key, await cookieSessionMutationOptions(signal))),
+  );
+}
+
+type LifecycleOptions = { expectedResourceVersion?: string | null; reasonCode?: string };
 
 function lifecyclePayload(options: LifecycleOptions = {}) {
   const payload: Record<string, string | null> = {};
-  if (options.expectedUpdatedAt !== undefined) payload.expected_updated_at = options.expectedUpdatedAt;
+  if (options.expectedResourceVersion !== undefined) payload.expected_resource_version = options.expectedResourceVersion;
   if (options.reasonCode) payload.reason = options.reasonCode.trim().slice(0, 120);
   return payload as unknown as LifecycleSchema;
 }
 
 export function acknowledgePortalExitInterview(referenceCode: string, key: IdempotencyKey, options: LifecycleOptions = {}, signal?: AbortSignal) {
-  return runMutation((requestOptions) => exitInterviewsAcknowledge(safeReference(referenceCode), { expected_updated_at: options.expectedUpdatedAt }, requestOptions), key, signal);
+  return runMutation((requestOptions) => exitInterviewsAcknowledge(safeReference(referenceCode), { expected_resource_version: options.expectedResourceVersion }, requestOptions), key, signal);
 }
 
 export function reopenPortalExitInterview(referenceCode: string, reasonCode: string, key: IdempotencyKey, options: LifecycleOptions = {}, signal?: AbortSignal) {

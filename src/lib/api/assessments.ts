@@ -28,6 +28,7 @@ import type {
 } from "@/lib/api/generated/model";
 import { cookieSessionMutationOptions, cookieSessionReadOptions } from "@/lib/api/auth";
 import { withIdempotencyKey, type IdempotencyKey } from "@/lib/api/idempotency";
+import { isOptionalResourceVersion } from "@/lib/api/resource-version";
 
 export const ASSESSMENTS_PAGE_SIZE = 20;
 
@@ -87,6 +88,7 @@ export type PortalAssessment = {
   status: AssessmentStatus;
   administered_at: string | null;
   updated_at: string | null;
+  resource_version: string | null;
   reviewed_at: string | null;
   released_to_student: boolean;
   released_at: string | null;
@@ -261,7 +263,7 @@ function parseInstrument(value: unknown): PortalAssessmentInstrument | null {
 function parseProjection(value: unknown): PortalAssessment | null {
   if (!isRecord(value) || typeof value.id !== "number" || !Number.isSafeInteger(value.id) || value.id < 1) return null;
   if (!boundedString(value.student_display_name, 160) || !optionalString(value.student_number, 50) || !isEnum(value.status, ASSESSMENT_STATUSES)) return null;
-  if (!optionalTimestamp(value.administered_at) || !optionalTimestamp(value.updated_at) || !optionalTimestamp(value.reviewed_at) || !optionalTimestamp(value.released_at)) return null;
+  if (!optionalTimestamp(value.administered_at) || !optionalTimestamp(value.updated_at) || !isOptionalResourceVersion(value.resource_version) || !optionalTimestamp(value.reviewed_at) || !optionalTimestamp(value.released_at)) return null;
   if (!isEnum(value.interpretation_visibility, ASSESSMENT_VISIBILITIES) || typeof value.released_to_student !== "boolean" || typeof value.has_protected_file !== "boolean") return null;
   const instrument = parseInstrument(value.instrument);
   if (!instrument) return null;
@@ -272,6 +274,7 @@ function parseProjection(value: unknown): PortalAssessment | null {
     status: value.status,
     administered_at: value.administered_at ?? null,
     updated_at: value.updated_at ?? null,
+    resource_version: value.resource_version ?? null,
     reviewed_at: value.reviewed_at ?? null,
     released_to_student: value.released_to_student,
     released_at: value.released_at ?? null,
@@ -471,36 +474,36 @@ export function recordPortalAssessment(item: PortalAssessment, payload: RecordSc
 }
 
 export function submitPortalAssessmentForReview(item: PortalAssessment, key: IdempotencyKey, signal?: AbortSignal) {
-  return runMutation((options) => assessmentsSubmitReview(recordKey(item), { expected_updated_at: item.updated_at }, options), key, parseProjection, signal);
+  return runMutation((options) => assessmentsSubmitReview(recordKey(item), { expected_resource_version: item.resource_version }, options), key, parseProjection, signal);
 }
 
 export function reviewPortalAssessment(item: PortalAssessment, notes: string | null, key: IdempotencyKey, signal?: AbortSignal) {
-  const payload: ReviewSchema = { expected_updated_at: item.updated_at, ...(notes?.trim() ? { notes: notes.trim().slice(0, 1000) } : {}) };
+  const payload: ReviewSchema = { expected_resource_version: item.resource_version, ...(notes?.trim() ? { notes: notes.trim().slice(0, 1000) } : {}) };
   return runMutation((options) => assessmentsReview(recordKey(item), payload, options), key, parseProjection, signal);
 }
 
 export function releasePortalAssessment(item: PortalAssessment, key: IdempotencyKey, signal?: AbortSignal) {
-  return runMutation((options) => assessmentsRelease(recordKey(item), { expected_updated_at: item.updated_at }, options), key, parseProjection, signal);
+  return runMutation((options) => assessmentsRelease(recordKey(item), { expected_resource_version: item.resource_version }, options), key, parseProjection, signal);
 }
 
 export function voidPortalAssessment(item: PortalAssessment, reasonCode: string, key: IdempotencyKey, signal?: AbortSignal) {
   const reason = safeText(reasonCode, 160);
   if (!reason) throw new AssessmentsApiError("validation");
-  return runMutation((options) => assessmentsVoid(recordKey(item), { reason_code: reason, expected_updated_at: item.updated_at }, options), key, parseProjection, signal);
+  return runMutation((options) => assessmentsVoid(recordKey(item), { reason_code: reason, expected_resource_version: item.resource_version }, options), key, parseProjection, signal);
 }
 
 export function supersedePortalAssessment(item: PortalAssessment, replacement: PortalAssessment, reasonCode: string, key: IdempotencyKey, signal?: AbortSignal) {
   const reason = safeText(reasonCode, 160);
   if (!reason) throw new AssessmentsApiError("validation");
   return runMutation((options) => {
-    return assessmentsSupersede(recordKey(item), { replacement_record_id: recordKey(replacement), reason_code: reason, expected_updated_at: item.updated_at }, options);
+    return assessmentsSupersede(recordKey(item), { replacement_record_id: recordKey(replacement), reason_code: reason, expected_resource_version: item.resource_version }, options);
   }, key, parseProjection, signal);
 }
 
 export function archivePortalAssessment(item: PortalAssessment, reasonCode: string, key: IdempotencyKey, signal?: AbortSignal) {
   const reason = safeText(reasonCode, 160);
   if (!reason) throw new AssessmentsApiError("validation");
-  return runMutation((options) => assessmentsArchive(recordKey(item), { reason_code: reason, expected_updated_at: item.updated_at }, options), key, parseProjection, signal);
+  return runMutation((options) => assessmentsArchive(recordKey(item), { reason_code: reason, expected_resource_version: item.resource_version }, options), key, parseProjection, signal);
 }
 
 export function attachPortalAssessmentFile(item: PortalAssessment, file: File, key: IdempotencyKey, signal?: AbortSignal) {

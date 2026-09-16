@@ -19,6 +19,7 @@ import {
   cookieSessionReadOptions,
 } from "@/lib/api/auth";
 import { withIdempotencyKey, type IdempotencyKey } from "@/lib/api/idempotency";
+import { isOptionalResourceVersion } from "@/lib/api/resource-version";
 import type {
   BackupArtifactPageSchema,
   BackupArtifactProjectionSchema,
@@ -169,7 +170,7 @@ function isBackupJob(value: unknown): value is BackupJobProjectionSchema {
     typeof value.includes_protected_files === "boolean" &&
     isOptionalTimestamp(value.queued_at) &&
     isOptionalTimestamp(value.requested_at) &&
-    isOptionalTimestamp(value.resource_version) &&
+    isOptionalResourceVersion(value.resource_version) &&
     isBoundedString(value.retention_class) &&
     isOptionalString(value.safe_failure_reason_code, MAX_TEXT_LENGTH) &&
     isBoundedString(value.scope) &&
@@ -231,7 +232,8 @@ function isRestoreRequest(
     isOptionalTimestamp(value.started_at) &&
     isBoundedString(value.status) &&
     isBoundedString(value.target_backup_job_id, MAX_ID_LENGTH) &&
-    isOptionalTimestamp(value.updated_at)
+    isOptionalTimestamp(value.updated_at) &&
+    isOptionalResourceVersion(value.resource_version)
   );
 }
 
@@ -393,8 +395,8 @@ export function getBackupRestoreDetail(
   );
 }
 
-function lifecyclePayload(expectedUpdatedAt?: string | null): LifecycleSchema {
-  return expectedUpdatedAt ? { expected_updated_at: expectedUpdatedAt } : {};
+function lifecyclePayload(expectedResourceVersion?: string | null): LifecycleSchema {
+  return expectedResourceVersion ? { expected_resource_version: expectedResourceVersion } : {};
 }
 
 export function requestBackup(
@@ -412,12 +414,12 @@ export function requestBackup(
 
 export function queueBackup(
   jobId: string,
-  expectedUpdatedAt: string | null | undefined,
+  expectedResourceVersion: string | null | undefined,
   idempotencyKey: IdempotencyKey,
   signal?: AbortSignal,
 ) {
   return getMutationResponse(
-    (options) => backupsJobQueue(jobId, lifecyclePayload(expectedUpdatedAt), options),
+    (options) => backupsJobQueue(jobId, lifecyclePayload(expectedResourceVersion), options),
     idempotencyKey,
     isBackupJob,
     signal,
@@ -426,12 +428,12 @@ export function queueBackup(
 
 export function verifyBackup(
   jobId: string,
-  expectedUpdatedAt: string | null | undefined,
+  expectedResourceVersion: string | null | undefined,
   idempotencyKey: IdempotencyKey,
   signal?: AbortSignal,
 ) {
   return getMutationResponse(
-    (options) => backupsJobVerify(jobId, lifecyclePayload(expectedUpdatedAt), options),
+    (options) => backupsJobVerify(jobId, lifecyclePayload(expectedResourceVersion), options),
     idempotencyKey,
     isBackupJob,
     signal,
@@ -440,12 +442,12 @@ export function verifyBackup(
 
 export function cancelBackup(
   jobId: string,
-  expectedUpdatedAt: string | null | undefined,
+  expectedResourceVersion: string | null | undefined,
   idempotencyKey: IdempotencyKey,
   signal?: AbortSignal,
 ) {
   return getMutationResponse(
-    (options) => backupsJobCancel(jobId, lifecyclePayload(expectedUpdatedAt), options),
+    (options) => backupsJobCancel(jobId, lifecyclePayload(expectedResourceVersion), options),
     idempotencyKey,
     isBackupJob,
     signal,

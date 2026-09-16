@@ -8,7 +8,7 @@
 import type { ReportExportSchemaFilters } from './reportExportSchemaFilters';
 
 export interface ReportExportSchema {
-  expected_definition_updated_at?: string | null;
+  expected_definition_resource_version?: string | null;
   export_format?: string;
   filters?: ReportExportSchemaFilters;
   purpose?: string;

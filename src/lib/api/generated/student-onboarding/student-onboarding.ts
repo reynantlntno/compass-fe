@@ -1290,8 +1290,8 @@ export const importsReplace = async (batchId: number,
     importsReplaceBody: ImportsReplaceBody, options?: Parameters<typeof compassFetch>[1]): Promise<importsReplaceResponse> => {
     const formData = new FormData();
 formData.append(`academic_year`, importsReplaceBody.academic_year);
-if(importsReplaceBody.expected_updated_at !== undefined && importsReplaceBody.expected_updated_at !== null) {
- formData.append(`expected_updated_at`, importsReplaceBody.expected_updated_at);
+if(importsReplaceBody.expected_resource_version !== undefined && importsReplaceBody.expected_resource_version !== null) {
+ formData.append(`expected_resource_version`, importsReplaceBody.expected_resource_version);
  }
 formData.append(`file`, importsReplaceBody.file);
 formData.append(`source_name`, importsReplaceBody.source_name);

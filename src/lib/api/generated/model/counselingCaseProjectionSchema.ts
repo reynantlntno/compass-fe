@@ -18,6 +18,7 @@ export interface CounselingCaseProjectionSchema {
   reference_code: string;
   reopened_at?: string | null;
   resolved_at?: string | null;
+  resource_version?: string | null;
   status: string;
   student_id?: number | null;
   updated_at?: string | null;

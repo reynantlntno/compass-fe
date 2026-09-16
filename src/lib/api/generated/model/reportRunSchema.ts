@@ -8,7 +8,7 @@
 import type { ReportRunSchemaFilters } from './reportRunSchemaFilters';
 
 export interface ReportRunSchema {
-  expected_definition_updated_at?: string | null;
+  expected_definition_resource_version?: string | null;
   filters?: ReportRunSchemaFilters;
   report_key: string;
 }

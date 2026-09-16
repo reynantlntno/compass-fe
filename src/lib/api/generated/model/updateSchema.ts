@@ -8,7 +8,7 @@
 
 export interface UpdateSchema {
   administered_at?: string | null;
-  expected_updated_at?: string | null;
+  expected_resource_version?: string | null;
   interpretation_text?: string | null;
   interpretation_visibility?: string | null;
   raw_score?: string | null;

@@ -62,7 +62,7 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import type { BrandingConfig } from "@/lib/branding";
+import type { PublicIdentityConfig } from "@/lib/public-identity";
 import type { MeSchema } from "@/lib/api/generated/model";
 
 const PORTAL_DOCK_VISIBLE_LIMIT = 5;
@@ -613,12 +613,12 @@ function AccountMenu({
 }
 
 export function PortalShell({
-  branding,
+  identity,
   children,
   isSigningOut,
   onSignOut,
 }: {
-  branding: BrandingConfig;
+  identity: PublicIdentityConfig;
   children: ReactNode;
   isSigningOut: boolean;
   onSignOut: () => Promise<void>;
@@ -701,8 +701,6 @@ export function PortalShell({
 
   if (!user) return null;
 
-  const footerMark = branding.footerIdentityAssets[0];
-
   return (
     <div className="portal-site">
       <a className="portal-shell__skip-link" href="#portal-main">
@@ -710,7 +708,7 @@ export function PortalShell({
       </a>
 
       <header
-        aria-label={`${branding.productName} portal navigation`}
+        aria-label={`${identity.productName} portal navigation`}
         className={`portal-dock${dockCollapsed ? " is-collapsed" : ""}`}
       >
         <CompassFrame className="portal-dock__inner" id="portal-dock-content">
@@ -766,24 +764,13 @@ export function PortalShell({
         <div className="portal-shell__footer-inner">
           <div className="portal-shell__footer-attribution">
             <div className="portal-shell__footer-copyright">
-              {footerMark ? (
-                <Image
-                  alt=""
-                  aria-hidden="true"
-                  className="portal-shell__footer-mark"
-                  height={footerMark.height}
-                  src={footerMark.src}
-                  width={footerMark.width}
-                  unoptimized
-                />
-              ) : null}
-              <p>© {new Date().getFullYear()} {branding.institutionName}</p>
+              <p>© {new Date().getFullYear()} {identity.institutionName}</p>
             </div>
-            <p>{branding.productName} is a service of {branding.officeName}.</p>
-            <p>Developed for {branding.officeName}.</p>
+            <p>{identity.productName} is a service of {identity.officeName}.</p>
+            <p>Developed for {identity.officeName}.</p>
           </div>
           <div className="portal-shell__footer-utility">
-            <Link href="/privacy">{branding.productName} Privacy Notice</Link>
+            <Link href="/privacy">{identity.productName} Privacy Notice</Link>
           </div>
         </div>
       </footer>

@@ -29,6 +29,7 @@ export interface ApplicationErrorProjectionSchema {
   remediation: DiagnosticRemediationSchema;
   request_id?: string | null;
   resolved_at?: string | null;
+  resource_version?: string | null;
   route_name?: string | null;
   safe_message: string;
   severity: string;

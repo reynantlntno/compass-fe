@@ -5,7 +5,6 @@ import { Menu, X } from "lucide-react";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
-import { BrandAssetImage } from "@/components/public/brand-asset-image";
 import { useAuthSession } from "@/components/auth/auth-session-provider";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,7 +14,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import type { BrandingConfig } from "@/lib/branding";
+import type { PublicIdentityConfig } from "@/lib/public-identity";
 
 const navigation = [
   { href: "/", label: "Home" },
@@ -37,25 +36,13 @@ function isCurrentNavigationItem(pathname: string | null, href: string) {
     : pathname === href || pathname.startsWith(`${href}/`);
 }
 
-function BrandIdentity({ branding }: { branding: BrandingConfig }) {
+function BrandIdentity({ identity }: { identity: PublicIdentityConfig }) {
   return (
     <span className="public-brand">
-      {branding.headerAssets.length > 0 ? (
-        <span className="public-brand__marks" aria-label="Institutional identity">
-          {branding.headerAssets.map((asset) => (
-            <BrandAssetImage
-              key={asset.id}
-              asset={asset}
-              className="public-brand__mark-image"
-              fallbackLabel={branding.productName}
-            />
-          ))}
-        </span>
-      ) : null}
       <span className="public-brand__copy">
-        <span className="public-brand__product">{branding.productName}</span>
+        <span className="public-brand__product">{identity.productName}</span>
         <span className="public-brand__office">
-          {branding.officeName}
+          {identity.officeName}
         </span>
       </span>
     </span>
@@ -86,7 +73,7 @@ function PublicAuthAction({ mobile = false }: { mobile?: boolean }) {
   );
 }
 
-export function SiteHeader({ branding }: { branding: BrandingConfig }) {
+export function SiteHeader({ identity }: { identity: PublicIdentityConfig }) {
   const pathname = usePathname();
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
@@ -96,9 +83,9 @@ export function SiteHeader({ branding }: { branding: BrandingConfig }) {
         <Link
           href="/"
           className="min-w-0 rounded-md focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-ring/50"
-          aria-label={`${branding.productName} home`}
+          aria-label={`${identity.productName} home`}
         >
-          <BrandIdentity branding={branding} />
+          <BrandIdentity identity={identity} />
         </Link>
 
         <div className="public-header__actions">

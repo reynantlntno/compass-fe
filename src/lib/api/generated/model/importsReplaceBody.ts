@@ -8,7 +8,7 @@
 
 export type ImportsReplaceBody = {
   academic_year: string;
-  expected_updated_at?: string | null;
+  expected_resource_version?: string | null;
   file: Blob | File;
   source_name: string;
 };

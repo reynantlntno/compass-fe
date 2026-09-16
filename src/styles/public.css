@@ -246,7 +246,7 @@
   font-weight: var(--compass-weight-bold);
 }
 
-.public-brand-asset-fallback {
+.public-identity-fallback {
   display: inline-block;
   color: currentColor;
   font-family: var(--compass-font-heading);
@@ -2073,7 +2073,7 @@
   .public-footer__privacy-credential-copy,
   .public-footer__privacy-credential-owner,
   .public-footer__privacy-credential-label,
-  .public-brand-asset-fallback {
+  .public-identity-fallback {
     color: CanvasText;
   }
 

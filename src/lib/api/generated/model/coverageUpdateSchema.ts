@@ -11,7 +11,7 @@ export interface CoverageUpdateSchema {
   college?: string | null;
   department?: string | null;
   ends_at?: string | null;
-  expected_updated_at?: string | null;
+  expected_resource_version?: string | null;
   is_primary?: boolean;
   program?: string | null;
   starts_at: string;

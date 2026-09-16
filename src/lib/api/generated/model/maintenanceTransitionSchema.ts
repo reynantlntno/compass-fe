@@ -8,6 +8,6 @@
 
 export interface MaintenanceTransitionSchema {
   ends_at?: string | null;
-  expected_updated_at?: string | null;
+  expected_resource_version?: string | null;
   reason_code?: string;
 }
